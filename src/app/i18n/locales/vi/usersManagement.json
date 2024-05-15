@@ -1,3 +1,18 @@
 {
-  "title": "Quản lý người dùng"
+  "title": "Quản lý người dùng",
+  "name": "Tên",
+  "position": "Chức vụ",
+  "department": "Ban",
+  "major": "Chuyên ngành",
+  "admin": "Chủ nhiệm",
+  "excellent": "Tiêu biểu",
+  "action": "Chức năng",
+
+  "deleteDepartment": {
+    "title": "Xóa ban",
+    "description": "Bạn có chắc chắn muốn xoá ban này?",
+    "cancelText": "Hủy",
+    "okText": "Xác nhận",
+    "delete": "Xóa"
+  }
 }

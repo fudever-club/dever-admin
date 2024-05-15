@@ -24,7 +24,30 @@ export const authAPI = baseApi.injectEndpoints({
         flashError: true,
       }),
     }),
+    deleteUser: build.mutation({
+      query: (id: string) => ({
+        url: endpointUsersManagement.DELETE_USER.replace("{id}", id),
+        method: "DELETE",
+        flashError: true,
+      }),
+    }),
+    editUser: build.mutation({
+      query: (data: any) => ({
+        url: endpointUsersManagement.EDIT_USER_BY_ID.replace(
+          "{id}",
+          data?.params?.id
+        ),
+        method: "PATCH",
+        body: data?.body,
+        flashError: true,
+      }),
+    }),
   }),
 });
 
-export const { useVerifyTokenMutation, useGetAllUsersQuery } = authAPI;
+export const {
+  useVerifyTokenMutation,
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
+  useEditUserMutation,
+} = authAPI;

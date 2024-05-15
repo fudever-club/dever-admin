@@ -2,6 +2,8 @@
   "dashboard": "Dashboard",
   "usersManagement": "Users Management",
   "departmentManagement": "Departments Management",
+  "positionManagement": "Position Management",
+  "majorManagement" : "Major Management",
 
   "english": "English",
   "vietnamese": "Vietnamese"

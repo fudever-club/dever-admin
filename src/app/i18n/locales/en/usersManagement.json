@@ -1,3 +1,17 @@
 {
-  "title": "Users Management"
+  "title": "User Management",
+  "name": "Name",
+  "postion": "Position",
+  "department": "Department",
+  "major": "Major",
+  "admin": "Admin",
+  "excellent": "Excellent",
+  "action": "Action",
+  "deleteDepartment": {
+    "title": "Delete department",
+    "description": "Are you sure to delete this department?",
+    "cancelText": "Cancel",
+    "okText": "Ok",
+    "delete": "Delete"
+  }
 }

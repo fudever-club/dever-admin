@@ -1,25 +1,25 @@
 {
-  "title": "Quản lý ban",
+  "title": "Quản lý chức vụ",
   "name": "Tên",
   "value": "Giá trị",
   "function": "Chức năng",
 
-  "addDepartment": {
+  "addPosition": {
     "title": "Thêm ban",
     "name": "Tên",
     "value": "Giá trị",
     "add": "Thêm"
   },
 
-  "editDepartment": {
-    "title": "Chỉnh sửa thông tin ban",
+  "editPosition": {
+    "title": "Chỉnh sửa thông tin chức vụ",
     "name": "Tên",
     "value": "Giá trị",
     "edit": "Chỉnh sửa"
   },
-  "deleteDepartment": {
+  "deletePosition": {
     "title": "Xóa ban",
-    "description": "Bạn có chắc chắn muốn xoá ban này?",
+    "description": "Bạn có chắc chắn muốn xoá chức vụ này?",
     "cancelText": "Hủy",
     "okText" : "Xác nhận",
     "delete": "Xóa"

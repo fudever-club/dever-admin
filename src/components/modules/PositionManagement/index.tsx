@@ -17,13 +17,13 @@ import _ from "lodash";
 import { useState } from "react";
 
 import { useTranslation } from "@/app/i18n/client";
-import {
-  useCreateDepartmentMutation,
-  useDeleteDepartmentMutation,
-  useEditDepartmentMutation,
-  useGetAllDepartmentsQuery,
-} from "@/store/queries/departmentMangement";
 import useModal from "@/hooks/useModal";
+import {
+  useCreatePositionMutation,
+  useDeletePositionMutation,
+  useEditPositionMutation,
+  useGetAllPositionQuery,
+} from "@/store/queries/positionManagement";
 
 import Button from "@/components/core/common/Button";
 
@@ -36,7 +36,7 @@ interface DataType {
   constant: string;
 }
 
-function DepartmentManagementModule() {
+function PositionManagementModule() {
   const params = useParams();
 
   const [editForm] = Form.useForm();
@@ -44,17 +44,14 @@ function DepartmentManagementModule() {
   const addModal = useModal();
   const editModal = useModal();
 
-  const { t } = useTranslation(
-    params?.locale as string,
-    "departmentManagement"
-  );
+  const { t } = useTranslation(params?.locale as string, "positionManagement");
 
-  const [departmentId, setDepartmentID] = useState<string>("");
+  const [PositionId, setPositionID] = useState<string>("");
 
-  const [deleteDepartment] = useDeleteDepartmentMutation();
-  const [createDepartment] = useCreateDepartmentMutation();
-  const [editDepartment] = useEditDepartmentMutation();
-  const { result, isFetching, refetch } = useGetAllDepartmentsQuery(undefined, {
+  const [deletePosition] = useDeletePositionMutation();
+  const [createPosition] = useCreatePositionMutation();
+  const [editPosition] = useEditPositionMutation();
+  const { result, isFetching, refetch } = useGetAllPositionQuery(undefined, {
     selectFromResult: ({ data, isFetching }) => {
       return {
         result: data?.data ?? [],
@@ -65,7 +62,7 @@ function DepartmentManagementModule() {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteDepartment(id).unwrap();
+      await deletePosition(id).unwrap();
       message.success("Xóa thành công");
       refetch();
     } catch (error) {}
@@ -73,7 +70,7 @@ function DepartmentManagementModule() {
 
   const handleAdd = async (values: any) => {
     try {
-      await createDepartment(values).unwrap();
+      await createPosition(values).unwrap();
       message.success("Thêm thành công");
       refetch();
       addModal.closeModal();
@@ -82,8 +79,8 @@ function DepartmentManagementModule() {
 
   const handleEdit = async (values: any) => {
     try {
-      await editDepartment({
-        params: { id: departmentId },
+      await editPosition({
+        params: { id: PositionId },
         body: values,
       }).unwrap();
       message.success("Sửa thành công");
@@ -122,7 +119,7 @@ function DepartmentManagementModule() {
               shape="circle"
               icon={<EditOutlined />}
               onClick={() => {
-                setDepartmentID(record?._id);
+                setPositionID(record?._id);
                 editModal.openModal();
                 editForm.setFieldsValue({
                   name: record?.name,
@@ -131,10 +128,10 @@ function DepartmentManagementModule() {
               }}
             />
             <Popconfirm
-              title={t("deleteDepartment.title")}
-              description={t("deleteDepartment.description")}
-              okText={t("deleteDepartment.okText")}
-              cancelText={t("deleteDepartment.cancelText")}
+              title={t("deletePosition.title")}
+              description={t("deletePosition.description")}
+              okText={t("deletePosition.okText")}
+              cancelText={t("deletePosition.cancelText")}
               onConfirm={() => handleDelete(record?._id)}
             >
               <Button
@@ -161,7 +158,7 @@ function DepartmentManagementModule() {
           icon={<PlusOutlined />}
           onClick={addModal.openModal}
         >
-          {t("addDepartment.title")}
+          {t("addPosition.title")}
         </Button>
       </S.FilterWrapper>
       <S.TableWrapper>
@@ -176,7 +173,7 @@ function DepartmentManagementModule() {
         open={addModal.visible}
         onCancel={addModal.closeModal}
         footer={[]}
-        title={t("addDepartment.title")}
+        title={t("addPosition.title")}
       >
         <Form
           name="basic"
@@ -185,24 +182,22 @@ function DepartmentManagementModule() {
           layout="vertical"
         >
           <Form.Item
-            label={t("addDepartment.name")}
+            label={t("addPosition.name")}
             name="name"
-            rules={[
-              { required: true, message: "Please input your department!" },
-            ]}
+            rules={[{ required: true, message: "Please input your Position!" }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            label={t("addDepartment.value")}
+            label={t("addPosition.value")}
             name="constant"
             rules={[{ required: true, message: "Please input your constant!" }]}
           >
             <Input />
           </Form.Item>
           <Button type="primary" htmlType="submit" $width="100%">
-            {t("addDepartment.add")}
+            {t("addPosition.add")}
           </Button>
         </Form>
       </Modal>
@@ -210,7 +205,7 @@ function DepartmentManagementModule() {
         open={editModal.visible}
         onCancel={editModal.closeModal}
         footer={[]}
-        title={t("editDepartment.title")}
+        title={t("editPosition.title")}
       >
         <Form
           name="basic"
@@ -220,24 +215,22 @@ function DepartmentManagementModule() {
           form={editForm}
         >
           <Form.Item
-            label={t("editDepartment.name")}
+            label={t("editPosition.name")}
             name="name"
-            rules={[
-              { required: true, message: "Please input your department!" },
-            ]}
+            rules={[{ required: true, message: "Please input your Position!" }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            label={t("editDepartment.value")}
+            label={t("editPosition.value")}
             name="constant"
             rules={[{ required: true, message: "Please input your constant!" }]}
           >
             <Input />
           </Form.Item>
           <Button type="primary" htmlType="submit" $width="100%">
-            {t("editDepartment.edit")}
+            {t("editPosition.edit")}
           </Button>
         </Form>
       </Modal>
@@ -245,4 +238,4 @@ function DepartmentManagementModule() {
   );
 }
 
-export default DepartmentManagementModule;
+export default PositionManagementModule;

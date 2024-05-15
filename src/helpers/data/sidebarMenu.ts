@@ -1,6 +1,11 @@
 import React from "react";
 import { MenuProps } from "antd";
-import { PieChartOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  TeamOutlined,
+  UserOutlined,
+  BookOutlined,
+  IdcardOutlined,
+} from "@ant-design/icons";
 
 export const sidebarMenu: MenuProps["items"] = [
   {
@@ -10,7 +15,17 @@ export const sidebarMenu: MenuProps["items"] = [
   },
   {
     key: "department-management",
-    icon: React.createElement(UserOutlined),
+    icon: React.createElement(TeamOutlined),
     label: "departmentManagement",
+  },
+  {
+    key: "position-management",
+    icon: React.createElement(IdcardOutlined),
+    label: "positionManagement",
+  },
+  {
+    key: "major-management",
+    icon: React.createElement(BookOutlined),
+    label: "majorManagement",
   },
 ];
