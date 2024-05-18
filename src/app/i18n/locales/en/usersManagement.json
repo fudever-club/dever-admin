@@ -7,6 +7,7 @@
   "admin": "Admin",
   "excellent": "Excellent",
   "action": "Action",
+  "email": "Email",
   "deleteDepartment": {
     "title": "Delete department",
     "description": "Are you sure to delete this department?",

@@ -4,10 +4,10 @@
   "position": "Chức vụ",
   "department": "Ban",
   "major": "Chuyên ngành",
-  "admin": "Chủ nhiệm",
+  "admin": "Quản trị viên",
   "excellent": "Tiêu biểu",
   "action": "Chức năng",
-
+  "email": "Email",
   "deleteDepartment": {
     "title": "Xóa ban",
     "description": "Bạn có chắc chắn muốn xoá ban này?",

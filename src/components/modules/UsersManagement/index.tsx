@@ -10,6 +10,7 @@ import {
   Space,
   Table,
   TableProps,
+  Tooltip,
   Typography,
   message,
 } from "antd";
@@ -29,9 +30,9 @@ import {
 import { createQueryString } from "@/utils/queryString";
 import { useGetAllDepartmentsQuery } from "@/store/queries/departmentMangement";
 import { useGetAllPositionQuery } from "@/store/queries/positionManagement";
+import { useGetAllMajorQuery } from "@/store/queries/majorManagement";
 
 import * as S from "./styles";
-import { useGetAllMajorQuery } from "@/store/queries/majorManagement";
 
 interface DataType {
   key: string;
@@ -42,6 +43,7 @@ interface DataType {
   department: string;
   isAdmin: boolean;
   isExcellent: boolean;
+  email: string;
 }
 
 interface InterfaceDepartmentData {
@@ -134,7 +136,8 @@ function UsersManagementModule() {
       title: "STT",
       dataIndex: "",
       key: "",
-      width: 50,
+      width: 60,
+      fixed: "left",
       render: (text, _, index) => (
         <Typography.Text>{index + 1}</Typography.Text>
       ),
@@ -143,6 +146,17 @@ function UsersManagementModule() {
       title: t("name"),
       dataIndex: "name",
       key: "name",
+      fixed: "left",
+      width: 200,
+    },
+    {
+      title: t("email"),
+      dataIndex: "email",
+      key: "email",
+      width: 200,
+      render: (value, record) => (
+        <Typography.Text>{record?.email}</Typography.Text>
+      ),
     },
     {
       title: t("position"),
@@ -214,6 +228,7 @@ function UsersManagementModule() {
       title: t("admin"),
       dataIndex: "isAdmin",
       key: "isAdmin",
+      width: 150,
       render: (value, record) => {
         return (
           <Flex justify="center" align="center">
@@ -235,6 +250,7 @@ function UsersManagementModule() {
       title: t("excellent"),
       dataIndex: "isExcellent",
       key: "isExcellent",
+      width: 150,
       render: (_, record) => {
         return (
           <Flex justify="center" align="center">
@@ -253,8 +269,9 @@ function UsersManagementModule() {
       },
     },
     {
-      title: t("action"),
       key: "action",
+      fixed: "right",
+      width: 60,
       render: (_, record) => {
         return (
           <Flex justify="center" gap={20}>
@@ -337,6 +354,7 @@ function UsersManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
+          scroll={{ x: 1300 }}
         />
       </S.TableWrapper>
     </S.PageWrapper>

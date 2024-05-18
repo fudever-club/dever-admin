@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Checkbox, Col, Flex, Form, FormProps, Input } from "antd";
+import { Checkbox, Col, Flex, Form, FormProps, Input, message } from "antd";
 import { useRouter } from "next-nprogress-bar";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -34,7 +34,13 @@ function SignInModule() {
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     try {
-      await signIn(values).unwrap();
+      const res: any = await signIn(values).unwrap();
+
+      if (!res?.data?.user?.isAdmin) {
+        message.error("Bạn không có quyền truy cập trang này");
+        return;
+      }
+
       router?.push(`/${locale}/dashboard`);
     } catch (error) {}
   };

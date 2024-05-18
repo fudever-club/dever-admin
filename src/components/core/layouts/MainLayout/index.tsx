@@ -47,7 +47,13 @@ const MainLayout = ({
         message.error("Bạn cần đăng nhập để truy cập trang này");
         throw new Error("Bạn cần đăng nhập để truy cập trang này");
       }
-      await verifyToken(webStorageClient.get("_access_token") || "??").unwrap();
+      const res: any = await verifyToken(
+        webStorageClient.get("_access_token") || "??"
+      ).unwrap();
+      if (!res?.data?.isAdmin) {
+        message.error("Bạn không có quyền truy cập trang này");
+        throw new Error("Bạn không có quyền truy cập trang này");
+      }
       setIsAuth(true);
       message.success("Kiểm tra truy cập thành công");
     } catch (error) {
