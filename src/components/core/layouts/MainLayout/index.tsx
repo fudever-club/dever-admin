@@ -107,7 +107,7 @@ const MainLayout = ({
 
             <Menu
               mode="inline"
-              defaultSelectedKeys={[getRootPathname(pathname)]}
+              defaultSelectedKeys={["user-management"]}
               items={sideBarMenuFormat}
               onClick={(e) => router?.push(`/${localActive}/${e?.key}`)}
             />

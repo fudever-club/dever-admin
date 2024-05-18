@@ -35,6 +35,13 @@ const endpointMajorManagement = {
   GET_MAJOR_BY_ID: `${prefixBase}/major/{id}`,
   EDIT_MAJOR_BY_ID: `${prefixBase}/major/{id}`,
 };
+const endpointSocialManagement = {
+  GET_ALL_SOCIAL: `${prefixBase}/social/`,
+  SOCIAL: `${prefixBase}/social/`,
+  DELETE_SOCIAL: `${prefixBase}/social/{id}`,
+  GET_SOCIAL_BY_ID: `${prefixBase}/social/{id}`,
+  EDIT_SOCIAL_BY_ID: `${prefixBase}/social/{id}`,
+};
 
 const endpointOther = {};
 
@@ -45,4 +52,5 @@ export {
   endpointOther,
   endpointPositionManagement,
   endpointMajorManagement,
+  endpointSocialManagement,
 };

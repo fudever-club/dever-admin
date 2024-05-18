@@ -17,8 +17,11 @@ import {
 import { DeleteOutlined } from "@ant-design/icons";
 import { useParams, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { SearchOutlined } from "@ant-design/icons";
-import { DownOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  UploadOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import _ from "lodash";
 
 import { useTranslation } from "@/app/i18n/client";
@@ -37,10 +40,11 @@ import * as S from "./styles";
 interface DataType {
   key: string;
   _id: string;
-  name: string;
+  firstname: string;
+  lastname: string;
   position: string;
   major: string;
-  department: string;
+  departments: any;
   isAdmin: boolean;
   isExcellent: boolean;
   email: string;
@@ -56,6 +60,7 @@ function UsersManagementModule() {
   const searchParams = useSearchParams();
   const [editUser] = useEditUserMutation();
   const [deleteUser] = useDeleteUserMutation();
+  const fileReader = new FileReader();
 
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
@@ -75,7 +80,7 @@ function UsersManagementModule() {
           ...user,
         }));
         return {
-          result: newDataUsers ?? [],
+          result: data?.data?.users ?? [],
           total: data?.result ?? 0,
           isFetching,
         };
@@ -111,6 +116,7 @@ function UsersManagementModule() {
         }));
         return {
           result: newPositionData ?? [],
+          total: data?.result ?? 0,
           isFetching,
         };
       },
@@ -136,7 +142,7 @@ function UsersManagementModule() {
       title: "STT",
       dataIndex: "",
       key: "",
-      width: 60,
+      width: 58,
       fixed: "left",
       render: (text, _, index) => (
         <Typography.Text>{index + 1}</Typography.Text>
@@ -144,10 +150,17 @@ function UsersManagementModule() {
     },
     {
       title: t("name"),
-      dataIndex: "name",
+      dataIndex: "",
       key: "name",
       fixed: "left",
       width: 200,
+      render: (value, record) => {
+        return (
+          <Typography.Text>
+            {record?.firstname} {record?.lastname}
+          </Typography.Text>
+        );
+      },
     },
     {
       title: t("email"),
@@ -182,31 +195,42 @@ function UsersManagementModule() {
     },
     {
       title: t("department"),
-      dataIndex: "departmentId",
-      key: "departmentId",
-      width: 200,
-      render: (value, record) => (
-        <div>
-          <S.Select
-            options={departmentData?.result}
-            defaultValue={value?.name}
-            onChange={(id: any) =>
-              HandleField(id, record, departmentData, "departmentId")
-            }
-          >
-            <Space>
-              {value?.name}
+      dataIndex: "departments",
+      key: "departments",
+      width: 160,
+      render: (values, record) => {
+        const defaultValue = values.map((value: any) => ({
+          label: value?.name,
+          value: value?._id,
+        }));
+        return (
+          <div>
+            <S.Select
+              mode="multiple"
+              options={departmentData?.result}
+              defaultValue={defaultValue}
+              onChange={(id: any) => {
+                const newData = departmentData?.result?.filter((department) => {
+                  return id.includes(department?._id);
+                });
+                const newEdit = {
+                  ...record,
+                  departments: newData,
+                };
+                handleEditUser(newEdit, false);
+              }}
+            >
               <DownOutlined />
-            </Space>
-          </S.Select>
-        </div>
-      ),
+            </S.Select>
+          </div>
+        );
+      },
     },
     {
       title: t("major"),
       dataIndex: "majorId",
       key: "majorId",
-      width: 200,
+      width: 180,
       render: (value, record) => (
         <div>
           <S.Select
@@ -228,7 +252,7 @@ function UsersManagementModule() {
       title: t("admin"),
       dataIndex: "isAdmin",
       key: "isAdmin",
-      width: 150,
+      width: 120,
       render: (value, record) => {
         return (
           <Flex justify="center" align="center">
@@ -239,7 +263,7 @@ function UsersManagementModule() {
                   ...record,
                   isAdmin: !value,
                 };
-                HandleEditUser(newRecord, true);
+                handleEditUser(newRecord, true);
               }}
             ></Checkbox>
           </Flex>
@@ -250,7 +274,7 @@ function UsersManagementModule() {
       title: t("excellent"),
       dataIndex: "isExcellent",
       key: "isExcellent",
-      width: 150,
+      width: 90,
       render: (_, record) => {
         return (
           <Flex justify="center" align="center">
@@ -261,7 +285,7 @@ function UsersManagementModule() {
                   ...record,
                   isExcellent: !record?.isExcellent,
                 };
-                HandleEditUser(newRecord, true);
+                handleEditUser(newRecord, true);
               }}
             ></Checkbox>
           </Flex>
@@ -271,7 +295,7 @@ function UsersManagementModule() {
     {
       key: "action",
       fixed: "right",
-      width: 60,
+      width: 50,
       render: (_, record) => {
         return (
           <Flex justify="center" gap={20}>
@@ -309,7 +333,7 @@ function UsersManagementModule() {
       ...record,
       [type]: newData,
     };
-    HandleEditUser(newEdit, false);
+    handleEditUser(newEdit, false);
   };
 
   const handleDelete = async (id: string) => {
@@ -319,7 +343,7 @@ function UsersManagementModule() {
       message.success("Xóa thành công");
     } catch (err) {}
   };
-  const HandleEditUser = async (data: any, isfetch: boolean) => {
+  const handleEditUser = async (data: any, isfetch: boolean) => {
     try {
       await editUser({
         params: { id: data?._id },
@@ -328,6 +352,35 @@ function UsersManagementModule() {
       if (isfetch) refetch();
       message.success("Thay đổi thành công");
     } catch (err) {}
+  };
+
+  const csvFileToArray = (string: any) => {
+    const csvHeader = string.slice(0, string.indexOf("\n")).split(",");
+    const csvRows = string.slice(string.indexOf("\n") + 1).split("\n");
+    console.log("first", csvRows);
+    const array = csvRows.map((i: any) => {
+      const values = i.split(",");
+      const obj = csvHeader.reduce(
+        (object: any, header: any, index: number) => {
+          object[header] = values[index];
+          return object;
+        },
+        {}
+      );
+      return obj;
+    });
+    console.log("aray : any", array);
+  };
+  const handleImportCsv = (e: any) => {
+    const file = e?.target?.files[0];
+    if (file) {
+      fileReader.onload = function (event) {
+        const text = event?.target?.result;
+        csvFileToArray(text);
+      };
+
+      fileReader?.readAsText(file);
+    }
   };
 
   const handleSearch = _.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -340,13 +393,27 @@ function UsersManagementModule() {
         <Typography.Title level={2}>{t("title")}</Typography.Title>
       </S.Head>
       <S.FilterWrapper>
-        <Typography.Title level={5}>{t("Search")}</Typography.Title>
-        <Input
-          placeholder="Search..."
-          prefix={<SearchOutlined />}
-          onChange={handleSearch}
-          defaultValue={search}
-        />
+        <div className="search">
+          <Typography.Title level={5}>{t("search")}</Typography.Title>
+          <Input
+            placeholder="Search..."
+            prefix={<SearchOutlined />}
+            onChange={handleSearch}
+            defaultValue={search}
+          />
+        </div>
+        <div className="input_csv">
+          <Button
+            icon={<UploadOutlined />}
+            onClick={() => {
+              const inputFile = document.getElementById("import_csv");
+              inputFile?.click();
+            }}
+          >
+            {t("import")}{" "}
+          </Button>
+          <input id="import_csv" type="file" onChange={handleImportCsv} />
+        </div>
       </S.FilterWrapper>
       <S.TableWrapper>
         <Table
