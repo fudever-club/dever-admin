@@ -42,6 +42,12 @@ const endpointSocialManagement = {
   GET_SOCIAL_BY_ID: `${prefixBase}/social/{id}`,
   EDIT_SOCIAL_BY_ID: `${prefixBase}/social/{id}`,
 };
+const endpointImageActivityManagement = {
+  GET_ALL_IMAGES: `${prefixBase}/image-activity`,
+  DELETE_IMAGE: `${prefixBase}/image-activity/{id}`,
+  DELETE_MANY_IMAGE: `${prefixBase}/image-activity/`,
+  IMAGE: `${prefixBase}/image-activity`,
+};
 
 const endpointOther = {};
 
@@ -53,4 +59,5 @@ export {
   endpointPositionManagement,
   endpointMajorManagement,
   endpointSocialManagement,
+  endpointImageActivityManagement,
 };

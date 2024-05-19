@@ -274,7 +274,7 @@ function UsersManagementModule() {
       title: t("excellent"),
       dataIndex: "isExcellent",
       key: "isExcellent",
-      width: 90,
+      width: 100,
       render: (_, record) => {
         return (
           <Flex justify="center" align="center">

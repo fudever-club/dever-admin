@@ -1,24 +1,24 @@
 {
-  "title": "Social Management",
+  "title": "Image Activity Management",
   "name": "Name",
-  "function": "Action",
+  "Social": "Social",
 
   "addSocial": {
-    "title": "Add social",
+    "title": "Add image",
     "name": "Name",
     "value": "Value",
     "add": "Add"
   },
 
   "editSocial": {
-    "title": "Edit social",
+    "title": "Edit image",
     "name": "Name",
     "value": "Value",
     "edit": "Edit"
   },
   "deleteSocial": {
-    "title": "Delete social",
-    "description": "Are you sure to delete this social?",
+    "title": "Delete image",
+    "description": "Are you sure to delete this image?",
     "cancelText": "Cancel",
     "okText": "Ok",
     "delete": "Delete"
