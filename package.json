@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
+    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-react": "^6.3.0",
     "@reduxjs/toolkit": "^2.2.4",
     "accept-language": "^3.0.18",
     "antd": "^5.17.0",
     "axios": "^1.6.8",
+    "ckeditor": "^4.12.1",
     "cookies-next": "^4.1.1",
     "i18next": "^23.11.4",
     "i18next-browser-languagedetector": "^7.2.1",

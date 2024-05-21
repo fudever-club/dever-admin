@@ -48,6 +48,13 @@ const endpointImageActivityManagement = {
   DELETE_MANY_IMAGE: `${prefixBase}/image-activity/`,
   IMAGE: `${prefixBase}/image-activity`,
 };
+const endpointProjectManagement = {
+  GET_ALL_PROJECT: `${prefixBase}/project`,
+  DELETE_PROJECT: `${prefixBase}/project/{id}`,
+  GET_PROJECT_DETAIL: `${prefixBase}/project/{id}`,
+  EDIT_PROJECT: `${prefixBase}/project/{id}`,
+  PROJECT: `${prefixBase}/project`,
+};
 
 const endpointOther = {};
 
@@ -60,4 +67,5 @@ export {
   endpointMajorManagement,
   endpointSocialManagement,
   endpointImageActivityManagement,
+  endpointProjectManagement,
 };

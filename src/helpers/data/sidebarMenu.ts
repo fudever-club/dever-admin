@@ -6,6 +6,7 @@ import {
   BookOutlined,
   IdcardOutlined,
   LinkOutlined,
+  AimOutlined,
 } from "@ant-design/icons";
 
 export const sidebarMenu: MenuProps["items"] = [
@@ -35,8 +36,8 @@ export const sidebarMenu: MenuProps["items"] = [
     label: "socialManagement",
   },
   {
-    key: "image-activity-management",
-    icon: React.createElement(BookOutlined),
-    label: "imageActivityManagement",
+    key: "project-management",
+    icon: React.createElement(AimOutlined),
+    label: "projectManagement",
   },
 ];
