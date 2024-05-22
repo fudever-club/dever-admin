@@ -36,6 +36,16 @@ export const sidebarMenu: MenuProps["items"] = [
     label: "socialManagement",
   },
   {
+    key: "image-activity-management",
+    icon: React.createElement(LinkOutlined),
+    label: "imageActivityManagement",
+  },
+  {
+    key: "album-management",
+    icon: React.createElement(LinkOutlined),
+    label: "albumManagement",
+  },
+  {
     key: "project-management",
     icon: React.createElement(AimOutlined),
     label: "projectManagement",

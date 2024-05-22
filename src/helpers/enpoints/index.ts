@@ -55,10 +55,20 @@ const endpointProjectManagement = {
   EDIT_PROJECT: `${prefixBase}/project/{id}`,
   PROJECT: `${prefixBase}/project`,
 };
+const endpointAlbumManagement = {
+  GET_ALL_Album: `${prefixBase}/album`,
+  DELETE_ALBUM: `${prefixBase}/album/{id}`,
+  GET_ALBUM_DETAIL: `${prefixBase}/album/{id}`,
+  EDIT_ALBUM: `${prefixBase}/album/{id}`,
+  ALBUM: `${prefixBase}/album`,
+  DELETE_MANY_IMAGES_IN_ALBUM: `${prefixBase}/album/{slug}/delete-images`,
+  UPLOAD_IMAGES_FOR_ALBUM: `${prefixBase}/album/{slug}`,
+};
 
 const endpointOther = {};
 
 export {
+  endpointAlbumManagement,
   endpointAuth,
   endpointUsersManagement,
   endpointDepartmentManagement,
