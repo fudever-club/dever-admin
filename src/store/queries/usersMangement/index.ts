@@ -5,6 +5,14 @@ import { baseApi } from "../base";
 
 export const authAPI = baseApi.injectEndpoints({
   endpoints: (build) => ({
+    createManyUsersByCSV: build.mutation({
+      query: (data: any) => ({
+        url: endpointUsersManagement.CREATE_USERS_BY_CSV,
+        method: "POST",
+        body: data,
+        flashError: true,
+      }),
+    }),
     verifyToken: build.mutation({
       query: (token: string) => ({
         url: endpointAuth.VERIFY_TOKEN,
@@ -46,6 +54,7 @@ export const authAPI = baseApi.injectEndpoints({
 });
 
 export const {
+  useCreateManyUsersByCSVMutation,
   useVerifyTokenMutation,
   useGetAllUsersQuery,
   useDeleteUserMutation,

@@ -13,6 +13,7 @@ const endpointUsersManagement = {
   GET_ALL_USERS: `${prefixBase}/users/`,
   DELETE_USER: `${prefixBase}/users/{id}`,
   EDIT_USER_BY_ID: `${prefixBase}/users/{id}`,
+  CREATE_USERS_BY_CSV: `${prefixBase}/users/csv`,
 };
 const endpointDepartmentManagement = {
   GET_ALL_DEPARTMENTS: `${prefixBase}/department/`,

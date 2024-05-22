@@ -26,6 +26,7 @@ import _ from "lodash";
 
 import { useTranslation } from "@/app/i18n/client";
 import {
+  useCreateManyUsersByCSVMutation,
   useDeleteUserMutation,
   useEditUserMutation,
   useGetAllUsersQuery,
@@ -60,6 +61,7 @@ function UsersManagementModule() {
   const searchParams = useSearchParams();
   const [editUser] = useEditUserMutation();
   const [deleteUser] = useDeleteUserMutation();
+  const [createManyUsersByCSV] = useCreateManyUsersByCSVMutation();
   const fileReader = new FileReader();
 
   const page = Number(searchParams.get("page")) || 1;
@@ -354,15 +356,14 @@ function UsersManagementModule() {
     } catch (err) {}
   };
 
-  const csvFileToArray = (string: any) => {
+  const csvFileToArray = async (string: any) => {
     const csvHeader = string.slice(0, string.indexOf("\n")).split(",");
     const csvRows = string.slice(string.indexOf("\n") + 1).split("\n");
-    console.log("first", csvRows);
     const array = csvRows.map((i: any) => {
       const values = i.split(",");
       const obj = csvHeader.reduce(
         (object: any, header: any, index: number) => {
-          object[header] = values[index];
+          object[header?.replace("\r", "")] = values[index]?.replace("\r", "");
           return object;
         },
         {}
@@ -370,6 +371,15 @@ function UsersManagementModule() {
       return obj;
     });
     console.log("aray : any", array);
+    try {
+      await createManyUsersByCSV({
+        users: array,
+      }).unwrap();
+      message.success("Import thành công");
+      refetch();
+    } catch (error) {
+      message.error("Import thất bại");
+    }
   };
   const handleImportCsv = (e: any) => {
     const file = e?.target?.files[0];
