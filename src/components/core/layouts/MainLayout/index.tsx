@@ -97,7 +97,7 @@ const MainLayout = ({
                         level={4}
                         $color={themes?.default?.colors?.primary}
                       >
-                        Khảo thí
+                        Derver Club
                       </Typography.Title>
                     )}
                   </Flex>

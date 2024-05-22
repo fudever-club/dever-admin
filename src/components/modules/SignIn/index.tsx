@@ -41,7 +41,7 @@ function SignInModule() {
         return;
       }
 
-      router?.push(`/${locale}/dashboard`);
+      router?.push(`/${locale}/user-management`);
     } catch (error) {}
   };
 
