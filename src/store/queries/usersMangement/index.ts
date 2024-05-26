@@ -23,7 +23,7 @@ export const authAPI = baseApi.injectEndpoints({
     }),
     getAllUsers: build.query<
       any,
-      { page: number; page_size: number; search: string }
+      { page: number; limit: number; search: string; filter: any }
     >({
       query: (params) => ({
         url: endpointUsersManagement.GET_ALL_USERS,

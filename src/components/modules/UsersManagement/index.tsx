@@ -3,14 +3,18 @@
 import {
   Button,
   Checkbox,
+  Col,
   Flex,
   Input,
+  Pagination,
+  PaginationProps,
   Popconfirm,
+  Row,
+  Select,
   SelectProps,
   Space,
   Table,
   TableProps,
-  Tooltip,
   Typography,
   message,
 } from "antd";
@@ -59,31 +63,37 @@ function UsersManagementModule() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const [editUser] = useEditUserMutation();
   const [deleteUser] = useDeleteUserMutation();
   const [createManyUsersByCSV] = useCreateManyUsersByCSVMutation();
+
   const fileReader = new FileReader();
 
   const page = Number(searchParams.get("page")) || 1;
+  const limit = Number(searchParams.get("limit")) || 10;
   const search = searchParams.get("search") || "";
+  const positionId = searchParams.get("positionId") || "";
+  const majorId = searchParams.get("majorId") || "";
+  const departments = searchParams.get("departments") || "";
+  const kGeneration = searchParams.get("kGeneration") || "";
 
   const { t } = useTranslation(params?.locale as string, "usersManagement");
 
   const { result, total, isFetching, refetch } = useGetAllUsersQuery(
     {
       page: page,
-      page_size: 10,
+      limit: limit,
       search: search,
+      filter: JSON.stringify({ positionId, departments, majorId, kGeneration }),
     },
     {
       selectFromResult: ({ data, isFetching }) => {
-        const newDataUsers = data?.data?.users?.map((user: any) => ({
-          name: `${user?.firstname} ${user?.lastname}`,
-          ...user,
-        }));
+        console.log(data);
+
         return {
           result: data?.data?.users ?? [],
-          total: data?.result ?? 0,
+          total: data?.total ?? 0,
           isFetching,
         };
       },
@@ -147,7 +157,7 @@ function UsersManagementModule() {
       width: 58,
       fixed: "left",
       render: (text, _, index) => (
-        <Typography.Text>{index + 1}</Typography.Text>
+        <Typography.Text>{limit * (page - 1) + index + 1}</Typography.Text>
       ),
     },
     {
@@ -393,8 +403,32 @@ function UsersManagementModule() {
     }
   };
 
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    console.log(pageSize);
+    // router.push(`?limit=${pageSize}`);
+    router.push(createQueryString("limit", `${20}`));
+  };
+
   const handleSearch = _.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     router.push(createQueryString("search", `${e?.target?.value}`));
+  }, 300);
+
+  const handleFilterPosition = _.debounce((e: string) => {
+    router.push(createQueryString("positionId", `${e ?? ""}`));
+  }, 300);
+
+  const handleFilterMajor = _.debounce((e: string) => {
+    router.push(createQueryString("majorId", `${e ?? ""}`));
+  }, 300);
+  const handleFilterK = _.debounce((e: string) => {
+    router.push(createQueryString("kGeneration", `${e ?? ""}`));
+  }, 300);
+
+  const handleFilterDepartment = _.debounce((e) => {
+    router.push(createQueryString("departments", `${e ?? ""}`));
   }, 300);
 
   return (
@@ -403,7 +437,7 @@ function UsersManagementModule() {
         <Typography.Title level={2}>{t("title")}</Typography.Title>
       </S.Head>
       <S.FilterWrapper>
-        <div className="search">
+        <div className="item">
           <Typography.Title level={5}>{t("search")}</Typography.Title>
           <Input
             placeholder="Search..."
@@ -420,11 +454,87 @@ function UsersManagementModule() {
               inputFile?.click();
             }}
           >
-            {t("import")}{" "}
+            {t("import")}
           </Button>
           <input id="import_csv" type="file" onChange={handleImportCsv} />
         </div>
       </S.FilterWrapper>
+      <Row gutter={16}>
+        <Col span={6}>
+          <Typography.Title level={5}>Chức vụ</Typography.Title>
+          <Select
+            placeholder="Chọn vị trí"
+            allowClear
+            onChange={handleFilterPosition}
+            defaultValue={positionId || undefined}
+            options={positionData?.result}
+          />
+        </Col>
+        <Col span={6}>
+          <Typography.Title level={5}>Ban hoạt động</Typography.Title>
+          <Select
+            placeholder="Chọn ban hoạt động"
+            allowClear
+            onChange={handleFilterDepartment}
+            defaultValue={departments?.length ? departments?.split(",") : null}
+            options={departmentData?.result}
+            mode="multiple"
+          />
+        </Col>
+        <Col span={6}>
+          <Typography.Title level={5}>Chuyên ngành</Typography.Title>
+          <Select
+            placeholder="Chọn chuyên ngành"
+            allowClear
+            onChange={handleFilterMajor}
+            defaultValue={majorId || undefined}
+            options={majorData?.result}
+          />
+        </Col>
+        <Col span={6}>
+          <Typography.Title level={5}>Khoá</Typography.Title>
+          <Select
+            placeholder="Chọn khoá"
+            allowClear
+            onChange={handleFilterK}
+            defaultValue={kGeneration || undefined}
+            options={[
+              {
+                label: "Khoá K20",
+                value: 20,
+              },
+              {
+                label: "Khoá K19",
+                value: 19,
+              },
+              {
+                label: "Khoá K18",
+                value: 18,
+              },
+              {
+                label: "Khoá K17",
+                value: 17,
+              },
+              {
+                label: "Khoá K16",
+                value: 16,
+              },
+              {
+                label: "Khoá K15",
+                value: 15,
+              },
+              {
+                label: "Khoá K14",
+                value: 14,
+              },
+              {
+                label: "Khoá K13",
+                value: 13,
+              },
+            ]}
+          />
+        </Col>
+      </Row>
       <S.TableWrapper>
         <Table
           columns={columns}
@@ -432,7 +542,20 @@ function UsersManagementModule() {
           loading={isFetching}
           rowKey={(record) => record._id}
           scroll={{ x: 1300 }}
+          pagination={false}
         />
+        <br />
+        <Flex justify="flex-end">
+          <Pagination
+            showSizeChanger
+            onShowSizeChange={onShowSizeChange}
+            defaultCurrent={page}
+            total={total}
+            onChange={(page) =>
+              router.push(createQueryString("page", `${page}`))
+            }
+          />
+        </Flex>
       </S.TableWrapper>
     </S.PageWrapper>
   );

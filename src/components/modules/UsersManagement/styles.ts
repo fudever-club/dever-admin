@@ -9,6 +9,10 @@ export const PageWrapper = styled.section`
   height: 100%;
 
   padding-bottom: 16px;
+
+  .ant-select {
+    width: 100%;
+  }
 `;
 
 export const Head = styled.div`
@@ -23,6 +27,8 @@ export const TableWrapper = styled.div`
   width: 100%;
 
   margin-bottom: 24px;
+
+  margin-top: 24px;
 `;
 
 export const FilterWrapper = styled.div`
@@ -30,7 +36,7 @@ export const FilterWrapper = styled.div`
 
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 
   gap: 8px;
   margin-bottom: 24px;
@@ -40,8 +46,8 @@ export const FilterWrapper = styled.div`
     height: 0;
   }
 
-  .search {
-    width: 30%;
+  .item {
+    width: 25%;
   }
 `;
 export const Select = styled(SelectFromAntd)`

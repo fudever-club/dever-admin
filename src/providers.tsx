@@ -40,6 +40,9 @@ function Providers({
                     headerColor: themes.default.colors.textWhite,
                     headerBorderRadius: 0,
                   },
+                  Select: {
+                    controlHeight: 40,
+                  },
                 },
                 token: {
                   colorPrimary: themes.default.colors.primary,
