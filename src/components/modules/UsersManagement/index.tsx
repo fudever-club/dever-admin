@@ -52,6 +52,7 @@ interface DataType {
   departments: any;
   isAdmin: boolean;
   isExcellent: boolean;
+  isLeader: boolean;
   email: string;
 }
 
@@ -154,7 +155,7 @@ function UsersManagementModule() {
       title: "STT",
       dataIndex: "",
       key: "",
-      width: 58,
+      width: 65,
       fixed: "left",
       render: (text, _, index) => (
         <Typography.Text>{limit * (page - 1) + index + 1}</Typography.Text>
@@ -274,6 +275,28 @@ function UsersManagementModule() {
                 const newRecord = {
                   ...record,
                   isAdmin: !value,
+                };
+                handleEditUser(newRecord, true);
+              }}
+            ></Checkbox>
+          </Flex>
+        );
+      },
+    },
+    {
+      title: "Leader",
+      dataIndex: "isLeader",
+      key: "isLeader",
+      width: 100,
+      render: (_, record) => {
+        return (
+          <Flex justify="center" align="center">
+            <Checkbox
+              defaultChecked={record?.isLeader}
+              onChange={async () => {
+                const newRecord = {
+                  ...record,
+                  isLeader: !record?.isLeader,
                 };
                 handleEditUser(newRecord, true);
               }}

@@ -97,7 +97,7 @@ const MainLayout = ({
                         level={4}
                         $color={themes?.default?.colors?.primary}
                       >
-                        Derver Club
+                        ADMIN
                       </Typography.Title>
                     )}
                   </Flex>
@@ -153,7 +153,7 @@ const MainLayout = ({
             </S.HeaderCustom>
             <S.ContentCustom>{children}</S.ContentCustom>
             <S.FooterCustom>
-              <p>COPYRIGHT © 2024 DashTail All rights Reserved</p>
+              <p>Hế lô ae ban chủ nhiệm, quản lý CLB zui zẻ nha ae</p>
             </S.FooterCustom>
           </S.LayoutCustom>
         </Layout>

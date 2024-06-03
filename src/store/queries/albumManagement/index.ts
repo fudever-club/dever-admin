@@ -39,7 +39,13 @@ export const authAPI = baseApi.injectEndpoints({
       }),
     }),
     editAlbum: build.mutation({
-      query: (data: any) => ({
+      query: (data: {
+        body: {
+          password: string;
+          conf: string;
+        };
+        params: { id: string };
+      }) => ({
         url: endpointAlbumManagement.EDIT_ALBUM.replace(
           "{id}",
           data?.params?.id

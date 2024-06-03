@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Phòng khảo thí | Quản lý người dùng",
+  title: "FU-DEVER | Quản lý người dùng",
 };
 
 import UsersManagementModule from "@/components/modules/UsersManagement";
