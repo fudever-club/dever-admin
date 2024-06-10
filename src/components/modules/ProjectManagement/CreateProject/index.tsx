@@ -134,7 +134,7 @@ function CreateProject() {
           <S.UploadWrap>
             <Upload.Dragger
               name="file"
-              action="https://api.imgbb.com/1/upload?expiration=600&key=d0adfbcb1f973887c165948d50681492"
+              action="https://api.imgbb.com/1/upload?expiration=600&key=488e7d944b2bedd5020e1ace8585d1df"
               headers={{
                 authorization: "authorization-text",
               }}

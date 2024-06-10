@@ -50,6 +50,13 @@ export const authAPI = baseApi.injectEndpoints({
         flashError: true,
       }),
     }),
+    resetPassword: build.mutation({
+      query: (id: string) => ({
+        url: endpointUsersManagement.RESET_PASSWORD.replace("{id}", id),
+        method: "PATCH",
+        flashError: true,
+      }),
+    }),
   }),
 });
 
@@ -59,4 +66,5 @@ export const {
   useGetAllUsersQuery,
   useDeleteUserMutation,
   useEditUserMutation,
+  useResetPasswordMutation,
 } = authAPI;

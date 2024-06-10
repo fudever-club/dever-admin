@@ -9,7 +9,7 @@
   "action": "Chức năng",
   "email": "Email",
   "search": "Tìm kiếm",
-  "import": "Thêm csv",
+  "import": "Import csv",
   "deleteDepartment": {
     "title": "Xóa ban",
     "description": "Bạn có chắc chắn muốn xoá người dùng này?",

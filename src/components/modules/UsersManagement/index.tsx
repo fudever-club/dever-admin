@@ -25,6 +25,7 @@ import {
   DownOutlined,
   UploadOutlined,
   SearchOutlined,
+  RollbackOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
 
@@ -34,6 +35,7 @@ import {
   useDeleteUserMutation,
   useEditUserMutation,
   useGetAllUsersQuery,
+  useResetPasswordMutation,
 } from "@/store/queries/usersMangement";
 import { createQueryString } from "@/utils/queryString";
 import { useGetAllDepartmentsQuery } from "@/store/queries/departmentMangement";
@@ -67,6 +69,7 @@ function UsersManagementModule() {
 
   const [editUser] = useEditUserMutation();
   const [deleteUser] = useDeleteUserMutation();
+  const [resetPassword] = useResetPasswordMutation();
   const [createManyUsersByCSV] = useCreateManyUsersByCSVMutation();
 
   const fileReader = new FileReader();
@@ -330,15 +333,24 @@ function UsersManagementModule() {
     {
       key: "action",
       fixed: "right",
-      width: 50,
+      width: 100,
       render: (_, record) => {
         return (
           <Flex justify="center" gap={20}>
             <Popconfirm
-              title={t("deleteDepartment.title")}
-              description={t("deleteDepartment.description")}
-              okText={t("deleteDepartment.okText")}
-              cancelText={t("deleteDepartment.cancelText")}
+              title={"Reset mật khẩu"}
+              description="Bạn có chắc chắn muốn reset mật khẩu của tài khoản này?"
+              okText={"Đồng ý"}
+              cancelText="Huỷ bỏ"
+              onConfirm={() => handleResetPassword(record?._id)}
+            >
+              <Button shape="circle" icon={<RollbackOutlined />} />
+            </Popconfirm>
+            <Popconfirm
+              title={"Xóa thành viên"}
+              description={"Bạn có chắc chắn muốn xoá thành viên này?"}
+              okText={"Xác nhận"}
+              cancelText={"Huỷ bỏ"}
               onConfirm={() => handleDelete(record?._id)}
             >
               <Button
@@ -378,6 +390,15 @@ function UsersManagementModule() {
       message.success("Xóa thành công");
     } catch (err) {}
   };
+
+  const handleResetPassword = async (id: string) => {
+    try {
+      await resetPassword(id).unwrap();
+      refetch();
+      message.success("Reset mật khẩu thành công!");
+    } catch (err) {}
+  };
+
   const handleEditUser = async (data: any, isfetch: boolean) => {
     try {
       await editUser({
@@ -431,7 +452,6 @@ function UsersManagementModule() {
     pageSize
   ) => {
     console.log(pageSize);
-    // router.push(`?limit=${pageSize}`);
     router.push(createQueryString("limit", `${20}`));
   };
 
@@ -570,7 +590,7 @@ function UsersManagementModule() {
         <br />
         <Flex justify="flex-end">
           <Pagination
-            showSizeChanger
+            showSizeChanger={false}
             onShowSizeChange={onShowSizeChange}
             defaultCurrent={page}
             total={total}
