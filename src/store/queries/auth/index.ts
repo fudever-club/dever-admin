@@ -21,7 +21,16 @@ export const authAPI = baseApi.injectEndpoints({
         flashError: true,
       }),
     }),
+    signUp: build.mutation({
+      query: (data) => ({
+        url: endpointAuth.SIGN_UP,
+        method: "POST",
+        body: data,
+        flashError: true,
+      }),
+    }),
   }),
 });
 
-export const { useSignInMutation, useVerifyTokenMutation } = authAPI;
+export const { useSignInMutation, useVerifyTokenMutation, useSignUpMutation } =
+  authAPI;

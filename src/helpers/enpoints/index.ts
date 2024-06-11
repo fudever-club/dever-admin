@@ -6,6 +6,7 @@ const prefixApiAuth: string = `/api/core`;
 
 const endpointAuth = {
   SIGN_IN: `${prefixBase}/auth/login/`,
+  SIGN_UP: `${prefixBase}/auth/register/`,
   VERIFY_TOKEN: `${prefixBase}/verifyToken`,
 };
 

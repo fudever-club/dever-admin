@@ -26,6 +26,7 @@ import {
   UploadOutlined,
   SearchOutlined,
   RollbackOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
 
@@ -41,6 +42,9 @@ import { createQueryString } from "@/utils/queryString";
 import { useGetAllDepartmentsQuery } from "@/store/queries/departmentMangement";
 import { useGetAllPositionQuery } from "@/store/queries/positionManagement";
 import { useGetAllMajorQuery } from "@/store/queries/majorManagement";
+import useModal from "@/hooks/useModal";
+
+import CreateUserModal from "./CreateUserModal";
 
 import * as S from "./styles";
 
@@ -83,6 +87,8 @@ function UsersManagementModule() {
   const kGeneration = searchParams.get("kGeneration") || "";
 
   const { t } = useTranslation(params?.locale as string, "usersManagement");
+
+  const modal = useModal();
 
   const { result, total, isFetching, refetch } = useGetAllUsersQuery(
     {
@@ -233,7 +239,7 @@ function UsersManagementModule() {
                   ...record,
                   departments: newData,
                 };
-                handleEditUser(newEdit, false);
+                handleEditUser(newEdit);
               }}
             >
               <DownOutlined />
@@ -279,7 +285,7 @@ function UsersManagementModule() {
                   ...record,
                   isAdmin: !value,
                 };
-                handleEditUser(newRecord, true);
+                handleEditUser(newRecord);
               }}
             ></Checkbox>
           </Flex>
@@ -301,7 +307,7 @@ function UsersManagementModule() {
                   ...record,
                   isLeader: !record?.isLeader,
                 };
-                handleEditUser(newRecord, true);
+                handleEditUser(newRecord);
               }}
             ></Checkbox>
           </Flex>
@@ -323,7 +329,7 @@ function UsersManagementModule() {
                   ...record,
                   isExcellent: !record?.isExcellent,
                 };
-                handleEditUser(newRecord, true);
+                handleEditUser(newRecord);
               }}
             ></Checkbox>
           </Flex>
@@ -380,7 +386,7 @@ function UsersManagementModule() {
       ...record,
       [type]: newData,
     };
-    handleEditUser(newEdit, false);
+    handleEditUser(newEdit);
   };
 
   const handleDelete = async (id: string) => {
@@ -399,13 +405,13 @@ function UsersManagementModule() {
     } catch (err) {}
   };
 
-  const handleEditUser = async (data: any, isfetch: boolean) => {
+  const handleEditUser = async (data: any) => {
     try {
       await editUser({
         params: { id: data?._id },
         body: data,
       }).unwrap();
-      if (isfetch) refetch();
+      refetch();
       message.success("Thay đổi thành công");
     } catch (err) {}
   };
@@ -478,6 +484,13 @@ function UsersManagementModule() {
     <S.PageWrapper>
       <S.Head>
         <Typography.Title level={2}>{t("title")}</Typography.Title>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={modal?.openModal}
+        >
+          Tạo thành viên
+        </Button>
       </S.Head>
       <S.FilterWrapper>
         <div className="item">
@@ -600,6 +613,11 @@ function UsersManagementModule() {
           />
         </Flex>
       </S.TableWrapper>
+      <CreateUserModal
+        visible={modal?.visible}
+        close={modal?.closeModal}
+        refetch={refetch}
+      />
     </S.PageWrapper>
   );
 }
