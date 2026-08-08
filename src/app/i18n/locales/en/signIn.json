@@ -1,4 +1,21 @@
 {
   "welcome": "Welcome",
-  "description": "Please log in to access the Examination Department administration page"
+  "description": "The internal administration portal for FU-DEVER Programming Club",
+  "accessNoticeTitle": "Administrator-only area",
+  "accessNoticeDescription": "Access is limited to authorised Executive Board and Technical Department members.",
+  "emailLabel": "Email",
+  "emailPlaceholder": "Enter your email",
+  "emailRequired": "Please enter your email.",
+  "emailInvalid": "Enter a valid email address.",
+  "passwordLabel": "Password",
+  "passwordPlaceholder": "Enter your password",
+  "passwordRequired": "Please enter your password.",
+  "remember": "Remember this sign-in on this device",
+  "recoveryHint": "Forgot your password? Contact the Executive Board for account recovery.",
+  "submit": "Sign in",
+  "submitting": "Signing in...",
+  "accountHint": "Administrator accounts are issued by the Executive Board; self-registration is not available.",
+  "notAdmin": "This account does not have administrator access.",
+  "signInSuccess": "Administrator sign-in successful!",
+  "signInFailed": "We could not sign you in. Check your email and password and try again."
 }

@@ -1,4 +1,21 @@
 {
-  "welcome": "Xin chào",
-  "description": "Vui lòng đăng nhập để vào trang quản trị FU-DEVER"
+  "welcome": "Đăng nhập quản trị",
+  "description": "Cổng quản trị nội bộ của Câu lạc bộ Lập trình FU-DEVER",
+  "accessNoticeTitle": "Khu vực dành cho quản trị viên",
+  "accessNoticeDescription": "Chỉ Ban Chủ nhiệm và Ban Chuyên môn đã được phân quyền mới có thể truy cập.",
+  "emailLabel": "Email",
+  "emailPlaceholder": "Nhập email của bạn",
+  "emailRequired": "Vui lòng nhập email.",
+  "emailInvalid": "Email chưa đúng định dạng.",
+  "passwordLabel": "Mật khẩu",
+  "passwordPlaceholder": "Nhập mật khẩu",
+  "passwordRequired": "Vui lòng nhập mật khẩu.",
+  "remember": "Ghi nhớ đăng nhập trên thiết bị này",
+  "recoveryHint": "Quên mật khẩu? Liên hệ Ban Chủ nhiệm để được hỗ trợ khôi phục.",
+  "submit": "Đăng nhập",
+  "submitting": "Đang đăng nhập...",
+  "accountHint": "Tài khoản quản trị được cấp bởi Ban Chủ nhiệm; không hỗ trợ tự đăng ký.",
+  "notAdmin": "Tài khoản này chưa được cấp quyền quản trị.",
+  "signInSuccess": "Đăng nhập quản trị thành công!",
+  "signInFailed": "Không thể đăng nhập. Vui lòng kiểm tra lại email và mật khẩu."
 }

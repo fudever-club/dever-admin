@@ -9,12 +9,19 @@ const nextConfig = {
   },
   reactStrictMode: false,
   images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
+    ],
     domains: [
       "res.cloudinary.com",
       "aiartshop.com",
       "th.bing.com",
       "i.ibb.co",
-      "example.com",
+      "drive.google.com",
+      "lh3.googleusercontent.com",
+      "docs.google.com",
+      "api.qrserver.com",
     ],
   },
 };

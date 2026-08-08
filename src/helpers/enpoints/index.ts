@@ -6,12 +6,12 @@ const prefixApiAuth: string = `/api/core`;
 
 const endpointAuth = {
   SIGN_IN: `${prefixBase}/auth/login/`,
-  SIGN_UP: `${prefixBase}/auth/register/`,
   VERIFY_TOKEN: `${prefixBase}/verifyToken`,
 };
 
 const endpointUsersManagement = {
   GET_ALL_USERS: `${prefixBase}/users/`,
+  CREATE_USER: `${prefixBase}/users/`,
   DELETE_USER: `${prefixBase}/users/{id}`,
   EDIT_USER_BY_ID: `${prefixBase}/users/{id}`,
   CREATE_USERS_BY_CSV: `${prefixBase}/users/csv`,
@@ -67,6 +67,14 @@ const endpointAlbumManagement = {
   DELETE_MANY_IMAGES_IN_ALBUM: `${prefixBase}/album/{slug}/delete-images`,
   UPLOAD_IMAGES_FOR_ALBUM: `${prefixBase}/album/{slug}`,
 };
+const endpointProjectLabManagement = {
+  PROJECT_LAB: `${prefixBase}/project-lab`,
+  PROJECT_LAB_BY_ID: `${prefixBase}/project-lab/{id}`,
+};
+const endpointAlumniManagement = {
+  ALUMNI: `${prefixBase}/alumni`,
+  ALUMNI_BY_ID: `${prefixBase}/alumni/{id}`,
+};
 
 const endpointOther = {};
 
@@ -81,4 +89,6 @@ export {
   endpointSocialManagement,
   endpointImageActivityManagement,
   endpointProjectManagement,
+  endpointProjectLabManagement,
+  endpointAlumniManagement,
 };

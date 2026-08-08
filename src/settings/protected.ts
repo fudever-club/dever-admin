@@ -1,6 +1,6 @@
 const routerWithAuth: string[] = ['/'];
 
-const routerWithoutAuth: string[] = ['/sign-in', '/sign-up'];
+const routerWithoutAuth: string[] = ['/sign-in'];
 
 const protectedRouter = {
   routerWithAuth,

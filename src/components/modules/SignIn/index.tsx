@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { Checkbox, Col, Flex, Form, FormProps, Input, message } from "antd";
 import { useRouter } from "next-nprogress-bar";
 import { useParams } from "next/navigation";
@@ -14,13 +13,14 @@ import Typography from "@/components/core/common/Typography";
 import themeColors from "@/style/themes/default/colors";
 import { useTranslation } from "@/app/i18n/client";
 import { useSignInMutation } from "@/store/queries/auth";
+import webStorageClient from "@/utils/webStorageClient";
 
 import * as S from "./styles";
 
 type FieldType = {
   email: string;
   password: string;
-  remember: string;
+  remember: boolean;
 };
 
 function SignInModule() {
@@ -36,13 +36,24 @@ function SignInModule() {
     try {
       const res: any = await signIn(values).unwrap();
 
-      if (!res?.data?.user?.isAdmin) {
-        message.error("Bạn không có quyền truy cập trang này");
+      const user = res?.data?.user;
+      const token = res?.data?.token;
+
+      if (!user?.isAdmin) {
+        message.error(t("notAdmin"));
         return;
       }
 
+      if (token) {
+        webStorageClient.setToken(token);
+        webStorageClient.set("_access_token", token);
+      }
+
+      message.success(t("signInSuccess"));
       router?.push(`/${locale}/user-management`);
-    } catch (error) {}
+    } catch {
+      message.error(t("signInFailed"));
+    }
   };
 
   return (
@@ -59,46 +70,66 @@ function SignInModule() {
       >
         {t("welcome")} 👋
       </Typography.Title>
-      <Typography.Text $align="center" $margin="0px 0px 32px 0">
+      <Typography.Text $align="center" $margin="0px 0px 16px 0">
         {t("description")} 👋
       </Typography.Text>
-      <Form
-        name="basic"
+      <S.AccessNotice role="note">
+        <strong>{t("accessNoticeTitle")}</strong>
+        <span>{t("accessNoticeDescription")}</span>
+      </S.AccessNotice>
+      <Form<FieldType>
+        name="admin-sign-in"
         initialValues={{ remember: true }}
         onFinish={onFinish}
         layout="vertical"
+        validateTrigger={["onBlur", "onChange"]}
+        aria-busy={isLoading}
       >
         <Form.Item<FieldType>
-          label="Email"
+          label={t("emailLabel")}
           name="email"
           wrapperCol={{ span: 24 }}
-          rules={[{ required: true, message: "Please input your username!" }]}
+          hasFeedback
+          rules={[
+            { required: true, message: t("emailRequired") },
+            { type: "email", message: t("emailInvalid") },
+          ]}
         >
           <Input
-            placeholder="Enter your email"
-            autoComplete="current-password"
+            type="email"
+            placeholder={t("emailPlaceholder")}
+            autoComplete="email"
+            autoFocus
+            disabled={isLoading}
+            aria-label={t("emailLabel")}
           />
         </Form.Item>
 
         <Form.Item<FieldType>
-          label="Password"
+          label={t("passwordLabel")}
           name="password"
           wrapperCol={{ span: 24 }}
-          rules={[{ required: true, message: "Please input your password!" }]}
+          hasFeedback
+          rules={[{ required: true, message: t("passwordRequired") }]}
         >
-          <Input.Password placeholder="Enter your password" />
+          <Input.Password
+            placeholder={t("passwordPlaceholder")}
+            autoComplete="current-password"
+            disabled={isLoading}
+            aria-label={t("passwordLabel")}
+          />
         </Form.Item>
 
         <Col span={24}>
-          <Flex align="flex-start" justify="space-between">
+          <Flex align="flex-start" justify="space-between" wrap="wrap" gap={8}>
             <Form.Item<FieldType>
               wrapperCol={{ span: 24 }}
               name="remember"
               valuePropName="checked"
             >
-              <Checkbox>Remember me</Checkbox>
+              <Checkbox disabled={isLoading}>{t("remember")}</Checkbox>
             </Form.Item>
-            <Link href={""}>Forget Password?</Link>
+            <S.RecoveryHint>{t("recoveryHint")}</S.RecoveryHint>
           </Flex>
         </Col>
 
@@ -108,15 +139,14 @@ function SignInModule() {
             htmlType="submit"
             $width="100%"
             loading={isLoading}
+            disabled={isLoading}
+            aria-label={isLoading ? t("submitting") : t("submit")}
           >
-            Xác nhận
+            {isLoading ? t("submitting") : t("submit")}
           </Button>
         </Form.Item>
       </Form>
-      <Flex justify="center" gap={4}>
-        <p>Don&apos;t have an account?</p>
-        <Link href={`/${locale}/sign-up`}>Sign up</Link>
-      </Flex>
+      <S.AccountHint>{t("accountHint")}</S.AccountHint>
     </S.Wrapper>
   );
 }

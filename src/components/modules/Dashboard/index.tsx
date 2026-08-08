@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 
 import { useTranslation } from "@/app/i18n/client";
 
+import ExecutiveAnalytics from "./ExecutiveAnalytics";
 import * as S from "./styles";
 
 function DashboardModule() {
@@ -16,6 +17,7 @@ function DashboardModule() {
       <S.Head>
         <Typography.Title level={2}>{t("title")}</Typography.Title>
       </S.Head>
+      <ExecutiveAnalytics />
     </S.PageWrapper>
   );
 }

@@ -7,6 +7,7 @@ import {
   IdcardOutlined,
   LinkOutlined,
   AimOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 
 export const sidebarMenu: MenuProps["items"] = [
@@ -14,6 +15,11 @@ export const sidebarMenu: MenuProps["items"] = [
     key: "user-management",
     icon: React.createElement(UserOutlined),
     label: "usersManagement",
+  },
+  {
+    key: "event-management",
+    icon: React.createElement(CalendarOutlined),
+    label: "Quản lý Sự kiện & Workshop",
   },
   {
     key: "department-management",
@@ -49,5 +55,15 @@ export const sidebarMenu: MenuProps["items"] = [
     key: "project-management",
     icon: React.createElement(AimOutlined),
     label: "projectManagement",
+  },
+  {
+    key: "resource-management",
+    icon: React.createElement(BookOutlined),
+    label: "Quản lý Tài liệu & Slide",
+  },
+  {
+    key: "community-content",
+    icon: React.createElement(AimOutlined),
+    label: "Nội dung cộng đồng",
   },
 ];

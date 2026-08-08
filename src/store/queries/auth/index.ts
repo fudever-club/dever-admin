@@ -14,16 +14,8 @@ export const authAPI = baseApi.injectEndpoints({
       }),
     }),
     signIn: build.mutation({
-      query: (data: { email: string; password: string; remember: string }) => ({
+      query: (data: { email: string; password: string; remember: boolean }) => ({
         url: endpointAuth.SIGN_IN,
-        method: "POST",
-        body: data,
-        flashError: true,
-      }),
-    }),
-    signUp: build.mutation({
-      query: (data) => ({
-        url: endpointAuth.SIGN_UP,
         method: "POST",
         body: data,
         flashError: true,
@@ -32,5 +24,4 @@ export const authAPI = baseApi.injectEndpoints({
   }),
 });
 
-export const { useSignInMutation, useVerifyTokenMutation, useSignUpMutation } =
-  authAPI;
+export const { useSignInMutation, useVerifyTokenMutation } = authAPI;

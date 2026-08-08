@@ -49,6 +49,23 @@ export const FilterWrapper = styled.div`
   .item {
     width: 25%;
   }
+
+  .input_csv {
+    text-align: right;
+  }
+
+  @media (max-width: 640px) {
+    align-items: stretch;
+    flex-direction: column;
+
+    .item {
+      width: 100%;
+    }
+
+    .input_csv {
+      text-align: left;
+    }
+  }
 `;
 export const Select = styled(SelectFromAntd)`
   width: 100%;

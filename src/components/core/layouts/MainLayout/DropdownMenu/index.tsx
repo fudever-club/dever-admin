@@ -62,6 +62,21 @@ function DropdownMenu() {
         </Flex>
       </Flex>
       <Divider $margin={8} />
+      <div className="flex flex-col gap-1 p-1">
+        <a
+          href="http://localhost:3000"
+          className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors"
+        >
+          <span>🌐</span> Trang Chủ Landing Page
+        </a>
+        <a
+          href="http://localhost:3002"
+          className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors"
+        >
+          <span>👤</span> Cổng Member Portal
+        </a>
+      </div>
+      <Divider $margin={4} />
       <S.MenuCustom
         items={sideBarMenuFormat}
         onClick={(e) => handleClickItem(e?.key)}

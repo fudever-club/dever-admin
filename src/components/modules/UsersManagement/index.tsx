@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Alert,
   Button,
   Checkbox,
   Col,
@@ -29,6 +30,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
+import { ChangeEvent, useRef, useState } from "react";
 
 import { useTranslation } from "@/app/i18n/client";
 import {
@@ -45,6 +47,9 @@ import { useGetAllMajorQuery } from "@/store/queries/majorManagement";
 import useModal from "@/hooks/useModal";
 
 import CreateUserModal from "./CreateUserModal";
+import OneTimeCredentialModal, {
+  OneTimeCredential,
+} from "./OneTimeCredentialModal";
 
 import * as S from "./styles";
 
@@ -66,6 +71,107 @@ interface InterfaceDepartmentData {
   result: SelectProps["options"];
 }
 
+type CsvMember = {
+  firstname: string;
+  lastname: string;
+  email: string;
+  phone: string;
+  mssv?: string;
+};
+
+type CsvValidationResult = {
+  users: CsvMember[];
+  errors: string[];
+};
+
+const REQUIRED_CSV_HEADERS = ["firstname", "lastname", "email", "phone"];
+
+function parseCsvLine(line: string): string[] {
+  const cells: string[] = [];
+  let cell = "";
+  let insideQuotes = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+    const nextCharacter = line[index + 1];
+
+    if (character === '"' && insideQuotes && nextCharacter === '"') {
+      cell += '"';
+      index += 1;
+    } else if (character === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (character === "," && !insideQuotes) {
+      cells.push(cell.trim());
+      cell = "";
+    } else {
+      cell += character;
+    }
+  }
+
+  cells.push(cell.trim());
+  return cells;
+}
+
+function parseMemberCsv(source: string): CsvValidationResult {
+  const rows = source
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .split("\n")
+    .filter((row) => row.trim().length > 0);
+
+  if (rows.length < 2) {
+    return { users: [], errors: ["CSV cần có hàng tiêu đề và ít nhất một thành viên."] };
+  }
+
+  const headers = parseCsvLine(rows[0]).map((header) => header.trim().toLowerCase());
+  const missingHeaders = REQUIRED_CSV_HEADERS.filter((header) => !headers.includes(header));
+  if (missingHeaders.length > 0) {
+    return {
+      users: [],
+      errors: [`Thiếu cột bắt buộc: ${missingHeaders.join(", ")}.`],
+    };
+  }
+
+  const seenEmails = new Set<string>();
+  const users: CsvMember[] = [];
+  const errors: string[] = [];
+
+  rows.slice(1).forEach((row, rowIndex) => {
+    const values = parseCsvLine(row);
+    const record = headers.reduce<Record<string, string>>((result, header, index) => {
+      result[header] = values[index]?.trim() ?? "";
+      return result;
+    }, {});
+    const email = record.email.toLowerCase();
+    const rowNumber = rowIndex + 2;
+
+    if (REQUIRED_CSV_HEADERS.some((header) => !record[header])) {
+      errors.push(`Hàng ${rowNumber}: thiếu họ, tên, email hoặc số điện thoại.`);
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      errors.push(`Hàng ${rowNumber}: email không hợp lệ.`);
+      return;
+    }
+    if (seenEmails.has(email)) {
+      errors.push(`Hàng ${rowNumber}: email bị trùng trong tệp.`);
+      return;
+    }
+
+    seenEmails.add(email);
+    users.push({
+      firstname: record.firstname,
+      lastname: record.lastname,
+      email,
+      phone: record.phone,
+      mssv: record.mssv || undefined,
+    });
+  });
+
+  return { users, errors };
+}
+
 function UsersManagementModule() {
   const params = useParams();
   const router = useRouter();
@@ -74,9 +180,14 @@ function UsersManagementModule() {
   const [editUser] = useEditUserMutation();
   const [deleteUser] = useDeleteUserMutation();
   const [resetPassword] = useResetPasswordMutation();
-  const [createManyUsersByCSV] = useCreateManyUsersByCSVMutation();
-
-  const fileReader = new FileReader();
+  const [createManyUsersByCSV, { isLoading: isImporting }] =
+    useCreateManyUsersByCSVMutation();
+  const csvInputRef = useRef<HTMLInputElement>(null);
+  const [csvFeedback, setCsvFeedback] = useState<{
+    type: "success" | "error" | "warning" | "info";
+    message: string;
+  } | null>(null);
+  const [issuedCredentials, setIssuedCredentials] = useState<OneTimeCredential[]>([]);
 
   const page = Number(searchParams.get("page")) || 1;
   const limit = Number(searchParams.get("limit")) || 10;
@@ -416,41 +527,82 @@ function UsersManagementModule() {
     } catch (err) {}
   };
 
-  const csvFileToArray = async (string: any) => {
-    const csvHeader = string.slice(0, string.indexOf("\n")).split(",");
-    const csvRows = string.slice(string.indexOf("\n") + 1).split("\n");
-    const array = csvRows.map((i: any) => {
-      const values = i.split(",");
-      const obj = csvHeader.reduce(
-        (object: any, header: any, index: number) => {
-          object[header?.replace("\r", "")] = values[index]?.replace("\r", "");
-          return object;
-        },
-        {}
-      );
-      return obj;
-    });
-    console.log("aray : any", array);
+  const importCsv = async (source: string) => {
+    const { users, errors } = parseMemberCsv(source);
+    if (errors.length > 0) {
+      const summary = `CSV chưa hợp lệ: ${errors.slice(0, 2).join(" ")}`;
+      setCsvFeedback({ type: "error", message: summary });
+      message.error("CSV chưa hợp lệ. Sửa dữ liệu rồi thử lại.");
+      return;
+    }
+
     try {
-      await createManyUsersByCSV({
-        users: array,
-      }).unwrap();
-      message.success("Import thành công");
+      const response: any = await createManyUsersByCSV({ users }).unwrap();
+      const report = response?.data?.rows ?? [];
+      const credentials = Array.isArray(report)
+        ? report.reduce<OneTimeCredential[]>((result, row) => {
+            const temporaryPassword = row?.created?.temporaryPassword;
+            const email = row?.created?.user?.email ?? row?.email;
+            if (temporaryPassword && email) {
+              result.push({ email, temporaryPassword });
+            }
+            return result;
+          }, [])
+        : [];
+      const createdCount = Number(response?.data?.created ?? credentials.length);
+      const skippedCount = Number(response?.data?.skipped ?? 0);
+      const errorCount = Number(response?.data?.errors ?? 0);
+
+      setIssuedCredentials(credentials);
+
+      if (skippedCount > 0 || errorCount > 0) {
+        const summary = `Đã tạo ${createdCount} thành viên; bỏ qua ${skippedCount}, lỗi ${errorCount}.`;
+        setCsvFeedback({ type: "warning", message: summary });
+        message.warning(summary);
+      } else {
+        const summary = `Đã tạo ${createdCount} thành viên.`;
+        setCsvFeedback({ type: "success", message: summary });
+        message.success("Import thành công");
+      }
       refetch();
-    } catch (error) {
-      message.error("Import thất bại");
+    } catch {
+      const summary = "Không thể import CSV. Kiểm tra lại tệp hoặc thử lại.";
+      setCsvFeedback({ type: "error", message: summary });
+      message.error(summary);
     }
   };
-  const handleImportCsv = (e: any) => {
-    const file = e?.target?.files[0];
-    if (file) {
-      fileReader.onload = function (event) {
-        const text = event?.target?.result;
-        csvFileToArray(text);
-      };
 
-      fileReader?.readAsText(file);
+  const handleImportCsv = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    setCsvFeedback(null);
+
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      const summary = "Chỉ hỗ trợ tệp .csv.";
+      setCsvFeedback({ type: "error", message: summary });
+      message.error(summary);
+      return;
     }
+    if (file.size > 2 * 1024 * 1024) {
+      const summary = "Tệp CSV phải nhỏ hơn 2 MB.";
+      setCsvFeedback({ type: "error", message: summary });
+      message.error(summary);
+      return;
+    }
+
+    await importCsv(await file.text());
+  };
+
+  const downloadCsvTemplate = () => {
+    const content = "firstname,lastname,email,phone,mssv\nNguyen,An,an.nguyen@fpt.edu.vn,0900000000,HE190000\n";
+    const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "dever-member-import-template.csv";
+    link.click();
+    URL.revokeObjectURL(downloadUrl);
   };
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
@@ -503,18 +655,44 @@ function UsersManagementModule() {
           />
         </div>
         <div className="input_csv">
-          <Button
-            icon={<UploadOutlined />}
-            onClick={() => {
-              const inputFile = document.getElementById("import_csv");
-              inputFile?.click();
-            }}
-          >
-            {t("import")}
-          </Button>
-          <input id="import_csv" type="file" onChange={handleImportCsv} />
+          <Space direction="vertical" size={4} align="end">
+            <Space wrap>
+              <Button onClick={downloadCsvTemplate} disabled={isImporting}>
+                Tải mẫu CSV
+              </Button>
+              <Button
+                icon={<UploadOutlined />}
+                loading={isImporting}
+                disabled={isImporting}
+                onClick={() => csvInputRef.current?.click()}
+              >
+                {isImporting ? "Đang import" : t("import")}
+              </Button>
+            </Space>
+            <Typography.Text type="secondary">
+              Chỉ admin có thể cấp tài khoản thành viên qua CSV.
+            </Typography.Text>
+          </Space>
+          <input
+            ref={csvInputRef}
+            id="import_csv"
+            type="file"
+            accept=".csv,text/csv"
+            onChange={handleImportCsv}
+            aria-label="Chọn tệp CSV thành viên"
+          />
         </div>
       </S.FilterWrapper>
+      {csvFeedback && (
+        <Alert
+          className="mb-4"
+          type={csvFeedback.type}
+          showIcon
+          message={csvFeedback.message}
+          closable
+          onClose={() => setCsvFeedback(null)}
+        />
+      )}
       <Row gutter={16}>
         <Col span={6}>
           <Typography.Title level={5}>Chức vụ</Typography.Title>
@@ -556,36 +734,32 @@ function UsersManagementModule() {
             defaultValue={kGeneration || undefined}
             options={[
               {
-                label: "Khoá K20",
+                label: "Khoá K21 (Gen 9 - Năm 2026)",
+                value: 21,
+              },
+              {
+                label: "Khoá K20 (Gen 8 - Năm 2025)",
                 value: 20,
               },
               {
-                label: "Khoá K19",
+                label: "Khoá K19 (Gen 7)",
                 value: 19,
               },
               {
-                label: "Khoá K18",
+                label: "Khoá K18 (Gen 6)",
                 value: 18,
               },
               {
-                label: "Khoá K17",
+                label: "Khoá K17 (Gen 5)",
                 value: 17,
               },
               {
-                label: "Khoá K16",
+                label: "Khoá K16 (Gen 4)",
                 value: 16,
               },
               {
-                label: "Khoá K15",
+                label: "Khoá K15 (Gen 3)",
                 value: 15,
-              },
-              {
-                label: "Khoá K14",
-                value: 14,
-              },
-              {
-                label: "Khoá K13",
-                value: 13,
               },
             ]}
           />
@@ -617,6 +791,10 @@ function UsersManagementModule() {
         visible={modal?.visible}
         close={modal?.closeModal}
         refetch={refetch}
+      />
+      <OneTimeCredentialModal
+        credentials={issuedCredentials}
+        onClose={() => setIssuedCredentials([])}
       />
     </S.PageWrapper>
   );
