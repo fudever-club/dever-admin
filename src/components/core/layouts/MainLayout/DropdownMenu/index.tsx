@@ -1,4 +1,5 @@
 import { Avatar, Flex } from "antd";
+import { GlobalOutlined, UserOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -71,7 +72,7 @@ function DropdownMenu() {
           rel="noreferrer"
           className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors"
         >
-          <span>🌐</span> Trang Chủ Landing Page
+          <GlobalOutlined aria-hidden="true" /> Trang Chủ Landing Page
         </a>
         <a
           href="https://dever-client-taupe.vercel.app/vi/sign-in"
@@ -79,7 +80,7 @@ function DropdownMenu() {
           rel="noreferrer"
           className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors"
         >
-          <span>👤</span> Cổng Member Portal
+          <UserOutlined aria-hidden="true" /> Cổng Member Portal
         </a>
       </div>
       <Divider $margin={4} />

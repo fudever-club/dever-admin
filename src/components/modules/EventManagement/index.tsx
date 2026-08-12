@@ -25,6 +25,7 @@ import {
   PictureOutlined,
   QrcodeOutlined,
   FormOutlined,
+  EnvironmentOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
 
@@ -127,7 +128,7 @@ export default function EventManagementModule() {
       });
       const json = await res.json();
       if (json.status === "success") {
-        message.success("🎉 Đã tạo Sự kiện mới vào Database MongoDB thành công!");
+        message.success("Đã tạo sự kiện mới thành công.");
         setIsModalOpen(false);
         setPreviewCoverUrl("");
         form.resetFields();
@@ -184,7 +185,7 @@ export default function EventManagementModule() {
             {record.description}
           </Paragraph>
           <Text type="secondary" style={{ fontSize: 11, color: "#0066CC" }}>
-            📍 {record.location} • 📅 {record.date} ({record.time})
+            <EnvironmentOutlined aria-hidden="true" /> {record.location} • <CalendarOutlined aria-hidden="true" /> {record.date} ({record.time})
           </Text>
         </Space>
       ),
@@ -256,7 +257,7 @@ export default function EventManagementModule() {
         <div style={{ display: "flex", justifyItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
           <div>
             <Title level={3} style={{ margin: 0, color: "#0066CC" }}>
-              📅 Quản Lý Sự Kiện & Workshop (Hỗ Trợ Tải Ảnh Từ Máy Tính & Link Google Drive)
+              <CalendarOutlined aria-hidden="true" /> Quản Lý Sự Kiện & Workshop
             </Title>
             <Text type="secondary">
               Tải ảnh từ máy tính hoặc dán link Google Drive (tự động đổi sang ảnh trực tiếp), lưu thẳng vào Database MongoDB.
@@ -331,7 +332,7 @@ export default function EventManagementModule() {
           {/* Upload Image Section */}
           <div style={{ marginBottom: 16, background: "#F8FCFF", padding: 16, borderRadius: 12, border: "1px border #e6f4ff" }}>
             <Text strong style={{ display: "block", marginBottom: 8 }}>
-              🖼️ Ảnh Bìa Sự Kiện (Tải từ máy tính HOẶC Dán URL Link Drive)
+              <PictureOutlined aria-hidden="true" /> Ảnh Bìa Sự Kiện (Tải từ máy tính HOẶC Dán URL Link Drive)
             </Text>
 
             <Row gutter={12} align="middle">
@@ -364,7 +365,7 @@ export default function EventManagementModule() {
                     justifyContent: "center",
                   }}
                 >
-                  <UploadOutlined /> Tải Từ Máy Tính 📁
+                  <UploadOutlined /> Tải Từ Máy Tính
                 </label>
                 <input
                   id="local-image-upload"
@@ -418,7 +419,7 @@ export default function EventManagementModule() {
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
             <Button onClick={() => setIsModalOpen(false)}>Hủy</Button>
             <Button type="primary" htmlType="submit" style={{ background: "#0066CC" }}>
-              Xác Nhận Lưu Vào MongoDB Database 🚀
+              Xác nhận lưu sự kiện
             </Button>
           </div>
         </Form>

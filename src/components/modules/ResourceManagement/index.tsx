@@ -98,7 +98,7 @@ export default function ResourceManagementModule() {
       });
       const json = await res.json();
       if (json.status === "success") {
-        message.success("🎉 Đã thêm tài liệu mới vào MongoDB Database thành công!");
+        message.success("Đã thêm tài liệu mới thành công.");
         setIsModalOpen(false);
         form.resetFields();
         fetchResources();
@@ -191,7 +191,7 @@ export default function ResourceManagementModule() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <div>
             <Title level={3} style={{ margin: 0, color: "#0066CC" }}>
-              📁 Quản Lý Tài Liệu & Slide Workshop (MongoDB API Live)
+              <FilePdfOutlined aria-hidden="true" /> Quản Lý Tài Liệu & Slide Workshop
             </Title>
             <Text type="secondary">
               Đăng tải tài liệu, Ebook, Slide bài giảng, tự động lưu vào Database MongoDB và hiển thị lên Landing Page.
@@ -242,8 +242,8 @@ export default function ResourceManagementModule() {
 
           <Form.Item label="Hình thức tải tài liệu">
             <Radio.Group value={uploadMode} onChange={(e) => setUploadMode(e.target.value)}>
-              <Radio.Button value="link">🔗 Dán Link (Drive/GitHub)</Radio.Button>
-              <Radio.Button value="file">📁 Tải File Trực Tiếp Từ Máy</Radio.Button>
+              <Radio.Button value="link"><LinkOutlined /> Dán Link (Drive/GitHub)</Radio.Button>
+              <Radio.Button value="file"><UploadOutlined /> Tải File Trực Tiếp Từ Máy</Radio.Button>
             </Radio.Group>
           </Form.Item>
 
@@ -272,7 +272,7 @@ export default function ResourceManagementModule() {
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
             <Button onClick={() => setIsModalOpen(false)}>Hủy</Button>
             <Button type="primary" htmlType="submit" style={{ background: "#0066CC" }}>
-              Xác Nhận Lưu Vào MongoDB Database 🚀
+              Xác nhận lưu tài liệu
             </Button>
           </div>
         </Form>
