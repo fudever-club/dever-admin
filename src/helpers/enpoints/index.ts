@@ -14,6 +14,9 @@ const endpointUsersManagement = {
   CREATE_USER: `${prefixBase}/users/`,
   DELETE_USER: `${prefixBase}/users/{id}`,
   EDIT_USER_BY_ID: `${prefixBase}/users/{id}`,
+  SET_USER_ADMIN_ROLE: `${prefixBase}/users/{id}/role`,
+  SET_USER_POSITION: `${prefixBase}/users/{id}/position`,
+  SET_USER_TEAM_LEADERSHIP: `${prefixBase}/users/{id}/team-leadership`,
   CREATE_USERS_BY_CSV: `${prefixBase}/users/csv`,
   RESET_PASSWORD: `${prefixBase}/users/reset-password/{id}`,
 };

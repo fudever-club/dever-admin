@@ -64,6 +64,30 @@ export const authAPI = baseApi.injectEndpoints({
         flashError: true,
       }),
     }),
+    setUserAdminRole: build.mutation({
+      query: (data: { id: string; isAdmin: boolean }) => ({
+        url: endpointUsersManagement.SET_USER_ADMIN_ROLE.replace("{id}", data.id),
+        method: "PATCH",
+        body: { isAdmin: data.isAdmin },
+        flashError: true,
+      }),
+    }),
+    setUserPosition: build.mutation({
+      query: (data: { id: string; positionId: string }) => ({
+        url: endpointUsersManagement.SET_USER_POSITION.replace("{id}", data.id),
+        method: "PATCH",
+        body: { positionId: data.positionId },
+        flashError: true,
+      }),
+    }),
+    setUserTeamLeadership: build.mutation({
+      query: (data: { id: string; isLeader: boolean }) => ({
+        url: endpointUsersManagement.SET_USER_TEAM_LEADERSHIP.replace("{id}", data.id),
+        method: "PATCH",
+        body: { isLeader: data.isLeader },
+        flashError: true,
+      }),
+    }),
     resetPassword: build.mutation({
       query: (id: string) => ({
         url: endpointUsersManagement.RESET_PASSWORD.replace("{id}", id),
@@ -81,5 +105,8 @@ export const {
   useGetAllUsersQuery,
   useDeleteUserMutation,
   useEditUserMutation,
+  useSetUserAdminRoleMutation,
+  useSetUserPositionMutation,
+  useSetUserTeamLeadershipMutation,
   useResetPasswordMutation,
 } = authAPI;

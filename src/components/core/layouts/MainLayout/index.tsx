@@ -17,6 +17,8 @@ import { sidebarMenu } from "@/helpers/data/sidebarMenu";
 import { useTranslation } from "@/app/i18n/client";
 import { themes } from "@/style/themes";
 import { useVerifyTokenMutation } from "@/store/queries/auth";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux-toolkit";
+import { setAuthenticatedUser } from "@/store/slices/auth";
 import webStorageClient from "@/utils/webStorageClient";
 import { getRootPathname } from "@/utils/getPathname";
 import themeColors from "@/style/themes/default/colors";
@@ -30,6 +32,8 @@ const MainLayout = ({
 }>) => {
   const params = useParams();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const userInfo = useAppSelector((state) => state.auth.userInfo);
   const localActive = useLocale();
   const pathname = usePathname();
 
@@ -54,6 +58,7 @@ const MainLayout = ({
         message.error("Bạn không có quyền truy cập trang này");
         throw new Error("Bạn không có quyền truy cập trang này");
       }
+      dispatch(setAuthenticatedUser(res.data));
       setIsAuth(true);
       message.success("Kiểm tra truy cập thành công");
     } catch (error) {
@@ -61,7 +66,7 @@ const MainLayout = ({
       webStorageClient.remove("_access_token");
       router.push(`/${localActive}/sign-in`);
     }
-  }, [localActive, router, verifyToken]);
+  }, [dispatch, localActive, router, verifyToken]);
 
   useLayoutEffect(() => {
     handleVerifyToken();
@@ -140,7 +145,7 @@ const MainLayout = ({
                       size={40}
                       src={
                         <Image
-                          src={"/images/avatar/avatar.jpg"}
+                          src={userInfo?.avatar || "/images/avatar/avatar.jpg"}
                           alt="avatar"
                           width={64}
                           height={64}

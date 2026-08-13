@@ -1,4 +1,4 @@
-import { Avatar, Flex } from "antd";
+import { Avatar, Flex, message } from "antd";
 import { GlobalOutlined, UserOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -10,6 +10,7 @@ import Divider from "@/components/core/common/Divider";
 import { useTranslation } from "@/app/i18n/client";
 import { userDropdownMenu } from "@/helpers/data/userDropdownMenu";
 import webStorageClient from "@/utils/webStorageClient";
+import { useAppSelector } from "@/hooks/redux-toolkit";
 
 import * as S from "./styles";
 
@@ -17,6 +18,8 @@ function DropdownMenu() {
   const params = useParams();
   const router = useRouter();
   const locale = useLocale();
+  const userInfo = useAppSelector((state) => state.auth.userInfo);
+  const clientAppUrl = (process.env.NEXT_PUBLIC_CLIENT_APP_URL || "https://dever-client-taupe.vercel.app").replace(/\/$/, "");
 
   const { t } = useTranslation(params?.locale as string, "layout");
 
@@ -29,10 +32,18 @@ function DropdownMenu() {
   const handleClickItem = (key: string) => {
     switch (key) {
       case "profile":
-        console.log("profile");
+        if (!userInfo?._id) {
+          message.error("Không thể xác định tài khoản hiện tại. Vui lòng đăng nhập lại.");
+          return;
+        }
+        window.open(
+          `${clientAppUrl}/${locale}/profile/${encodeURIComponent(userInfo._id)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
         break;
       case "setting":
-        console.log("setting");
+        window.open(`${clientAppUrl}/${locale}/settings`, "_blank", "noopener,noreferrer");
         break;
       case "logout":
         webStorageClient.remove("_access_token");
@@ -50,7 +61,7 @@ function DropdownMenu() {
           size={28}
           src={
             <Image
-              src={"/images/avatar/avatar.jpg"}
+              src={userInfo?.avatar || "/images/avatar/avatar.jpg"}
               alt="avatar"
               width={28}
               height={28}
@@ -58,10 +69,8 @@ function DropdownMenu() {
           }
         />
         <Flex vertical>
-          <p>Tran Van Bao Thang</p>
-          <a href="https://github.com/fudever-club" target="_blank" rel="noreferrer">
-            @fudever-club
-          </a>
+          <p>{[userInfo?.firstname, userInfo?.lastname].filter(Boolean).join(" ") || "Thành viên FU-DEVER"}</p>
+          <span className="text-xs text-gray-500">@{userInfo?.email || "fudever-club"}</span>
         </Flex>
       </Flex>
       <Divider $margin={8} />
