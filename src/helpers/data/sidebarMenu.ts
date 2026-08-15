@@ -8,6 +8,7 @@ import {
   LinkOutlined,
   AimOutlined,
   CalendarOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 
 export const sidebarMenu: MenuProps["items"] = [
@@ -15,6 +16,11 @@ export const sidebarMenu: MenuProps["items"] = [
     key: "user-management",
     icon: React.createElement(UserOutlined),
     label: "usersManagement",
+  },
+  {
+    key: "blog-management",
+    icon: React.createElement(FileTextOutlined),
+    label: "Duyệt & Quản lý Tech Blog",
   },
   {
     key: "event-management",

@@ -16,10 +16,11 @@ import {
   Space,
   Table,
   TableProps,
+  Tooltip,
   Typography,
   message,
 } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, TrophyOutlined } from "@ant-design/icons";
 import { useParams, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import {
@@ -467,12 +468,24 @@ function UsersManagementModule() {
       },
     },
     {
+      title: "Hành động",
       key: "action",
       fixed: "right",
-      width: 100,
+      width: 140,
       render: (_, record) => {
         return (
-          <Flex justify="center" gap={20}>
+          <Flex justify="center" gap={12}>
+            <Tooltip title="Thăng hạng / Chuyển thành Alumni (Hall of Fame)">
+              <Button
+                shape="circle"
+                style={{ color: "#0066CC", borderColor: "#93C5FD", backgroundColor: "#EFF6FF" }}
+                icon={<TrophyOutlined />}
+                onClick={() => {
+                  router.push(`/vi/community-content`);
+                  message.info(`Đang mở Quản lý Alumni. Chọn "+ Thêm Cựu Thành Viên" và chọn ${record.firstname || ""} ${record.lastname || ""} để lấy Avatar tự động!`);
+                }}
+              />
+            </Tooltip>
             <Popconfirm
               title={"Reset mật khẩu"}
               description="Bạn có chắc chắn muốn reset mật khẩu của tài khoản này?"

@@ -78,6 +78,11 @@ const endpointAlumniManagement = {
   ALUMNI: `${prefixBase}/alumni`,
   ALUMNI_BY_ID: `${prefixBase}/alumni/{id}`,
 };
+const endpointOpenSourceManagement = {
+  OPEN_SOURCE: `${prefixBase}/opensource-projects`,
+  OPEN_SOURCE_ADMIN_ALL: `${prefixBase}/opensource-projects/admin/all`,
+  OPEN_SOURCE_BY_ID: `${prefixBase}/opensource-projects/{id}`,
+};
 
 const endpointOther = {};
 
@@ -94,4 +99,5 @@ export {
   endpointProjectManagement,
   endpointProjectLabManagement,
   endpointAlumniManagement,
+  endpointOpenSourceManagement,
 };

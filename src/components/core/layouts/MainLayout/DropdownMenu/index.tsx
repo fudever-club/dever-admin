@@ -19,7 +19,8 @@ function DropdownMenu() {
   const router = useRouter();
   const locale = useLocale();
   const userInfo = useAppSelector((state) => state.auth.userInfo);
-  const clientAppUrl = (process.env.NEXT_PUBLIC_CLIENT_APP_URL || "https://dever-client-taupe.vercel.app").replace(/\/$/, "");
+  const clientAppUrl = (process.env.NEXT_PUBLIC_CLIENT_APP_URL || "http://localhost:3002").replace(/\/$/, "");
+  const landingUrl = (process.env.NEXT_PUBLIC_LANDING_URL || "http://localhost:3000").replace(/\/$/, "");
 
   const { t } = useTranslation(params?.locale as string, "layout");
 
@@ -76,18 +77,18 @@ function DropdownMenu() {
       <Divider $margin={8} />
       <div className="flex flex-col gap-1 p-1">
         <a
-          href="https://fu-dever-landingpage-v2.vercel.app"
+          href={landingUrl}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors"
+          className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors font-medium"
         >
           <GlobalOutlined aria-hidden="true" /> Trang Chủ Landing Page
         </a>
         <a
-          href="https://dever-client-taupe.vercel.app/vi/sign-in"
+          href={`${clientAppUrl}/${locale}/dashboard`}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors"
+          className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors font-medium"
         >
           <UserOutlined aria-hidden="true" /> Cổng Member Portal
         </a>
