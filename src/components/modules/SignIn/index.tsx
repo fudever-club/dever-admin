@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Checkbox, Col, Flex, Form, FormProps, Input, message } from "antd";
+import { Checkbox, Flex, Form, FormProps, Input, message } from "antd";
 import { useRouter } from "next-nprogress-bar";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -68,10 +68,10 @@ function SignInModule() {
         $align="center"
         $margin="32px 0px 16px 0"
       >
-        {t("welcome")} 👋
+        {t("welcome")}
       </Typography.Title>
       <Typography.Text $align="center" $margin="0px 0px 16px 0">
-        {t("description")} 👋
+        {t("description")}
       </Typography.Text>
       <S.AccessNotice role="note">
         <strong>{t("accessNoticeTitle")}</strong>
@@ -120,8 +120,7 @@ function SignInModule() {
           />
         </Form.Item>
 
-        <Col span={24}>
-          <Flex align="flex-start" justify="space-between" wrap="wrap" gap={8}>
+        <S.LoginOptions>
             <Form.Item<FieldType>
               wrapperCol={{ span: 24 }}
               name="remember"
@@ -129,9 +128,8 @@ function SignInModule() {
             >
               <Checkbox disabled={isLoading}>{t("remember")}</Checkbox>
             </Form.Item>
-            <S.RecoveryHint>{t("recoveryHint")}</S.RecoveryHint>
-          </Flex>
-        </Col>
+            <S.RecoveryHint role="note">{t("recoveryHint")}</S.RecoveryHint>
+        </S.LoginOptions>
 
         <Form.Item wrapperCol={{ span: 24 }}>
           <Button

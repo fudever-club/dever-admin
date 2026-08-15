@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google";
 
 import Providers from "@/providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const deverSans = Be_Vietnam_Pro({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "FU-DEVER",
@@ -22,7 +26,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang={params?.locale}>
-      <body className={inter.className} suppressHydrationWarning={true}>
+      <body className={deverSans.className} suppressHydrationWarning={true}>
         <Providers>{children}</Providers>
       </body>
     </html>

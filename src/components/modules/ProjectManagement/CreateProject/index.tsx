@@ -128,7 +128,7 @@ function CreateProject() {
               multiple={false}
               showUploadList={false}
             >
-              <Button icon={<UploadOutlined />}>Tải Ảnh Từ Máy Tính 📁</Button>
+              <Button icon={<UploadOutlined />}>Tải Ảnh Từ Máy Tính</Button>
             </Upload.Dragger>
           </S.UploadWrap>
         </Form.Item>
@@ -154,7 +154,7 @@ function CreateProject() {
             loading={isLoading}
             style={{ background: "#0066CC" }}
           >
-            Tạo bài viết Dự án 🚀
+            Tạo bài viết Dự án
           </Button>
         </Form.Item>
       </Form>

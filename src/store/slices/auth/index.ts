@@ -25,6 +25,9 @@ export const authSlice = createSlice({
         isRemember: boolean;
       }>
     ) => {},
+    setAuthenticatedUser: (state, action: PayloadAction<any>) => {
+      state.userInfo = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(
@@ -41,6 +44,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { actionLogin } = authSlice.actions;
+export const { actionLogin, setAuthenticatedUser } = authSlice.actions;
 
 export default authSlice.reducer;

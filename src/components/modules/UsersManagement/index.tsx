@@ -16,10 +16,11 @@ import {
   Space,
   Table,
   TableProps,
+  Tooltip,
   Typography,
   message,
 } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, TrophyOutlined } from "@ant-design/icons";
 import { useParams, useSearchParams } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import {
@@ -39,12 +40,16 @@ import {
   useEditUserMutation,
   useGetAllUsersQuery,
   useResetPasswordMutation,
+  useSetUserAdminRoleMutation,
+  useSetUserPositionMutation,
+  useSetUserTeamLeadershipMutation,
 } from "@/store/queries/usersMangement";
 import { createQueryString } from "@/utils/queryString";
 import { useGetAllDepartmentsQuery } from "@/store/queries/departmentMangement";
 import { useGetAllPositionQuery } from "@/store/queries/positionManagement";
 import { useGetAllMajorQuery } from "@/store/queries/majorManagement";
 import useModal from "@/hooks/useModal";
+import { useAppSelector } from "@/hooks/redux-toolkit";
 
 import CreateUserModal from "./CreateUserModal";
 import OneTimeCredentialModal, {
@@ -85,6 +90,9 @@ type CsvValidationResult = {
 };
 
 const REQUIRED_CSV_HEADERS = ["firstname", "lastname", "email", "phone"];
+const EXECUTIVE_POSITION_CONSTANTS = new Set(["CHUNHIEM", "PHOCHUNHIEM"]);
+const isExecutivePosition = (position: any) =>
+  EXECUTIVE_POSITION_CONSTANTS.has(position?.constant);
 
 function parseCsvLine(line: string): string[] {
   const cells: string[] = [];
@@ -178,6 +186,16 @@ function UsersManagementModule() {
   const searchParams = useSearchParams();
 
   const [editUser] = useEditUserMutation();
+  const [setUserAdminRole, { isLoading: isChangingAdminAccess }] =
+    useSetUserAdminRoleMutation();
+  const [setUserPosition, { isLoading: isChangingPosition }] =
+    useSetUserPositionMutation();
+  const [setUserTeamLeadership, { isLoading: isChangingTeamLeadership }] =
+    useSetUserTeamLeadershipMutation();
+  const currentUser = useAppSelector((state) => state.auth.userInfo);
+  const isPresident = Boolean(
+    currentUser?.isAdmin && currentUser?.positionId?.constant === "CHUNHIEM"
+  );
   const [deleteUser] = useDeleteUserMutation();
   const [resetPassword] = useResetPasswordMutation();
   const [createManyUsersByCSV, { isLoading: isImporting }] =
@@ -242,7 +260,9 @@ function UsersManagementModule() {
     undefined,
     {
       selectFromResult: ({ data, isFetching }) => {
-        const newPositionData = data?.data?.map((position: any) => ({
+        const newPositionData = data?.data?.filter((position: any) =>
+          isPresident || !isExecutivePosition(position)
+        ).map((position: any) => ({
           label: position.name,
           value: position._id,
           ...position,
@@ -314,9 +334,13 @@ function UsersManagementModule() {
           <S.Select
             options={positionData?.result}
             defaultValue={value?.name}
-            onChange={(id: any) =>
-              HandleField(id, record, positionData, "positionId")
+            disabled={isChangingPosition || (!isPresident && isExecutivePosition(value))}
+            title={
+              isPresident || !isExecutivePosition(value)
+                ? "Cập nhật chức danh"
+                : "Chỉ Chủ nhiệm mới có thể thay đổi chức danh điều hành"
             }
+            onChange={(id) => handlePositionChange(record, String(id))}
           >
             <Space>
               {value?.name}
@@ -390,21 +414,21 @@ function UsersManagementModule() {
         return (
           <Flex justify="center" align="center">
             <Checkbox
-              defaultChecked={record?.isAdmin}
-              onChange={async () => {
-                const newRecord = {
-                  ...record,
-                  isAdmin: !value,
-                };
-                handleEditUser(newRecord);
-              }}
+              checked={Boolean(value)}
+              disabled={isChangingAdminAccess || !isPresident}
+              title={
+                isPresident
+                  ? "Cấp hoặc thu quyền vào trang quản trị"
+                  : "Chỉ Chủ nhiệm mới có thể thay đổi quyền quản trị"
+              }
+              onChange={() => handleAdminRoleChange(record, !Boolean(value))}
             ></Checkbox>
           </Flex>
         );
       },
     },
     {
-      title: "Leader",
+      title: "Trưởng nhóm/Ban",
       dataIndex: "isLeader",
       key: "isLeader",
       width: 100,
@@ -412,14 +436,10 @@ function UsersManagementModule() {
         return (
           <Flex justify="center" align="center">
             <Checkbox
-              defaultChecked={record?.isLeader}
-              onChange={async () => {
-                const newRecord = {
-                  ...record,
-                  isLeader: !record?.isLeader,
-                };
-                handleEditUser(newRecord);
-              }}
+              checked={Boolean(record?.isLeader)}
+              disabled={isChangingTeamLeadership}
+              title="Gán nhãn Trưởng nhóm/Ban; không cấp quyền trang quản trị"
+              onChange={() => handleTeamLeadershipChange(record, !Boolean(record?.isLeader))}
             ></Checkbox>
           </Flex>
         );
@@ -448,12 +468,24 @@ function UsersManagementModule() {
       },
     },
     {
+      title: "Hành động",
       key: "action",
       fixed: "right",
-      width: 100,
+      width: 140,
       render: (_, record) => {
         return (
-          <Flex justify="center" gap={20}>
+          <Flex justify="center" gap={12}>
+            <Tooltip title="Thăng hạng / Chuyển thành Alumni (Hall of Fame)">
+              <Button
+                shape="circle"
+                style={{ color: "#0066CC", borderColor: "#93C5FD", backgroundColor: "#EFF6FF" }}
+                icon={<TrophyOutlined />}
+                onClick={() => {
+                  router.push(`/vi/community-content`);
+                  message.info(`Đang mở Quản lý Alumni. Chọn "+ Thêm Cựu Thành Viên" và chọn ${record.firstname || ""} ${record.lastname || ""} để lấy Avatar tự động!`);
+                }}
+              />
+            </Tooltip>
             <Popconfirm
               title={"Reset mật khẩu"}
               description="Bạn có chắc chắn muốn reset mật khẩu của tài khoản này?"
@@ -505,7 +537,9 @@ function UsersManagementModule() {
       await deleteUser(id).unwrap();
       refetch();
       message.success("Xóa thành công");
-    } catch (err) {}
+    } catch (err: any) {
+      message.error(err?.data?.message || "Không thể xóa thành viên. Vui lòng thử lại.");
+    }
   };
 
   const handleResetPassword = async (id: string) => {
@@ -513,7 +547,9 @@ function UsersManagementModule() {
       await resetPassword(id).unwrap();
       refetch();
       message.success("Reset mật khẩu thành công!");
-    } catch (err) {}
+    } catch (err: any) {
+      message.error(err?.data?.message || "Không thể reset mật khẩu. Vui lòng thử lại.");
+    }
   };
 
   const handleEditUser = async (data: any) => {
@@ -524,7 +560,43 @@ function UsersManagementModule() {
       }).unwrap();
       refetch();
       message.success("Thay đổi thành công");
-    } catch (err) {}
+    } catch (err: any) {
+      message.error(err?.data?.message || "Không thể cập nhật thành viên. Vui lòng thử lại.");
+    }
+  };
+
+  const handleAdminRoleChange = async (record: DataType, isAdmin: boolean) => {
+    try {
+      const response: any = await setUserAdminRole({ id: record._id, isAdmin }).unwrap();
+      await refetch();
+      message.success(
+        response?.message || (isAdmin ? "Đã cấp quyền quản trị viên." : "Đã thu hồi quyền quản trị viên.")
+      );
+    } catch (err: any) {
+      message.error(
+        err?.data?.message || "Không thể cập nhật quyền quản trị viên. Vui lòng thử lại."
+      );
+    }
+  };
+
+  const handlePositionChange = async (record: DataType, positionId: string) => {
+    try {
+      const response: any = await setUserPosition({ id: record._id, positionId }).unwrap();
+      await refetch();
+      message.success(response?.message || "Đã cập nhật chức danh.");
+    } catch (err: any) {
+      message.error(err?.data?.message || "Không thể cập nhật chức danh. Vui lòng thử lại.");
+    }
+  };
+
+  const handleTeamLeadershipChange = async (record: DataType, isLeader: boolean) => {
+    try {
+      const response: any = await setUserTeamLeadership({ id: record._id, isLeader }).unwrap();
+      await refetch();
+      message.success(response?.message || "Đã cập nhật nhãn Trưởng nhóm/Ban.");
+    } catch (err: any) {
+      message.error(err?.data?.message || "Không thể cập nhật nhãn Trưởng nhóm/Ban. Vui lòng thử lại.");
+    }
   };
 
   const importCsv = async (source: string) => {

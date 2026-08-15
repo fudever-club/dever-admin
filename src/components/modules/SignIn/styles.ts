@@ -54,13 +54,33 @@ export const AccessNotice = styled.div`
 `;
 
 export const RecoveryHint = styled.p`
-  max-width: 230px;
   margin: 0;
 
   color: #52677d;
   font-size: 13px;
   line-height: 1.45;
   text-align: right;
+`;
+
+export const LoginOptions = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 230px);
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+
+  @media ${(props) => props.theme.breakpoints.smMax} {
+    grid-template-columns: 1fr;
+    gap: 6px;
+
+    ${RecoveryHint} {
+      text-align: left;
+    }
+  }
 `;
 
 export const AccountHint = styled.p`
