@@ -733,7 +733,7 @@ export default function EventManagementModule() {
             >
               <Switch checkedChildren={<StarFilled />} unCheckedChildren={<StarOutlined />} />
               <span style={{ fontSize: "13px", fontWeight: 600, color: "#92400E", display: "inline-flex", alignItems: "center", gap: 6 }}>
-                <StarFilled style={{ color: "#F59E0B" }} /> Ghim làm "SỰ KIỆN NỔI BẬT" trên Hero Banner đầu trang Landing Page
+                <StarFilled style={{ color: "#F59E0B" }} /> Ghim làm &quot;SỰ KIỆN NỔI BẬT&quot; trên Hero Banner đầu trang Landing Page
               </span>
             </div>
           </Form.Item>
