@@ -494,20 +494,20 @@ export default function CommunityContentManagement() {
         {mode === "alumni" && (
           <Card style={{ borderRadius: 16, backgroundColor: "#F8FCFF", borderColor: "#E2F0FD" }}>
             <Row gutter={[16, 16]} align="middle" justify="space-between">
-              <Col xs={24} md={12} lg={14}>
-                <Space wrap size={12}>
+              <Col xs={24} lg={14}>
+                <Space wrap style={{ width: "100%" }}>
                   <Input
                     prefix={<SearchOutlined style={{ color: "#0066CC" }} />}
                     placeholder="Tìm tên cựu SV, công ty, vị trí..."
                     value={alumniSearch}
                     onChange={(e) => setAlumniSearch(e.target.value)}
-                    style={{ width: 240, borderRadius: 10 }}
+                    style={{ width: 220, borderRadius: 10 }}
                     allowClear
                   />
                   <Select
                     value={alumniGenFilter}
                     onChange={(val) => setAlumniGenFilter(val)}
-                    style={{ width: 180 }}
+                    style={{ width: 170 }}
                     options={[
                       { value: "All", label: "Tất Cả Thế Hệ (Gen 1 - 6)" },
                       ...GEN_CHOICES,
@@ -515,20 +515,20 @@ export default function CommunityContentManagement() {
                   />
                 </Space>
               </Col>
-              <Col xs={24} md={12} lg={10} style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
+              <Col xs={24} lg={10} style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 8 }}>
                 <Radio.Group
                   value={alumniViewMode}
                   onChange={(e) => setAlumniViewMode(e.target.value)}
                   buttonStyle="solid"
                 >
-                  <Radio.Button value="cards"><AppstoreOutlined /> Thẻ Hồ Sơ</Radio.Button>
-                  <Radio.Button value="table"><UnorderedListOutlined /> Dạng Bảng</Radio.Button>
+                  <Radio.Button value="cards"><AppstoreOutlined /> Thẻ</Radio.Button>
+                  <Radio.Button value="table"><UnorderedListOutlined /> Bảng</Radio.Button>
                 </Radio.Group>
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
                   onClick={() => openEditor()}
-                  style={{ backgroundColor: "#0066CC", borderRadius: 10 }}
+                  style={{ backgroundColor: "#0066CC", borderRadius: 8, height: "34px", fontWeight: 600, fontSize: "13px" }}
                 >
                   Thêm Cựu Thành Viên
                 </Button>
@@ -542,7 +542,7 @@ export default function CommunityContentManagement() {
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => openEditor()}
-            style={{ width: "fit-content", backgroundColor: "#0066CC" }}
+            style={{ width: "fit-content", backgroundColor: "#0066CC", borderRadius: 8, height: "34px", fontWeight: 600, fontSize: "13px" }}
           >
             Thêm {mode === "opensource" ? "dự án Open Source" : "dự án Lab"}
           </Button>
@@ -649,6 +649,7 @@ export default function CommunityContentManagement() {
             columns={[...columns, actionColumn]}
             dataSource={rows}
             pagination={{ pageSize: 10 }}
+            scroll={{ x: 880 }}
           />
         )}
       </Space>
@@ -664,6 +665,7 @@ export default function CommunityContentManagement() {
         onCancel={() => setOpen(false)}
         footer={null}
         destroyOnClose
+        width="min(680px, 95vw)"
       >
         <Form form={form} layout="vertical" onFinish={save}>
           {mode === "opensource" && (
@@ -678,7 +680,15 @@ export default function CommunityContentManagement() {
                 <Form.Item name="author" label="Tác giả" style={{ flex: 1 }} rules={[{ required: true }]}>
                   <Input placeholder="Nhật Quang, Vũ Vũ..." />
                 </Form.Item>
-                <Form.Item name="stars" label="Số sao ⭐" style={{ width: 120 }}>
+                <Form.Item
+                  name="stars"
+                  label={
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      Số sao <StarFilled style={{ color: "#F59E0B" }} />
+                    </span>
+                  }
+                  style={{ width: 130 }}
+                >
                   <InputNumber min={0} style={{ width: "100%" }} />
                 </Form.Item>
               </Space>

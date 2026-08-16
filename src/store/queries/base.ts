@@ -17,5 +17,6 @@ const baseQuery = fetchBaseQuery({
 
 export const baseApi = createApi({
   baseQuery: baseQuery,
+  tagTypes: ["Notifications", "Users", "Content"],
   endpoints: () => ({}),
 });

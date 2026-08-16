@@ -286,7 +286,9 @@ export default function BlogManagement() {
                 key: "pending_review",
                 label: (
                   <Badge count={blogs.filter((b) => b.status === "pending_review").length} offset={[8, 0]}>
-                    <span className="font-bold pr-2">🟡 Chờ duyệt</span>
+                    <span className="font-bold pr-2 inline-flex items-center gap-1.5">
+                      <ClockCircleOutlined style={{ color: "#D97706" }} /> Chờ duyệt
+                    </span>
                   </Badge>
                 ),
               },
@@ -294,14 +296,18 @@ export default function BlogManagement() {
                 key: "changes_requested",
                 label: (
                   <Badge count={blogs.filter((b) => b.status === "changes_requested").length} offset={[8, 0]}>
-                    <span className="font-bold pr-2">🟠 Cần chỉnh sửa</span>
+                    <span className="font-bold pr-2 inline-flex items-center gap-1.5">
+                      <ExclamationCircleOutlined style={{ color: "#EA580C" }} /> Cần chỉnh sửa
+                    </span>
                   </Badge>
                 ),
               },
               {
                 key: "draft",
                 label: (
-                  <span className="font-bold">⚪ Bản nháp</span>
+                  <span className="font-bold inline-flex items-center gap-1.5">
+                    <FileTextOutlined style={{ color: "#64748B" }} /> Bản nháp
+                  </span>
                 ),
               },
               {
@@ -318,6 +324,7 @@ export default function BlogManagement() {
           rowKey="_id"
           loading={loading}
           pagination={{ pageSize: 10 }}
+          scroll={{ x: 880 }}
           className="dever-admin-table"
         />
       </Card>
@@ -331,7 +338,7 @@ export default function BlogManagement() {
         }
         open={reviewModalVisible}
         onCancel={() => setReviewModalVisible(false)}
-        width={900}
+        width="min(900px, 95vw)"
         footer={null}
         className="!rounded-3xl"
       >

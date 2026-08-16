@@ -84,6 +84,14 @@ const endpointOpenSourceManagement = {
   OPEN_SOURCE_BY_ID: `${prefixBase}/opensource-projects/{id}`,
 };
 
+const endpointNotifications = {
+  MY_NOTIFICATIONS: `${prefixBase}/notifications/my-notifications`,
+  READ_ALL: `${prefixBase}/notifications/read-all`,
+  READ_ITEM: `${prefixBase}/notifications/{id}/read`,
+  DELETE_ITEM: `${prefixBase}/notifications/{id}`,
+  TEST_TELEGRAM: `${prefixBase}/notifications/test-telegram`,
+};
+
 const endpointOther = {};
 
 export {
@@ -100,4 +108,5 @@ export {
   endpointProjectLabManagement,
   endpointAlumniManagement,
   endpointOpenSourceManagement,
+  endpointNotifications,
 };
