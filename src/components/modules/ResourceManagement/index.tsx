@@ -15,6 +15,9 @@ import {
   Card,
   Radio,
   Upload,
+  Popconfirm,
+  Row,
+  Col,
   type UploadFile,
 } from "antd";
 import {
@@ -23,10 +26,13 @@ import {
   FilePdfOutlined,
   LinkOutlined,
   UploadOutlined,
+  ReloadOutlined,
+  FileTextOutlined,
+  FolderOpenOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
 interface ResourceData {
@@ -47,9 +53,10 @@ export default function ResourceManagementModule() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadMode, setUploadMode] = useState<"link" | "file">("link");
-  const [localFileData, setLocalFileData] = useState<string | null>(null);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form] = Form.useForm();
 
   const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:5000";
@@ -62,10 +69,7 @@ export default function ResourceManagementModule() {
     };
   };
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
   const resetUpload = () => {
-    setLocalFileData(null);
     setSelectedFile(null);
     setFileList([]);
   };
@@ -96,7 +100,7 @@ export default function ResourceManagementModule() {
         setResources(json.data.map((item: any) => ({ ...item, key: item._id })));
       }
     } catch (err) {
-      message.error("Lỗi khi tải tài liệu từ MongoDB");
+      message.error("Lỗi khi tải tài liệu từ Database");
     } finally {
       setLoading(false);
     }
@@ -148,7 +152,7 @@ export default function ResourceManagementModule() {
         method: "POST",
         headers: authHeaders(true),
         body: JSON.stringify({
-          title: values.title,
+          title: values.title.trim(),
           type: values.type,
           category: values.category,
           author: values.author || "Ban Chuyên Môn FU-DEVER",
@@ -167,7 +171,7 @@ export default function ResourceManagementModule() {
       resetUpload();
       fetchResources();
     } catch (err) {
-      message.error(err instanceof Error ? err.message : "Lỗi khi lưu tài liệu vào MongoDB");
+      message.error(err instanceof Error ? err.message : "Lỗi khi lưu tài liệu vào Database");
     } finally {
       setIsSaving(false);
     }
@@ -175,18 +179,25 @@ export default function ResourceManagementModule() {
 
   const handleDelete = async (id?: string) => {
     if (!id) return;
+    setDeletingId(id);
     try {
       const res = await fetch(`${API_SERVER}/api/v1/resources/${id}`, {
         method: "DELETE",
         headers: authHeaders(),
       });
       const json = await res.json();
-      if (json.status === "success") {
-        message.success("Đã xóa tài liệu khỏi MongoDB!");
-        fetchResources();
+      if (res.ok && json.status === "success") {
+        message.success("Đã xóa tài liệu thành công!");
+        // Update local state immediately
+        setResources((prev) => prev.filter((r) => r._id !== id));
+      } else {
+        throw new Error(json.message || "Lỗi khi xóa tài liệu");
       }
     } catch (err) {
-      message.error("Lỗi khi xóa tài liệu!");
+      message.error(err instanceof Error ? err.message : "Lỗi khi xóa tài liệu!");
+      fetchResources();
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -195,42 +206,75 @@ export default function ResourceManagementModule() {
       title: "Tên tài liệu / Slide",
       dataIndex: "title",
       key: "title",
+      width: 280,
       render: (text: string, record: ResourceData) => (
-        <Space>
-          <FilePdfOutlined style={{ color: "#0066CC", fontSize: 18 }} />
-          <div>
-            <Text strong>{text}</Text>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 10, maxWidth: 300 }}>
+          <FilePdfOutlined style={{ color: "#0066CC", fontSize: 20, marginTop: 2, flexShrink: 0 }} />
+          <div style={{ minWidth: 150 }}>
+            <Text strong style={{ fontSize: 13, wordBreak: "break-word" }}>{text}</Text>
+            {record.description && (
+              <Paragraph ellipsis={{ rows: 1 }} type="secondary" style={{ fontSize: 11, margin: "2px 0 0 0" }}>
+                {record.description}
+              </Paragraph>
+            )}
+            <Text type="secondary" style={{ fontSize: 11, color: "#64748B", display: "block" }}>
+              Tác giả: {record.author || "FU-DEVER"}
+            </Text>
           </div>
-        </Space>
+        </div>
       ),
     },
     {
       title: "Loại tài liệu",
       dataIndex: "type",
       key: "type",
-      render: (type: string) => (
-        <Tag color={type === "Slide" ? "blue" : type === "Source Code" ? "green" : "purple"}>
-          {type}
-        </Tag>
-      ),
+      width: 140,
+      render: (type: string) => {
+        let color = "blue";
+        if (type === "Source Code") color = "green";
+        else if (type === "Ebook / PDF") color = "purple";
+        else if (type === "Cheatsheet") color = "orange";
+        return (
+          <Tag color={color} style={{ borderRadius: 6, fontWeight: 600, fontSize: 11 }}>
+            {type}
+          </Tag>
+        );
+      },
     },
     {
       title: "Chủ đề",
       dataIndex: "category",
       key: "category",
-      render: (cat: string) => <Tag color="cyan">{cat}</Tag>,
+      width: 160,
+      render: (cat: string) => (
+        <Tag color="cyan" style={{ borderRadius: 6, fontWeight: 600, fontSize: 11 }}>
+          {cat}
+        </Tag>
+      ),
     },
     {
       title: "Dung lượng / Nguồn",
       dataIndex: "size",
       key: "size",
+      width: 140,
+      render: (size: string) => (
+        <Text style={{ fontSize: 12, color: "#475569", fontWeight: 500 }}>
+          {size || "External Link"}
+        </Text>
+      ),
     },
     {
       title: "Đường dẫn File",
       dataIndex: "fileUrl",
       key: "fileUrl",
+      width: 130,
       render: (url: string) => (
-        <a href={url} target="_blank" rel="noreferrer" style={{ color: "#0066CC", fontWeight: 600 }}>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer noopener"
+          style={{ color: "#0066CC", fontWeight: 600, fontSize: 12 }}
+        >
           <LinkOutlined /> Xem File ↗
         </a>
       ),
@@ -238,59 +282,153 @@ export default function ResourceManagementModule() {
     {
       title: "Thao tác",
       key: "action",
+      width: 90,
       render: (_: any, record: ResourceData) => (
-        <Button
-          danger
-          type="text"
-          icon={<DeleteOutlined />}
-          onClick={() => handleDelete(record._id)}
+        <Popconfirm
+          title="Xóa tài liệu"
+          description={`Bạn có chắc chắn muốn xóa "${record.title}"?`}
+          onConfirm={() => handleDelete(record._id)}
+          okText="Xóa"
+          cancelText="Hủy"
+          okButtonProps={{ danger: true, loading: deletingId === record._id }}
         >
-          Xóa
-        </Button>
+          <Button
+            danger
+            type="text"
+            icon={<DeleteOutlined />}
+            loading={deletingId === record._id}
+            aria-label={`Xóa tài liệu ${record.title}`}
+          >
+            Xóa
+          </Button>
+        </Popconfirm>
       ),
     },
   ];
 
   return (
-    <div style={{ padding: 24 }}>
-      <Card style={{ borderRadius: 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-          <div>
-            <Title level={3} style={{ margin: 0, color: "#0066CC" }}>
-              <FilePdfOutlined aria-hidden="true" /> Quản Lý Tài Liệu & Slide Workshop
-            </Title>
-            <Text type="secondary">
-              Đăng tải tài liệu, Ebook, Slide bài giảng, tự động lưu vào Database MongoDB và hiển thị lên Landing Page.
-            </Text>
-          </div>
+    <div style={{ padding: "16px 20px" }}>
+      {/* Header Bar */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "12px",
+          marginBottom: "16px",
+        }}
+      >
+        <div>
+          <Title level={4} style={{ margin: 0, color: "#0066CC", fontSize: "18px", fontWeight: 700 }}>
+            <FolderOpenOutlined aria-hidden="true" /> Quản Lý Tài Liệu & Slide Workshop
+          </Title>
+          <Text type="secondary" style={{ fontSize: "13px" }}>
+            Đăng tải tài liệu, Ebook, Slide bài giảng, tự động đồng bộ lên Landing Page.
+          </Text>
+        </div>
+        <Space>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={fetchResources}
+            loading={loading}
+            style={{ borderRadius: 8 }}
+          >
+            Làm mới
+          </Button>
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            size="large"
+            size="middle"
             onClick={() => setIsModalOpen(true)}
-            style={{ borderRadius: 10, background: "#0066CC" }}
+            style={{
+              background: "#0066CC",
+              borderRadius: "8px",
+              fontWeight: 600,
+              fontSize: "13px",
+              height: "34px",
+              padding: "0 14px",
+              display: "inline-flex",
+              alignItems: "center",
+              boxShadow: "0 2px 4px rgba(0,102,204,0.15)",
+            }}
           >
             Tải Lên Tài Liệu Mới
           </Button>
-        </div>
+        </Space>
+      </div>
 
-        <Table dataSource={resources} columns={columns} loading={loading} pagination={{ pageSize: 5 }} />
+      <Card
+        style={{
+          borderRadius: "16px",
+          border: "1px solid #e6f4ff",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+        }}
+        bodyStyle={{ padding: "16px" }}
+      >
+        <Table
+          dataSource={resources}
+          columns={columns}
+          loading={loading}
+          pagination={{ pageSize: 8 }}
+          scroll={{ x: 880 }}
+        />
       </Card>
 
       {/* Modal Add Resource */}
       <Modal
-        title="Tải Lên Tài Liệu / Slide Bài Giảng Mới (Lưu MongoDB Database)"
+        title="Tải Lên Tài Liệu / Slide Bài Giảng Mới"
         open={isModalOpen}
         onCancel={() => {
           setIsModalOpen(false);
           resetUpload();
         }}
         footer={null}
+        width="min(640px, 95vw)"
+        style={{ top: 20 }}
       >
-        <Form form={form} layout="vertical" onFinish={handleAddResource} initialValues={{ type: "Slide", category: "Web & Frontend", author: "Ban Chuyên Môn FU-DEVER" }}>
-          <Form.Item label="Tên bài giảng / Tài liệu" name="title" rules={[{ required: true, message: "Vui lòng nhập tên tài liệu!" }]}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleAddResource}
+          initialValues={{
+            type: "Slide",
+            category: "Web & Frontend",
+            author: "Ban Chuyên Môn FU-DEVER",
+          }}
+        >
+          <Form.Item
+            label="Tên bài giảng / Tài liệu"
+            name="title"
+            rules={[{ required: true, message: "Vui lòng nhập tên tài liệu!" }]}
+          >
             <Input placeholder="Ví dụ: Slide Workshop Clean Architecture 2026..." />
           </Form.Item>
+
+          <Row gutter={[12, 12]}>
+            <Col xs={24} sm={12}>
+              <Form.Item label="Loại tài liệu" name="type" rules={[{ required: true }]}>
+                <Select>
+                  <Option value="Slide">Slide Bài Giảng</Option>
+                  <Option value="Source Code">Mã Nguồn Mẫu (GitHub / ZIP)</Option>
+                  <Option value="Ebook / PDF">Sách Ebook / File PDF</Option>
+                  <Option value="Cheatsheet">Cẩm Nang Cheatsheet</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={12}>
+              <Form.Item label="Chủ đề chuyên môn" name="category" rules={[{ required: true }]}>
+                <Select>
+                  <Option value="Web & Frontend">Web & Frontend</Option>
+                  <Option value="Backend & Architecture">Backend & Architecture</Option>
+                  <Option value="Giải Thuật ICPC">Giải Thuật ICPC</Option>
+                  <Option value="AI & Data Science">AI & Data Science</Option>
+                  <Option value="Cẩm Nang Chung">Cẩm Nang Chung</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item label="Tác giả / Ban chuyên môn biên soạn" name="author">
             <Input placeholder="Ví dụ: Ban Chuyên Môn FU-DEVER, Dev Team..." />
@@ -300,33 +438,15 @@ export default function ResourceManagementModule() {
             <Input.TextArea rows={2} placeholder="Tóm tắt ngắn gọn giá trị của tài liệu đối với sinh viên..." />
           </Form.Item>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <Form.Item label="Loại tài liệu" name="type" rules={[{ required: true }]}>
-              <Select>
-                <Option value="Slide">Slide Bài Giảng</Option>
-                <Option value="Source Code">Mã Nguồn Mẫu (GitHub / ZIP)</Option>
-                <Option value="Ebook / PDF">Sách Ebook / File PDF</Option>
-                <Option value="Cheatsheet">Cẩm Nang Cheatsheet</Option>
-              </Select>
-            </Form.Item>
-
-            <Form.Item label="Chủ đề chuyên môn" name="category" rules={[{ required: true }]}>
-              <Select>
-                <Option value="Web & Frontend">Web & Frontend</Option>
-                <Option value="Backend & Architecture">Backend & Architecture</Option>
-                <Option value="Giải Thuật ICPC">Giải Thuật ICPC</Option>
-                <Option value="AI & Data Science">AI & Data Science</Option>
-                <Option value="Cẩm Nang Chung">Cẩm Nang Chung</Option>
-              </Select>
-            </Form.Item>
-          </div>
-
           <Form.Item label="Hình thức tải tài liệu">
-            <Radio.Group value={uploadMode} onChange={(e) => {
-              setUploadMode(e.target.value);
-              resetUpload();
-              form.setFieldValue("fileUrl", undefined);
-            }}>
+            <Radio.Group
+              value={uploadMode}
+              onChange={(e) => {
+                setUploadMode(e.target.value);
+                resetUpload();
+                form.setFieldValue("fileUrl", undefined);
+              }}
+            >
               <Radio.Button value="link"><LinkOutlined /> Dán link (Google Docs/Drive/GitHub)</Radio.Button>
               <Radio.Button value="file"><UploadOutlined /> Tải File Trực Tiếp Từ Máy</Radio.Button>
             </Radio.Group>
@@ -356,7 +476,7 @@ export default function ResourceManagementModule() {
                 { required: true, message: "Vui lòng dán link tài liệu." },
                 { type: "url", message: "Link phải bắt đầu bằng http:// hoặc https://" },
               ]}
-              extra="Hỗ trợ Google Docs, Google Drive, GitHub, OneDrive và mọi link HTTP(S) có thể mở công khai."
+              extra="Hỗ trợ Google Docs, Google Drive, GitHub, OneDrive và mọi link HTTP(S) công khai."
             >
               <Input prefix={<LinkOutlined />} placeholder="https://docs.google.com/document/d/..." />
             </Form.Item>

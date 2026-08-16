@@ -2,7 +2,7 @@
 
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import Image from "next/image";
-import { MenuFoldOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Flex, Layout, Menu, Popover, message } from "antd";
 import { useParams, usePathname } from "next/navigation";
 import { AppProgressBar, useRouter } from "next-nprogress-bar";
@@ -10,6 +10,7 @@ import { useLocale } from "next-intl";
 
 import DropdownMenu from "./DropdownMenu";
 import SelectLanguage from "./SelectLanguage";
+import NotificationBell from "@/components/ui/NotificationBell";
 import Typography from "../../common/Typography";
 import LoadingScreen from "../../common/LoadingScreen";
 
@@ -20,7 +21,6 @@ import { useVerifyTokenMutation } from "@/store/queries/auth";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux-toolkit";
 import { setAuthenticatedUser } from "@/store/slices/auth";
 import webStorageClient from "@/utils/webStorageClient";
-import { getRootPathname } from "@/utils/getPathname";
 import themeColors from "@/style/themes/default/colors";
 
 import * as S from "./styles";
@@ -40,6 +40,7 @@ const MainLayout = ({
   const { t } = useTranslation(params?.locale as string, "layout");
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [isShowMenu, setIsShowMenu] = useState<boolean>(false);
   const [isAuth, setIsAuth] = useState<boolean>(false);
 
@@ -60,7 +61,6 @@ const MainLayout = ({
       }
       dispatch(setAuthenticatedUser(res.data));
       setIsAuth(true);
-      message.success("Kiểm tra truy cập thành công");
     } catch (error) {
       setIsAuth(false);
       webStorageClient.remove("_access_token");
@@ -78,31 +78,60 @@ const MainLayout = ({
     link: `/${item.key}`,
   }));
 
+  const handleToggle = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 992) {
+      setMobileOpen((prev) => !prev);
+    } else {
+      setCollapsed((prev) => !prev);
+    }
+  };
+
+  const handleMenuClick = (key: string) => {
+    setMobileOpen(false);
+    router?.push(`/${localActive}/${key}`);
+  };
+
   return (
     <>
       {!isAuth ? (
         <LoadingScreen />
       ) : (
-        <Layout hasSider>
-          <S.SiderCustom trigger={null} collapsible collapsed={collapsed}>
+        <Layout hasSider style={{ minHeight: "100vh" }}>
+          <S.MobileBackdrop
+            $visible={mobileOpen}
+            onClick={() => setMobileOpen(false)}
+          />
+
+          <S.SiderCustom
+            trigger={null}
+            collapsible
+            collapsed={collapsed}
+            $mobileOpen={mobileOpen}
+            width={200}
+            collapsedWidth={80}
+          >
             <S.LogoWrapper
-              onClick={() => router?.push(`/${localActive}/dashboard`)}
+              onClick={() => {
+                setMobileOpen(false);
+                router?.push(`/${localActive}/dashboard`);
+              }}
             >
               <div className="demo-logo-vertical">
                 <Flex align="center" justify="space-between">
                   <Flex align="center" gap={12}>
                     <Image
-                      alt=""
+                      alt="Logo"
                       src={"/icons/layout/logo.svg"}
-                      width={40}
-                      height={40}
+                      width={36}
+                      height={36}
                     />
                     {!collapsed && (
                       <Typography.Title
                         level={4}
                         $color={themes?.default?.colors?.primary}
+                        style={{ margin: 0, fontWeight: 800 }}
                       >
-                        ADMIN
+                        DEVER ADMIN
                       </Typography.Title>
                     )}
                   </Flex>
@@ -112,11 +141,12 @@ const MainLayout = ({
 
             <Menu
               mode="inline"
-              defaultSelectedKeys={["user-management"]}
+              selectedKeys={[pathname?.split("/")[2] || "dashboard"]}
               items={sideBarMenuFormat}
-              onClick={(e) => router?.push(`/${localActive}/${e?.key}`)}
+              onClick={(e) => handleMenuClick(e?.key)}
             />
           </S.SiderCustom>
+
           <S.LayoutCustom $collapsed={collapsed}>
             <AppProgressBar
               height="4px"
@@ -125,13 +155,16 @@ const MainLayout = ({
               shallowRouting
             />
             <S.HeaderCustom $collapsed={collapsed}>
-              <S.ButtonWrap
-                onClick={() => setCollapsed((prev) => !prev)}
-                $collapsed={collapsed}
-              >
-                <MenuFoldOutlined />
+              <S.ButtonWrap onClick={handleToggle} $collapsed={collapsed}>
+                {collapsed ? (
+                  <MenuUnfoldOutlined style={{ fontSize: "18px" }} />
+                ) : (
+                  <MenuFoldOutlined style={{ fontSize: "18px" }} />
+                )}
               </S.ButtonWrap>
-              <Flex align="center" gap={20}>
+
+              <Flex align="center" gap={12}>
+                <NotificationBell />
                 <SelectLanguage />
                 <Popover
                   content={<DropdownMenu />}
@@ -142,7 +175,7 @@ const MainLayout = ({
                 >
                   <Flex>
                     <S.AvatarCustom
-                      size={40}
+                      size={36}
                       src={
                         <Image
                           src={userInfo?.avatar || "/images/avatar/avatar.jpg"}
@@ -156,9 +189,13 @@ const MainLayout = ({
                 </Popover>
               </Flex>
             </S.HeaderCustom>
+
             <S.ContentCustom>{children}</S.ContentCustom>
+
             <S.FooterCustom>
-              <p>Hế lô ae ban chủ nhiệm, quản lý CLB zui zẻ nha ae</p>
+              <p style={{ margin: 0 }}>
+                Hệ thống Quản trị Ban Chủ nhiệm & Điều hành FU-DEVER Club
+              </p>
             </S.FooterCustom>
           </S.LayoutCustom>
         </Layout>

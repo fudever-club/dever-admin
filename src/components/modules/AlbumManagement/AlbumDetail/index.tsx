@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Col, Flex, Image, Row, Typography, Upload, message } from "antd";
+import { Col, Flex, Image, Row, Typography, Upload, message, Space } from "antd";
 import { useParams } from "next/navigation";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import _ from "lodash";
@@ -116,20 +116,26 @@ function AlbumDetailModule() {
     <>
       {contextHolder}
       <S.PageWrapper>
-        <S.Head>
-          <Typography.Title level={2}>{result?.name}</Typography.Title>
-        </S.Head>
-        <Flex justify="space-between" align="flex-start">
-          <S.FilterWrapper>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAdd}
-              disabled={!fileList.length}
-              loading={isLoading}
-            >
-              Tải ảnh lên album
-            </Button>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "12px",
+            marginBottom: "16px",
+          }}
+        >
+          <div>
+            <Typography.Title level={3} style={{ margin: 0, color: "#0066CC", fontSize: "20px", fontWeight: 700 }}>
+              {result?.name || "Chi Tiết Album"}
+            </Typography.Title>
+            <Typography.Text type="secondary" style={{ fontSize: "13px" }}>
+              {result?.description || "Bộ sưu tập hình ảnh sự kiện"} • {result?.imageList?.length || 0} ảnh
+            </Typography.Text>
+          </div>
+
+          <Space wrap>
             <Upload
               name="file"
               action="https://api.imgbb.com/1/upload?expiration=600&key=488e7d944b2bedd5020e1ace8585d1df"
@@ -145,35 +151,75 @@ function AlbumDetailModule() {
                 url: file,
               }))}
             >
-              <Button icon={<UploadOutlined />}>Click to pick images</Button>
+              <Button icon={<UploadOutlined />} style={{ borderRadius: 8 }}>
+                Chọn ảnh tải lên
+              </Button>
             </Upload>
-          </S.FilterWrapper>
-        </Flex>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAdd}
+              disabled={!fileList.length}
+              loading={isLoading}
+              style={{
+                backgroundColor: "#0066CC",
+                borderRadius: 8,
+                height: "34px",
+                fontWeight: 600,
+                fontSize: "13px",
+              }}
+            >
+              Lưu {fileList.length > 0 ? `(${fileList.length})` : ""} ảnh vào Album
+            </Button>
+          </Space>
+        </div>
 
-        <S.TableWrapper>
-          {/* <Table
-            columns={columns}
-            dataSource={result?.imageList}
-            loading={isFetching}
-            pagination={false}
-            rowKey={(record) => {
-              return record?.url;
-            }}
-            rowSelection={{
-              type: "checkbox",
-              onChange: (selectedRowKey, selectedRows: DataType[]) => {
-                setDeleteList(selectedRows.map((row) => row?.url));
-              },
-            }}
-          /> */}
-          <Row gutter={[16, 16]}>
-            {result?.imageList?.map((image: any) => (
-              <Col key={image?.url} span={6}>
-                <Image src={image?.url} alt="" />
-              </Col>
-            ))}
-          </Row>
-        </S.TableWrapper>
+        <div
+          style={{
+            backgroundColor: "#ffffff",
+            borderRadius: "16px",
+            border: "1px solid #e6f4ff",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+            padding: "16px",
+          }}
+        >
+          {(!result?.imageList || result.imageList.length === 0) ? (
+            <div style={{ textAlign: "center", padding: "40px 0", color: "#94a3b8" }}>
+              <p style={{ fontSize: "14px", fontWeight: 600 }}>Chưa có hình ảnh nào trong album này</p>
+              <p style={{ fontSize: "12px" }}>Bấm &quot;Chọn ảnh tải lên&quot; ở trên để bắt đầu thêm ảnh</p>
+            </div>
+          ) : (
+            <Row gutter={[16, 16]}>
+              {result?.imageList?.map((image: any, idx: number) => (
+                <Col key={image?.url || idx} xs={24} sm={12} md={8} lg={6}>
+                  <div
+                    style={{
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      border: "1px solid #f1f5f9",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                      backgroundColor: "#f8fafc",
+                      aspectRatio: "4/3",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Image
+                      src={image?.url}
+                      alt={`Album ${result?.name} - Ảnh ${idx + 1}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </div>
       </S.PageWrapper>
     </>
   );
