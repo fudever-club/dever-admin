@@ -41,13 +41,20 @@ export function middleware(req: NextRequest) {
   }
 
   if (req.headers.has("referer")) {
-    const refererUrl = new URL(req.headers.get("referer") || "");
-    const lngInReferer = languages.find((l) =>
-      refererUrl.pathname.startsWith(`/${l}`)
-    );
-    const response = NextResponse.next();
-    if (lngInReferer) response.cookies.set(cookieName, lngInReferer);
-    return response;
+    try {
+      const refererHeader = req.headers.get("referer");
+      if (refererHeader) {
+        const refererUrl = new URL(refererHeader);
+        const lngInReferer = languages.find((l) =>
+          refererUrl.pathname.startsWith(`/${l}`)
+        );
+        const response = NextResponse.next();
+        if (lngInReferer) response.cookies.set(cookieName, lngInReferer);
+        return response;
+      }
+    } catch {
+      // Ignore invalid or relative referer headers to prevent 500 crashes
+    }
   }
 
   return NextResponse.next();

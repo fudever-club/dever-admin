@@ -1,9 +1,15 @@
 import { TIME_FORMAT } from './formatDateTime';
 
-const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER;
-const API_SERVER_SOCKET = process?.env?.NEXT_PUBLIC_SERVER_SOCKET_URL;
-const ASSETS_URL = process.env.NEXT_PUBLIC_ASSETS_URL;
-const SITE_URL = '/';
+const API_SERVER =
+  process.env.NEXT_PUBLIC_API_SERVER ||
+  "https://dever-backend-production.up.railway.app";
+const API_SERVER_SOCKET =
+  process?.env?.NEXT_PUBLIC_SERVER_SOCKET_URL ||
+  "https://dever-backend-production.up.railway.app";
+const ASSETS_URL =
+  process.env.NEXT_PUBLIC_ASSETS_URL ||
+  "https://dever-backend-production.up.railway.app/static";
+const SITE_URL = "/";
 
 const USER_INFO = '_user_info';
 const ACCESS_TOKEN = '_access_token';
