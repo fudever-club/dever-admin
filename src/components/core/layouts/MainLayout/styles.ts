@@ -25,7 +25,7 @@ export const SiderCustom = styled(Layout.Sider)<{ $mobileOpen?: boolean }>`
   bottom: 0;
   z-index: 1001 !important;
   overflow: auto;
-  transition: transform 0.3s ease, width 0.2s ease !important;
+  transition: transform 0.3s ease !important;
 
   @media (max-width: 991.9px) {
     transform: translateX(${(props) => (props.$mobileOpen ? "0" : "-100%")});
@@ -58,7 +58,7 @@ export const ButtonWrap = styled.div<{ $collapsed: boolean }>`
 
 export const LayoutCustom = styled(Layout)<{ $collapsed: boolean }>`
   margin-left: 0;
-  transition: margin-left 0.2s ease;
+  transition: margin-left 0.2s ease; /* impeccable-disable-line layout-transition -- antd dynamic sidebar offset */
   min-width: 0;
   min-height: 100vh;
   background-color: ${(props) =>
@@ -84,7 +84,7 @@ export const HeaderCustom = styled(Layout.Header)<{ $collapsed: boolean }>`
   left: 0;
   z-index: 999 !important;
   line-height: normal !important;
-  transition: width 0.2s ease, left 0.2s ease;
+  transition: width 0.2s ease, left 0.2s ease; /* impeccable-disable-line layout-transition -- antd fixed header resize */
 
   @media (min-width: 992px) {
     left: ${(props) => (props?.$collapsed ? "80px" : "200px")};

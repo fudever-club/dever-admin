@@ -80,7 +80,7 @@ function DropdownMenu() {
           href={landingUrl}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors font-medium"
+          className="text-xs text-slate-700 hover:text-[#0066CC] flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-colors font-medium"
         >
           <GlobalOutlined aria-hidden="true" /> Trang Chủ Landing Page
         </a>
@@ -88,7 +88,7 @@ function DropdownMenu() {
           href={`${clientAppUrl}/${locale}/dashboard`}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-gray-700 hover:text-[#0098FF] flex items-center gap-2 p-1.5 rounded hover:bg-blue-50 transition-colors font-medium"
+          className="text-xs text-slate-700 hover:text-[#0066CC] flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-colors font-medium"
         >
           <UserOutlined aria-hidden="true" /> Cổng Member Portal
         </a>
