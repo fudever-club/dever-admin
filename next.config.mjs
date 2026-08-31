@@ -27,6 +27,18 @@ const nextConfig = {
       "api.qrserver.com",
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: 'https://dever-backend-production.up.railway.app/api/v1/:path*',
+      },
+      {
+        source: '/static/:path*',
+        destination: 'https://dever-backend-production.up.railway.app/static/:path*',
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

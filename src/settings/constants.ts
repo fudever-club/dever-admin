@@ -1,8 +1,7 @@
 import { TIME_FORMAT } from './formatDateTime';
 
 const API_SERVER =
-  process.env.NEXT_PUBLIC_API_SERVER ||
-  "https://dever-backend-production.up.railway.app";
+  process.env.NEXT_PUBLIC_API_SERVER || "";
 const API_SERVER_SOCKET =
   process?.env?.NEXT_PUBLIC_SERVER_SOCKET_URL ||
   "https://dever-backend-production.up.railway.app";
