@@ -1,17 +1,34 @@
 import _ from "lodash";
-import { getCookie, setCookie } from "cookies-next";
+import { getCookie, setCookie, deleteCookie } from "cookies-next";
 import Cookies from "js-cookie";
 
 import { constants } from "@/settings";
 
+const COOKIE_DEFAULT_OPTIONS = {
+  path: "/",
+  maxAge: 30 * 24 * 60 * 60, // 30 days
+  sameSite: "lax" as const,
+};
+
 const webStorageClient = {
   set(key: string, rawValue: any, option?: any) {
     const value = _.isString(rawValue) ? rawValue : JSON?.stringify(rawValue);
-    setCookie(key, value, option);
+    setCookie(key, value, { ...COOKIE_DEFAULT_OPTIONS, ...option });
+    Cookies.set(key, value, { path: "/" });
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(key, value);
+      } catch {}
+    }
   },
 
   get(key: string) {
-    const value: string = getCookie(key) || "";
+    let value: string = (getCookie(key, { path: "/" }) as string) || "";
+    if (!value && typeof window !== "undefined") {
+      try {
+        value = localStorage.getItem(key) || "";
+      } catch {}
+    }
     try {
       return JSON?.parse(value);
     } catch {
@@ -20,21 +37,33 @@ const webStorageClient = {
   },
 
   remove(key: string) {
-    setCookie(key, null, { maxAge: 0 });
+    deleteCookie(key, { path: "/" });
+    Cookies.remove(key, { path: "/" });
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem(key);
+      } catch {}
+    }
   },
 
   removeAll() {
     Object.keys(Cookies.get()).forEach((cookieName) => {
-      Cookies.remove(cookieName);
+      Cookies.remove(cookieName, { path: "/" });
+      deleteCookie(cookieName, { path: "/" });
     });
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.clear();
+      } catch {}
+    }
   },
 
   setToken(value: string, option?: any) {
-    setCookie(constants.ACCESS_TOKEN, value, option);
+    this.set(constants.ACCESS_TOKEN, value, option);
   },
 
   getToken() {
-    return getCookie(constants.ACCESS_TOKEN);
+    return this.get(constants.ACCESS_TOKEN);
   },
 };
 

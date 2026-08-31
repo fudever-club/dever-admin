@@ -47,12 +47,20 @@ function SignInModule() {
       if (token) {
         webStorageClient.setToken(token);
         webStorageClient.set("_access_token", token);
+        if (user) {
+          webStorageClient.set("_user_info", user);
+        }
       }
 
       message.success(t("signInSuccess"));
-      router?.push(`/${locale}/user-management`);
-    } catch {
-      message.error(t("signInFailed"));
+      if (typeof window !== "undefined") {
+        window.location.href = `/${locale}/user-management`;
+      } else {
+        router?.push(`/${locale}/user-management`);
+      }
+    } catch (err: any) {
+      const errMsg = err?.data?.message || err?.message || t("signInFailed");
+      message.error(errMsg);
     }
   };
 
