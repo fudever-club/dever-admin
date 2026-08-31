@@ -7,8 +7,8 @@ The authenticated administration workspace for FU-DEVER Club. It is used to prov
 | Service | Repository | Production |
 | --- | --- | --- |
 | Landing page | [fu-dever-landingpage](https://github.com/fudever-club/fu-dever-landingpage) | [Open](https://fu-dever-landingpage-v2.vercel.app) |
-| Member portal | [dever-client](https://github.com/fudever-club/dever-client) | [Open](https://dever-client-taupe.vercel.app/vi/sign-in) |
-| Admin dashboard | [dever-admin](https://github.com/fudever-club/dever-admin) | [Open](https://dever-admin-lac.vercel.app/vi/sign-in) |
+| Member portal | [dever-client](https://github.com/fudever-club/dever-client) | [Open](https://dever-client-sigma.vercel.app/vi/sign-in) |
+| Admin dashboard | [dever-admin](https://github.com/fudever-club/dever-admin) | [Open](https://dever-admin-three.vercel.app/vi/sign-in) |
 | Backend API | [dever-backend](https://github.com/fudever-club/dever-backend) | [Open](https://dever-backend-production.up.railway.app/health) |
 
 ## Key flows
