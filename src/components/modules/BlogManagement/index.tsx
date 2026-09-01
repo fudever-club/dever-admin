@@ -97,6 +97,17 @@ export default function BlogManagement() {
     fetchReviewQueue();
   }, [fetchReviewQueue]);
 
+  useEffect(() => {
+    if (!reviewModalVisible) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setReviewModalVisible(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [reviewModalVisible]);
+
   const handleReviewAction = async (status: "published" | "changes_requested" | "rejected") => {
     if (!selectedBlog) return;
     if ((status === "changes_requested" || status === "rejected") && !reviewFeedback.trim()) {

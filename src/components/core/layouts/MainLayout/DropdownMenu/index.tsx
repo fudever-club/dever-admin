@@ -19,8 +19,8 @@ function DropdownMenu() {
   const router = useRouter();
   const locale = useLocale();
   const userInfo = useAppSelector((state) => state.auth.userInfo);
-  const clientAppUrl = (process.env.NEXT_PUBLIC_CLIENT_APP_URL || "http://localhost:3002").replace(/\/$/, "");
-  const landingUrl = (process.env.NEXT_PUBLIC_LANDING_URL || "http://localhost:3000").replace(/\/$/, "");
+  const clientAppUrl = (process.env.NEXT_PUBLIC_CLIENT_APP_URL || process.env.NEXT_PUBLIC_CLIENT_URL || "https://client.fudever.com").replace(/\/$/, "");
+  const landingUrl = (process.env.NEXT_PUBLIC_LANDING_URL || "https://fudever.com").replace(/\/$/, "");
 
   const { t } = useTranslation(params?.locale as string, "layout");
 
