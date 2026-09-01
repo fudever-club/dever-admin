@@ -92,6 +92,14 @@ const endpointNotifications = {
   TEST_TELEGRAM: `${prefixBase}/notifications/test-telegram`,
 };
 
+const endpointFundManagement = {
+  CAMPAIGNS: `${prefixBase}/funds/admin/campaigns`,
+  CAMPAIGN_BY_ID: `${prefixBase}/funds/admin/campaigns/{id}`,
+  PAYMENTS: `${prefixBase}/funds/admin/payments`,
+  REVIEW_PAYMENT: `${prefixBase}/funds/admin/payments/{id}/review`,
+  ANALYTICS: `${prefixBase}/funds/admin/analytics`,
+};
+
 const endpointOther = {};
 
 export {
@@ -109,4 +117,5 @@ export {
   endpointAlumniManagement,
   endpointOpenSourceManagement,
   endpointNotifications,
+  endpointFundManagement,
 };
