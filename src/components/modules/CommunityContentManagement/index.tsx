@@ -63,12 +63,14 @@ const statusLabels: Record<string, string> = {
 };
 
 const GEN_CHOICES = [
-  { value: "Gen 1", label: "Gen 1 (Thế hệ sáng lập)" },
-  { value: "Gen 2", label: "Gen 2 (Thế hệ tiên phong)" },
+  { value: "Gen 1", label: "Gen 1" },
+  { value: "Gen 2", label: "Gen 2" },
   { value: "Gen 3", label: "Gen 3" },
   { value: "Gen 4", label: "Gen 4" },
   { value: "Gen 5", label: "Gen 5" },
-  { value: "Gen 6", label: "Gen 6 (Tốt nghiệp / OJT)" },
+  { value: "Gen 6", label: "Gen 6" },
+  { value: "Gen 7", label: "Gen 7" },
+  { value: "Gen 8", label: "Gen 8" },
 ];
 
 const COMPANY_SUGGESTIONS = [
@@ -776,7 +778,7 @@ export default function CommunityContentManagement() {
               </Form.Item>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <Form.Item name="graduationGen" label="Thế hệ (Gen 6 trở lùi)" rules={[{ required: true }]}>
+                <Form.Item name="graduationGen" label="Thế hệ (Gen)" rules={[{ required: true, message: "Chọn Gen" }]}>
                   <Select options={GEN_CHOICES} />
                 </Form.Item>
                 <Form.Item name="workplace" label="Đơn vị / Công ty (Tự điền bất kỳ)">
