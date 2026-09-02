@@ -87,7 +87,7 @@ export default function ResourceManagementModule() {
     });
     setSelectedFile(file);
     setFileList([{ uid: `${file.name}-${file.lastModified}`, name: file.name, status: "done", size: file.size, type: file.type }]);
-    message.success(`Đã chọn "${file.name}". File sẽ được tải lên Cloudflare R2.`);
+    message.success(`Đã chọn "${file.name}". Bấm "Lưu" để hoàn tất.`);
     return false; // Prevent automatic upload
   };
 
@@ -100,7 +100,7 @@ export default function ResourceManagementModule() {
         setResources(json.data.map((item: any) => ({ ...item, key: item._id })));
       }
     } catch (err) {
-      message.error("Lỗi khi tải tài liệu từ Database");
+      message.error("Lỗi khi tải danh sách tài liệu");
     } finally {
       setLoading(false);
     }
@@ -134,14 +134,14 @@ export default function ResourceManagementModule() {
 
         const uploadJson = await uploadRes.json();
         if (!uploadRes.ok || uploadJson.status !== "success") {
-          throw new Error(uploadJson.message || "Không thể tải tài liệu lên Cloudflare R2");
+          throw new Error(uploadJson.message || "Không thể tải tài liệu lên máy chủ");
         }
 
         finalFileUrl = uploadJson.data.url;
         finalSize = `${(uploadJson.data.size / (1024 * 1024)).toFixed(2)} MB (${selectedFile.name.split(".").pop()?.toUpperCase()})`;
       } catch (err) {
         setIsSaving(false);
-        message.error(err instanceof Error ? err.message : "Lỗi khi tải file lên Cloudflare R2");
+        message.error(err instanceof Error ? err.message : "Lỗi khi tải file lên máy chủ");
         return;
       }
     }
@@ -165,7 +165,7 @@ export default function ResourceManagementModule() {
       if (!res.ok || json.status !== "success") {
         throw new Error(json.message || "Không thể lưu tài liệu");
       }
-      message.success(uploadMode === "file" ? "Đã tải file lên Cloudflare R2 và lưu tài liệu thành công!" : "Đã lưu đường dẫn tài liệu.");
+      message.success(uploadMode === "file" ? "Đã tải file và lưu tài liệu thành công!" : "Đã lưu đường dẫn tài liệu.");
       setIsModalOpen(false);
       form.resetFields();
       resetUpload();
