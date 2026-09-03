@@ -17,11 +17,14 @@ import {
   Col,
   Image as AntImage,
   QRCode,
+  Popconfirm,
 } from "antd";
 import {
   PlusOutlined,
   CalendarOutlined,
   DeleteOutlined,
+  EditOutlined,
+  LoadingOutlined,
   PictureOutlined,
   QrcodeOutlined,
   FormOutlined,
@@ -133,10 +136,17 @@ export default function EventManagementModule() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<EventAdminData | null>(null);
   const [selectedQrEvent, setSelectedQrEvent] = useState<EventAdminData | null>(null);
   const [previewCoverUrl, setPreviewCoverUrl] = useState("");
+  const [previewEditCoverUrl, setPreviewEditCoverUrl] = useState("");
   const [updatingFeaturedId, setUpdatingFeaturedId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingEditImage, setIsUploadingEditImage] = useState(false);
   const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
 
   const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:5000";
 
@@ -159,28 +169,79 @@ export default function EventManagementModule() {
     fetchEvents();
   }, []);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        message.error("Kích thước file ảnh không được vượt quá 5MB!");
-        return;
+  const uploadImageFile = async (file: File): Promise<string | null> => {
+    if (file.size > 8 * 1024 * 1024) {
+      message.error("Kích thước file ảnh không được vượt quá 8MB!");
+      return null;
+    }
+    const token = webStorageClient.getToken();
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", "events");
+
+    try {
+      const res = await fetch(`${API_SERVER}/api/v1/upload/image`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      const json = await res.json();
+      if (res.ok && json.status === "success" && json.data?.url) {
+        return json.data.url;
       }
-      const reader = new FileReader();
-      reader.onload = (uploadEvent) => {
-        const base64Url = uploadEvent.target?.result as string;
-        setPreviewCoverUrl(base64Url);
-        form.setFieldsValue({ coverImage: base64Url });
-        message.success("Tải ảnh từ máy tính thành công!");
-      };
-      reader.readAsDataURL(file);
+      throw new Error(json.message || "Tải ảnh lên máy chủ không thành công");
+    } catch (err: any) {
+      message.error(err.message || "Không thể tải file ảnh lên máy chủ!");
+      return null;
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingImage(true);
+    try {
+      const uploadedUrl = await uploadImageFile(file);
+      if (uploadedUrl) {
+        setPreviewCoverUrl(uploadedUrl);
+        form.setFieldsValue({ coverImage: uploadedUrl });
+        message.success("Tải ảnh lên máy chủ thành công!");
+      }
+    } finally {
+      setIsUploadingImage(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleEditFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingEditImage(true);
+    try {
+      const uploadedUrl = await uploadImageFile(file);
+      if (uploadedUrl) {
+        setPreviewEditCoverUrl(uploadedUrl);
+        editForm.setFieldsValue({ coverImage: uploadedUrl });
+        message.success("Tải ảnh lên máy chủ thành công!");
+      }
+    } finally {
+      setIsUploadingEditImage(false);
+      e.target.value = "";
     }
   };
 
   const handleAddEvent = async (values: any) => {
-    const finalCoverImage = formatImageUrl(values.coverImage || previewCoverUrl || "/images/dever_blog_hero.png");
     const token = webStorageClient.getToken();
+    if (!token) {
+      message.warning("Vui lòng đăng nhập với tài khoản Quản trị viên để tạo sự kiện!");
+      return;
+    }
 
+    const finalCoverImage = formatImageUrl(
+      values.coverImage || previewCoverUrl || "/images/dever_blog_hero.png"
+    );
+
+    setIsSubmitting(true);
     try {
       const res = await fetch(`${API_SERVER}/api/v1/events`, {
         method: "POST",
@@ -189,35 +250,122 @@ export default function EventManagementModule() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          title: values.title,
-          date: values.date || "20/09/2026",
-          time: values.time || "14:00 - 17:00",
-          location: values.location,
+          title: values.title?.trim(),
+          date: values.date?.trim() || "20/09/2026",
+          time: values.time?.trim() || "14:00 - 17:00",
+          location: values.location?.trim(),
           status: values.status || "Đang mở đăng ký",
-          speakers: values.speakers || "Ban Chuyên Môn FU-DEVER",
+          speakers: values.speakers?.trim() || "Ban Chuyên Môn FU-DEVER",
           coverImage: finalCoverImage,
-          description: values.description || "Nội dung chi tiết sự kiện...",
-          registerUrl: values.registerUrl || "#",
-          checkinUrl: values.checkinUrl || "#",
+          description: values.description?.trim() || "Nội dung chi tiết sự kiện...",
+          registerUrl: values.registerUrl?.trim() || "#",
+          checkinUrl: values.checkinUrl?.trim() || "#",
           isFeatured: !!values.isFeatured,
         }),
       });
+
       const json = await res.json();
-      if (json.status === "success") {
+      if (res.ok && json.status === "success") {
         message.success("Đã tạo sự kiện mới thành công.");
         setIsModalOpen(false);
         setPreviewCoverUrl("");
         form.resetFields();
         fetchEvents();
+      } else {
+        const errMsg = Array.isArray(json?.message)
+          ? json.message.join(", ")
+          : (json?.message || "Không thể tạo sự kiện. Vui lòng kiểm tra lại thông tin!");
+        message.error(errMsg);
       }
-    } catch (err) {
-      message.error("Lỗi khi thêm sự kiện!");
+    } catch (err: any) {
+      message.error(err?.message || "Lỗi kết nối máy chủ khi thêm sự kiện!");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOpenEditModal = (record: EventAdminData) => {
+    setEditingEvent(record);
+    setPreviewEditCoverUrl(record.coverImage || "");
+    editForm.setFieldsValue({
+      title: record.title,
+      date: record.date,
+      time: record.time,
+      location: record.location,
+      status: record.status,
+      speakers: record.speakers,
+      coverImage: record.coverImage,
+      description: record.description,
+      registerUrl: record.registerUrl === "#" ? "" : record.registerUrl,
+      checkinUrl: record.checkinUrl === "#" ? "" : record.checkinUrl,
+      isFeatured: !!record.isFeatured,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateEvent = async (values: any) => {
+    if (!editingEvent?._id) return;
+    const token = webStorageClient.getToken();
+    if (!token) {
+      message.warning("Vui lòng đăng nhập với tài khoản Quản trị viên để thực hiện!");
+      return;
+    }
+
+    const finalCoverImage = formatImageUrl(
+      values.coverImage || previewEditCoverUrl || editingEvent.coverImage || "/images/dever_blog_hero.png"
+    );
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`${API_SERVER}/api/v1/events/${editingEvent._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: values.title?.trim(),
+          date: values.date?.trim(),
+          time: values.time?.trim(),
+          location: values.location?.trim(),
+          status: values.status,
+          speakers: values.speakers?.trim(),
+          coverImage: finalCoverImage,
+          description: values.description?.trim(),
+          registerUrl: values.registerUrl?.trim() || "#",
+          checkinUrl: values.checkinUrl?.trim() || "#",
+          isFeatured: !!values.isFeatured,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.status === "success") {
+        message.success("Đã cập nhật sự kiện thành công!");
+        setIsEditModalOpen(false);
+        setEditingEvent(null);
+        setPreviewEditCoverUrl("");
+        editForm.resetFields();
+        fetchEvents();
+      } else {
+        const errMsg = Array.isArray(json?.message)
+          ? json.message.join(", ")
+          : (json?.message || "Không thể cập nhật sự kiện!");
+        message.error(errMsg);
+      }
+    } catch (err: any) {
+      message.error(err?.message || "Lỗi khi cập nhật sự kiện!");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleQuickStatusChange = async (id?: string, newStatus?: string) => {
     if (!id || !newStatus) return;
     const token = webStorageClient.getToken();
+    if (!token) {
+      message.warning("Vui lòng đăng nhập với tài khoản Quản trị viên để thực hiện!");
+      return;
+    }
 
     // Optimistic UI update
     setEvents((prev) =>
@@ -234,13 +382,17 @@ export default function EventManagementModule() {
         body: JSON.stringify({ status: newStatus }),
       });
       const json = await res.json();
-      if (json.status === "success") {
+      if (res.ok && json.status === "success") {
         message.success(`Đã cập nhật trạng thái: "${newStatus}"!`);
       } else {
+        const errMsg = Array.isArray(json?.message)
+          ? json.message.join(", ")
+          : (json?.message || "Không thể cập nhật trạng thái!");
+        message.error(errMsg);
         fetchEvents();
       }
-    } catch (err) {
-      message.error("Lỗi khi cập nhật trạng thái!");
+    } catch (err: any) {
+      message.error(err?.message || "Lỗi khi cập nhật trạng thái!");
       fetchEvents();
     }
   };
@@ -249,6 +401,11 @@ export default function EventManagementModule() {
     if (!id || updatingFeaturedId === id) return;
     setUpdatingFeaturedId(id);
     const token = webStorageClient.getToken();
+    if (!token) {
+      message.warning("Vui lòng đăng nhập với tài khoản Quản trị viên để thực hiện!");
+      setUpdatingFeaturedId(null);
+      return;
+    }
 
     // Optimistic update
     setEvents((prev) =>
@@ -271,17 +428,21 @@ export default function EventManagementModule() {
         body: JSON.stringify({ isFeatured: checked }),
       });
       const json = await res.json();
-      if (json.status === "success") {
+      if (res.ok && json.status === "success") {
         message.success(
           checked
             ? "Đã ghim sự kiện này lên vị trí SỰ KIỆN NỔI BẬT đầu trang Landing Page!"
             : "Đã tắt ghim sự kiện nổi bật."
         );
       } else {
+        const errMsg = Array.isArray(json?.message)
+          ? json.message.join(", ")
+          : (json?.message || "Không thể cập nhật sự kiện nổi bật!");
+        message.error(errMsg);
         fetchEvents();
       }
-    } catch (err) {
-      message.error("Lỗi khi cập nhật sự kiện nổi bật!");
+    } catch (err: any) {
+      message.error(err?.message || "Lỗi khi cập nhật sự kiện nổi bật!");
       fetchEvents();
     } finally {
       setUpdatingFeaturedId(null);
@@ -291,18 +452,27 @@ export default function EventManagementModule() {
   const handleDelete = async (id?: string) => {
     if (!id) return;
     const token = webStorageClient.getToken();
+    if (!token) {
+      message.warning("Vui lòng đăng nhập với tài khoản Quản trị viên để thực hiện!");
+      return;
+    }
     try {
       const res = await fetch(`${API_SERVER}/api/v1/events/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
       const json = await res.json();
-      if (json.status === "success") {
+      if (res.ok && json.status === "success") {
         message.success("Đã xóa sự kiện thành công!");
         fetchEvents();
+      } else {
+        const errMsg = Array.isArray(json?.message)
+          ? json.message.join(", ")
+          : (json?.message || "Không thể xóa sự kiện!");
+        message.error(errMsg);
       }
-    } catch (err) {
-      message.error("Lỗi khi xóa sự kiện!");
+    } catch (err: any) {
+      message.error(err?.message || "Lỗi khi xóa sự kiện!");
     }
   };
 
@@ -517,16 +687,37 @@ export default function EventManagementModule() {
     {
       title: "Thao tác",
       key: "action",
-      width: 75,
+      width: 130,
       render: (_: any, record: EventAdminData) => (
-        <Button
-          danger
-          type="text"
-          icon={<DeleteOutlined />}
-          onClick={() => handleDelete(record._id)}
-        >
-          Xóa
-        </Button>
+        <Space size={6}>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            size="small"
+            onClick={() => handleOpenEditModal(record)}
+            style={{ color: "#0066CC", padding: "0 4px", fontWeight: 600 }}
+          >
+            Sửa
+          </Button>
+          <Popconfirm
+            title="Xác nhận xóa sự kiện"
+            description="Bạn có chắc chắn muốn xóa sự kiện này không? Hành động này không thể hoàn tác."
+            onConfirm={() => handleDelete(record._id)}
+            okText="Xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
+            <Button
+              danger
+              type="link"
+              icon={<DeleteOutlined />}
+              size="small"
+              style={{ padding: "0 4px" }}
+            >
+              Xóa
+            </Button>
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
@@ -565,7 +756,11 @@ export default function EventManagementModule() {
             type="primary"
             icon={<PlusOutlined />}
             size="middle"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              form.resetFields();
+              setPreviewCoverUrl("");
+              setIsModalOpen(true);
+            }}
             style={{
               background: "#0066CC",
               borderRadius: "8px",
@@ -659,9 +854,15 @@ export default function EventManagementModule() {
 
       {/* Modal Add Event */}
       <Modal
-        title="Tạo Sự Kiện / Workshop Mới (Hỗ trợ Upload File Ảnh & Link Drive)"
+        title="Tạo Sự Kiện / Workshop Mới"
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => {
+          if (!isSubmitting) {
+            setIsModalOpen(false);
+            setPreviewCoverUrl("");
+            form.resetFields();
+          }
+        }}
         footer={null}
         width="min(720px, 95vw)"
         style={{ top: 20 }}
@@ -764,22 +965,24 @@ export default function EventManagementModule() {
                     alignItems: "center",
                     gap: 6,
                     padding: "8px 16px",
-                    background: "#0066CC",
+                    background: isUploadingImage ? "#94a3b8" : "#0066CC",
                     color: "white",
                     borderRadius: 8,
                     fontWeight: 600,
                     fontSize: 13,
-                    cursor: "pointer",
+                    cursor: isUploadingImage ? "not-allowed" : "pointer",
                     width: "100%",
                     justifyContent: "center",
+                    transition: "all 0.2s",
                   }}
                 >
-                  <UploadOutlined /> Tải Từ Máy Tính
+                  {isUploadingImage ? <LoadingOutlined /> : <UploadOutlined />} {isUploadingImage ? "Đang Tải Lên..." : "Tải Từ Máy Tính"}
                 </label>
                 <input
                   id="local-image-upload"
                   type="file"
                   accept="image/*"
+                  disabled={isUploadingImage}
                   onChange={handleFileUpload}
                   style={{ display: "none" }}
                 />
@@ -810,31 +1013,254 @@ export default function EventManagementModule() {
           </Form.Item>
 
           <Form.Item
-            label="Link Đăng Ký (Google Form / MS Form)"
+            label="Link Đăng Ký (Google Form / MS Form - Để trống nếu dùng vé QR nội bộ)"
             name="registerUrl"
-            rules={[
-              { required: true, message: "Vui lòng nhập link form đăng ký sự kiện!" },
-              { type: "url", message: "Link đăng ký phải là URL hợp lệ (bắt đầu bằng http:// hoặc https://)!" },
-            ]}
           >
-            <Input prefix={<FormOutlined />} placeholder="https://docs.google.com/forms/d/e/.../viewform" />
+            <Input
+              prefix={<FormOutlined />}
+              placeholder="https://docs.google.com/forms/d/e/... hoặc để trống (#)"
+              onChange={(e) => {
+                const val = e.target.value.trim();
+                if (val && !val.startsWith("http://") && !val.startsWith("https://") && val !== "#") {
+                  form.setFieldsValue({ registerUrl: `https://${val}` });
+                }
+              }}
+            />
           </Form.Item>
 
           <Form.Item
-            label="Link / Mã QR Check-in (Điểm danh)"
+            label="Link / Mã QR Check-in (Điểm danh - Để trống nếu check-in bàn desk)"
             name="checkinUrl"
-            rules={[
-              { required: true, message: "Vui lòng nhập link tạo mã QR điểm danh / check-in!" },
-              { type: "url", message: "Link check-in phải là URL hợp lệ (bắt đầu bằng http:// hoặc https://)!" },
-            ]}
           >
-            <Input prefix={<QrcodeOutlined />} placeholder="https://docs.google.com/forms/d/e/.../viewform hoặc link điểm danh" />
+            <Input
+              prefix={<QrcodeOutlined />}
+              placeholder="https://docs.google.com/forms/d/e/... hoặc để trống (#)"
+              onChange={(e) => {
+                const val = e.target.value.trim();
+                if (val && !val.startsWith("http://") && !val.startsWith("https://") && val !== "#") {
+                  form.setFieldsValue({ checkinUrl: `https://${val}` });
+                }
+              }}
+            />
           </Form.Item>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-            <Button onClick={() => setIsModalOpen(false)}>Hủy</Button>
-            <Button type="primary" htmlType="submit" style={{ background: "#0066CC" }}>
-              Xác nhận lưu sự kiện
+            <Button disabled={isSubmitting} onClick={() => setIsModalOpen(false)}>Hủy</Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isSubmitting}
+              disabled={isUploadingImage}
+              style={{ background: "#0066CC" }}
+            >
+              {isSubmitting ? "Đang Lưu..." : "Xác nhận lưu sự kiện"}
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* Modal Edit Event */}
+      <Modal
+        title="Chỉnh Sửa Thông Tin Sự Kiện / Workshop"
+        open={isEditModalOpen}
+        onCancel={() => {
+          if (!isSubmitting) {
+            setIsEditModalOpen(false);
+            setEditingEvent(null);
+            setPreviewEditCoverUrl("");
+            editForm.resetFields();
+          }
+        }}
+        footer={null}
+        width="min(720px, 95vw)"
+        style={{ top: 20 }}
+      >
+        <Form
+          form={editForm}
+          layout="vertical"
+          onFinish={handleUpdateEvent}
+        >
+          <Form.Item label="Tiêu đề Sự kiện / Workshop" name="title" rules={[{ required: true, message: "Vui lòng nhập tiêu đề sự kiện!" }]}>
+            <Input placeholder="Ví dụ: Workshop Tối Ưu Hóa Code Web 2026..." />
+          </Form.Item>
+
+          <Row gutter={[12, 12]}>
+            <Col xs={24} sm={12}>
+              <Form.Item label="Ngày diễn ra" name="date" rules={[{ required: true, message: "Nhập ngày diễn ra!" }]}>
+                <Input placeholder="Ví dụ: 15/08/2026" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item label="Khung giờ" name="time" rules={[{ required: true, message: "Nhập khung giờ!" }]}>
+                <Input placeholder="Ví dụ: 14:00 - 17:00" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={[12, 12]}>
+            <Col xs={24} sm={14}>
+              <Form.Item label="Địa điểm tổ chức" name="location" rules={[{ required: true, message: "Vui lòng nhập địa điểm!" }]}>
+                <Input placeholder="Ví dụ: Hội trường Beta, FPTU Da Nang..." />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={10}>
+              <Form.Item label="Trạng thái sự kiện" name="status" rules={[{ required: true }]}>
+                <Select>
+                  {Object.keys(EVENT_STATUS_CONFIG).map((stKey) => {
+                    const cfg = EVENT_STATUS_CONFIG[stKey];
+                    return (
+                      <Option key={stKey} value={stKey}>
+                        <Space size={6}>
+                          {cfg.renderIcon()}
+                          <span style={{ color: cfg.color, fontWeight: 600, fontSize: 12 }}>{cfg.label}</span>
+                        </Space>
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item label="Diễn giả / Ban tổ chức" name="speakers">
+            <Input placeholder="Ví dụ: Lê Đức Anh Phương & Ban Chuyên Môn FU-DEVER" />
+          </Form.Item>
+
+          {/* Featured Event Switch */}
+          <Form.Item name="isFeatured" valuePropName="checked" style={{ marginBottom: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "10px 14px",
+                backgroundColor: "#FFFBEB",
+                borderRadius: "12px",
+                border: "1px solid #FDE68A",
+              }}
+            >
+              <Switch checkedChildren={<StarFilled />} unCheckedChildren={<StarOutlined />} />
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#92400E", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <StarFilled style={{ color: "#F59E0B" }} /> Ghim làm &quot;SỰ KIỆN NỔI BẬT&quot; trên Hero Banner đầu trang Landing Page
+              </span>
+            </div>
+          </Form.Item>
+
+          {/* Upload Image Section */}
+          <div style={{ marginBottom: 16, background: "#F8FCFF", padding: 16, borderRadius: 12, border: "1px solid #e6f4ff" }}>
+            <Text strong style={{ display: "block", marginBottom: 8 }}>
+              <PictureOutlined aria-hidden="true" /> Ảnh Bìa Sự Kiện (Tải từ máy tính HOẶC Dán URL Link Drive)
+            </Text>
+
+            <Row gutter={[12, 12]} align="middle">
+              <Col xs={24} sm={15}>
+                <Form.Item name="coverImage" style={{ marginBottom: 0 }}>
+                  <Input
+                    prefix={<PictureOutlined style={{ color: "#0066CC" }} />}
+                    placeholder="Dán URL link ảnh (Google Drive, ImgBB, Unsplash...)"
+                    value={previewEditCoverUrl}
+                    onChange={(e) => setPreviewEditCoverUrl(e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={9}>
+                <label
+                  htmlFor="local-edit-image-upload"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 16px",
+                    background: isUploadingEditImage ? "#94a3b8" : "#0066CC",
+                    color: "white",
+                    borderRadius: 8,
+                    fontWeight: 600,
+                    fontSize: 13,
+                    cursor: isUploadingEditImage ? "not-allowed" : "pointer",
+                    width: "100%",
+                    justifyContent: "center",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  {isUploadingEditImage ? <LoadingOutlined /> : <UploadOutlined />} {isUploadingEditImage ? "Đang Tải Lên..." : "Tải Từ Máy Tính"}
+                </label>
+                <input
+                  id="local-edit-image-upload"
+                  type="file"
+                  accept="image/*"
+                  disabled={isUploadingEditImage}
+                  onChange={handleEditFileUpload}
+                  style={{ display: "none" }}
+                />
+              </Col>
+            </Row>
+
+            {previewEditCoverUrl && (
+              <div style={{ marginTop: 12, textAlign: "center", borderRadius: 10, overflow: "hidden", border: "1px solid #d9d9d9", maxHeight: 180 }}>
+                <img
+                  src={formatImageUrl(previewEditCoverUrl)}
+                  alt="Banner Preview"
+                  style={{ width: "100%", objectFit: "cover" }}
+                  onError={() => setPreviewEditCoverUrl("")}
+                />
+              </div>
+            )}
+          </div>
+
+          <Form.Item
+            label="Mô Tả Chi Tiết Sự Kiện (Description & Agenda)"
+            name="description"
+            rules={[{ required: true, message: "Vui lòng nhập mô tả sự kiện!" }]}
+          >
+            <TextArea
+              rows={4}
+              placeholder="Ví dụ: Buổi workshop sẽ đi qua 3 phần chính: 1. Giới thiệu Next.js 14; 2. Demo xây dựng Web; 3. Hỏi đáp cùng Senior Dev..."
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Link Đăng Ký (Google Form / MS Form - Để trống nếu dùng vé QR nội bộ)"
+            name="registerUrl"
+          >
+            <Input
+              prefix={<FormOutlined />}
+              placeholder="https://docs.google.com/forms/d/e/... hoặc để trống (#)"
+              onChange={(e) => {
+                const val = e.target.value.trim();
+                if (val && !val.startsWith("http://") && !val.startsWith("https://") && val !== "#") {
+                  editForm.setFieldsValue({ registerUrl: `https://${val}` });
+                }
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Link / Mã QR Check-in (Điểm danh - Để trống nếu check-in bàn desk)"
+            name="checkinUrl"
+          >
+            <Input
+              prefix={<QrcodeOutlined />}
+              placeholder="https://docs.google.com/forms/d/e/... hoặc để trống (#)"
+              onChange={(e) => {
+                const val = e.target.value.trim();
+                if (val && !val.startsWith("http://") && !val.startsWith("https://") && val !== "#") {
+                  editForm.setFieldsValue({ checkinUrl: `https://${val}` });
+                }
+              }}
+            />
+          </Form.Item>
+
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+            <Button disabled={isSubmitting} onClick={() => setIsEditModalOpen(false)}>Hủy</Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isSubmitting}
+              disabled={isUploadingEditImage}
+              style={{ background: "#0066CC" }}
+            >
+              {isSubmitting ? "Đang Lưu..." : "Lưu thay đổi"}
             </Button>
           </div>
         </Form>
