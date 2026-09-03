@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
+  App,
   AutoComplete,
   Avatar,
   Button,
@@ -22,7 +23,6 @@ import {
   Tabs,
   Tag,
   Typography,
-  message,
 } from "antd";
 import {
   DeleteOutlined,
@@ -90,9 +90,11 @@ const COMPANY_SUGGESTIONS = [
 ];
 
 export default function CommunityContentManagement() {
+  const { message } = App.useApp();
   const [mode, setMode] = useState<Mode>("opensource");
   const [editing, setEditing] = useState<any | null>(null);
   const [open, setOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form] = Form.useForm();
 
   // Alumni UX state
@@ -108,7 +110,7 @@ export default function CommunityContentManagement() {
     page: 1,
     limit: 200,
     search: "",
-    filter: {},
+    filter: JSON.stringify({}),
   });
 
   const memberList: any[] = useMemo(() => {
@@ -209,6 +211,7 @@ export default function CommunityContentManagement() {
   const handleToggleAlumniPublish = async (record: any, checked: boolean) => {
     try {
       await updateAlumnus({ id: record._id, body: { isPublished: checked } }).unwrap();
+      await alumni.refetch();
       message.success(`Đã ${checked ? "hiển thị" : "ẩn"} cựu thành viên ${record.name} trên Landing Page`);
     } catch {
       message.error("Lỗi khi cập nhật trạng thái");
@@ -218,6 +221,7 @@ export default function CommunityContentManagement() {
   const handleToggleAlumniMentor = async (record: any, checked: boolean) => {
     try {
       await updateAlumnus({ id: record._id, body: { isMentor: checked } }).unwrap();
+      await alumni.refetch();
       message.success(`Đã cập nhật trạng thái Mentoring cho ${record.name}`);
     } catch {
       message.error("Lỗi khi cập nhật trạng thái");
@@ -242,18 +246,24 @@ export default function CommunityContentManagement() {
       if (editing) {
         if (mode === "project") {
           await updateProject({ id: editing._id, body }).unwrap();
+          await projects.refetch();
         } else if (mode === "opensource") {
           await updateOpenSource({ id: editing._id, body }).unwrap();
+          await openSourceProjects.refetch();
         } else {
           await updateAlumnus({ id: editing._id, body }).unwrap();
+          await alumni.refetch();
         }
       } else {
         if (mode === "project") {
           await createProject(body).unwrap();
+          await projects.refetch();
         } else if (mode === "opensource") {
           await createOpenSource(body).unwrap();
+          await openSourceProjects.refetch();
         } else {
           await createAlumnus(body).unwrap();
+          await alumni.refetch();
         }
       }
       message.success(editing ? "Đã cập nhật nội dung thành công" : "Đã tạo nội dung mới thành công");
@@ -265,16 +275,22 @@ export default function CommunityContentManagement() {
 
   const remove = async (record: any) => {
     try {
+      setDeletingId(record._id);
       if (mode === "project") {
         await deleteProject(record._id).unwrap();
+        await projects.refetch();
       } else if (mode === "opensource") {
         await deleteOpenSource(record._id).unwrap();
+        await openSourceProjects.refetch();
       } else {
         await deleteAlumnus(record._id).unwrap();
+        await alumni.refetch();
       }
       message.success("Đã xóa nội dung thành công");
     } catch (err: any) {
       message.error(err?.data?.message || "Lỗi khi xóa dữ liệu");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -454,11 +470,18 @@ export default function CommunityContentManagement() {
         </Button>
         <Popconfirm
           title="Xóa nội dung này?"
+          description="Dữ liệu sẽ bị xóa vĩnh viễn khỏi hệ thống."
           okText="Xóa"
           cancelText="Hủy"
+          okButtonProps={{ loading: deletingId === record._id, danger: true }}
           onConfirm={() => remove(record)}
         >
-          <Button danger type="text" icon={<DeleteOutlined />}>
+          <Button
+            danger
+            type="text"
+            icon={<DeleteOutlined />}
+            loading={deletingId === record._id}
+          >
             Xóa
           </Button>
         </Popconfirm>
@@ -578,9 +601,18 @@ export default function CommunityContentManagement() {
                       <Popconfirm
                         key="del"
                         title="Xóa cựu thành viên này?"
+                        description="Dữ liệu sẽ bị xóa vĩnh viễn khỏi hệ thống."
+                        okText="Xóa"
+                        cancelText="Hủy"
+                        okButtonProps={{ loading: deletingId === alumnus._id, danger: true }}
                         onConfirm={() => remove(alumnus)}
                       >
-                        <Button danger type="text" icon={<DeleteOutlined />}>
+                        <Button
+                          danger
+                          type="text"
+                          icon={<DeleteOutlined />}
+                          loading={deletingId === alumnus._id}
+                        >
                           Xóa
                         </Button>
                       </Popconfirm>,
