@@ -1,13 +1,13 @@
 import { TIME_FORMAT } from './formatDateTime';
 
 const API_SERVER =
-  process.env.NEXT_PUBLIC_API_SERVER || "";
+  process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:5000";
 const API_SERVER_SOCKET =
   process?.env?.NEXT_PUBLIC_SERVER_SOCKET_URL ||
-  "https://dever-backend-production.up.railway.app";
+  "http://localhost:5000";
 const ASSETS_URL =
   process.env.NEXT_PUBLIC_ASSETS_URL ||
-  "https://dever-backend-production.up.railway.app/static";
+  "http://localhost:5000/static";
 const SITE_URL = "/";
 
 const USER_INFO = '_user_info';
