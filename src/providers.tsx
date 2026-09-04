@@ -10,6 +10,41 @@ import ProviderI18n from "./services/i18n/ProviderI18n";
 import { Provider } from "react-redux";
 import { store } from "./store";
 
+if (typeof window !== "undefined") {
+  const isExtensionError = (errOrMsg: any, source?: string) => {
+    const str = String(errOrMsg?.stack || errOrMsg?.message || errOrMsg || source || "");
+    return (
+      str.includes("chrome-extension://") ||
+      str.includes("moz-extension://") ||
+      str.includes("M_ID") ||
+      str.includes("nimlmejbmnecnaghgmbahmbaddhjbecg")
+    );
+  };
+
+  window.addEventListener(
+    "error",
+    (event) => {
+      if (isExtensionError(event.error) || isExtensionError(event.message, event.filename)) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        return true;
+      }
+    },
+    true
+  );
+
+  window.addEventListener(
+    "unhandledrejection",
+    (event) => {
+      if (isExtensionError(event.reason)) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      }
+    },
+    true
+  );
+}
+
 function Providers({
   children,
 }: Readonly<{

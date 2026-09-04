@@ -113,7 +113,7 @@ const MainLayout = ({
             <S.LogoWrapper
               onClick={() => {
                 setMobileOpen(false);
-                router?.push(`/${localActive}/dashboard`);
+                router?.push(`/${localActive}/user-management`);
               }}
             >
               <div className="demo-logo-vertical">
@@ -141,7 +141,7 @@ const MainLayout = ({
 
             <Menu
               mode="inline"
-              selectedKeys={[pathname?.split("/")[2] || "dashboard"]}
+              selectedKeys={[pathname?.split("/")[2] || "user-management"]}
               items={sideBarMenuFormat}
               onClick={(e) => handleMenuClick(e?.key)}
             />

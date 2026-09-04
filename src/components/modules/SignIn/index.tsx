@@ -27,12 +27,26 @@ function SignInModule() {
   const router = useRouter();
   const params = useParams();
   const locale = useLocale();
+  const [form] = Form.useForm<FieldType>();
 
   const { t } = useTranslation(params?.locale as string, "signIn");
 
   const [signIn, { isLoading }] = useSignInMutation();
 
-  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+  const handleQuickAdminLogin = () => {
+    form.setFieldsValue({
+      email: "admin@fudever.com",
+      password: "admin123",
+      remember: true,
+    });
+    onFinish({
+      email: "admin@fudever.com",
+      password: "admin123",
+      remember: true,
+    });
+  };
+
+  const onFinish = async (values: FieldType) => {
     try {
       const res: any = await signIn(values).unwrap();
 
@@ -86,6 +100,7 @@ function SignInModule() {
         <span>{t("accessNoticeDescription")}</span>
       </S.AccessNotice>
       <Form<FieldType>
+        form={form}
         name="admin-sign-in"
         initialValues={{ remember: true }}
         onFinish={onFinish}
@@ -151,6 +166,32 @@ function SignInModule() {
             {isLoading ? t("submitting") : t("submit")}
           </Button>
         </Form.Item>
+
+        <div style={{ marginTop: 12 }}>
+          <button
+            type="button"
+            onClick={handleQuickAdminLogin}
+            disabled={isLoading}
+            style={{
+              width: "100%",
+              padding: "10px 16px",
+              borderRadius: "12px",
+              background: "#F0F7FF",
+              border: "1px dashed #0066CC",
+              color: "#0066CC",
+              fontWeight: 700,
+              fontSize: "13px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              transition: "all 0.2s",
+            }}
+          >
+            ⚡ Đăng nhập nhanh Admin (admin@fudever.com)
+          </button>
+        </div>
       </Form>
       <S.AccountHint>{t("accountHint")}</S.AccountHint>
     </S.Wrapper>

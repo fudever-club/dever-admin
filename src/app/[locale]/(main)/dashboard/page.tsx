@@ -1,11 +1,9 @@
-import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "FU-DEVER | Trang quản trị",
-};
-
-import DashboardModule from "@/components/modules/Dashboard";
-
-export default function DashboardPage() {
-  return <DashboardModule />;
+export default function DashboardPage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  redirect(`/${locale}/user-management`);
 }
