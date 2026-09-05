@@ -39,6 +39,7 @@ interface DataType {
 function MajorManagementModule() {
   const params = useParams();
 
+  const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
   const addModal = useModal();
@@ -51,30 +52,29 @@ function MajorManagementModule() {
   const [deleteMajor] = useDeleteMajorMutation();
   const [createMajor] = useCreateMajorMutation();
   const [editMajor] = useEditMajorMutation();
-  const { result, isFetching, refetch } = useGetAllMajorQuery(undefined, {
-    selectFromResult: ({ data, isFetching }) => {
-      return {
-        result: data?.data ?? [],
-        isFetching,
-      };
-    },
-  });
+  const { data: majorData, isFetching, refetch } = useGetAllMajorQuery(undefined);
+  const result = majorData?.data ?? [];
 
   const handleDelete = async (id: string) => {
     try {
       await deleteMajor(id).unwrap();
-      message.success("Xóa thành công");
-      refetch();
-    } catch (error) {}
+      message.success("Xóa chuyên ngành thành công");
+      refetch?.();
+    } catch (error: any) {
+      message.error(error?.data?.message || "Xóa chuyên ngành thất bại");
+    }
   };
 
   const handleAdd = async (values: any) => {
     try {
       await createMajor(values).unwrap();
-      message.success("Thêm thành công");
-      refetch();
+      message.success("Thêm chuyên ngành thành công");
+      addForm.resetFields();
+      refetch?.();
       addModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Thêm chuyên ngành thất bại");
+    }
   };
 
   const handleEdit = async (values: any) => {
@@ -83,10 +83,12 @@ function MajorManagementModule() {
         params: { id: MajorId },
         body: values,
       }).unwrap();
-      message.success("Sửa thành công");
-      refetch();
+      message.success("Cập nhật chuyên ngành thành công");
+      refetch?.();
       editModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Sửa chuyên ngành thất bại");
+    }
   };
 
   const columns: TableProps<DataType>["columns"] = [
@@ -171,12 +173,16 @@ function MajorManagementModule() {
       </S.TableWrapper>
       <Modal
         open={addModal.visible}
-        onCancel={addModal.closeModal}
+        onCancel={() => {
+          addForm.resetFields();
+          addModal.closeModal();
+        }}
         footer={[]}
         title={t("addMajor.title")}
       >
         <Form
-          name="basic"
+          form={addForm}
+          name="addMajorForm"
           onFinish={handleAdd}
           autoComplete="off"
           layout="vertical"

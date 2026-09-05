@@ -13,6 +13,7 @@ import SelectLanguage from "./SelectLanguage";
 import NotificationBell from "@/components/ui/NotificationBell";
 import Typography from "../../common/Typography";
 import LoadingScreen from "../../common/LoadingScreen";
+import DeverRouteLoader from "@/components/ui/DeverRouteLoader";
 
 import { sidebarMenu } from "@/helpers/data/sidebarMenu";
 import { useTranslation } from "@/app/i18n/client";
@@ -43,10 +44,13 @@ const MainLayout = ({
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [isShowMenu, setIsShowMenu] = useState<boolean>(false);
   const [isAuth, setIsAuth] = useState<boolean>(false);
+  const [loadingVisible, setLoadingVisible] = useState<boolean>(true);
+  const [loadingFadeOut, setLoadingFadeOut] = useState<boolean>(false);
 
   const [verifyToken] = useVerifyTokenMutation();
 
   const handleVerifyToken = useCallback(async () => {
+    const startTime = Date.now();
     try {
       if (!webStorageClient.get("_access_token")) {
         message.error("Bạn cần đăng nhập để truy cập trang này");
@@ -59,10 +63,30 @@ const MainLayout = ({
         message.error("Bạn không có quyền truy cập trang này");
         throw new Error("Bạn không có quyền truy cập trang này");
       }
+
+      // Guarantee minimum 450ms display time so the user sees the crisp branded LoadingScreen
+      const elapsed = Date.now() - startTime;
+      const minDisplayMs = 450;
+      if (elapsed < minDisplayMs) {
+        await new Promise((resolve) => setTimeout(resolve, minDisplayMs - elapsed));
+      }
+
       dispatch(setAuthenticatedUser(res.data));
       setIsAuth(true);
+      setLoadingFadeOut(true);
+      setTimeout(() => {
+        setLoadingVisible(false);
+      }, 350);
     } catch (error) {
+      const elapsed = Date.now() - startTime;
+      if (elapsed < 300) {
+        await new Promise((resolve) => setTimeout(resolve, 300 - elapsed));
+      }
       setIsAuth(false);
+      setLoadingFadeOut(true);
+      setTimeout(() => {
+        setLoadingVisible(false);
+      }, 300);
       webStorageClient.remove("_access_token");
       router.push(`/${localActive}/sign-in`);
     }
@@ -93,9 +117,8 @@ const MainLayout = ({
 
   return (
     <>
-      {!isAuth ? (
-        <LoadingScreen />
-      ) : (
+      {loadingVisible && <LoadingScreen fadeOut={loadingFadeOut} />}
+      {isAuth && (
         <Layout hasSider style={{ minHeight: "100vh" }}>
           <S.MobileBackdrop
             $visible={mobileOpen}

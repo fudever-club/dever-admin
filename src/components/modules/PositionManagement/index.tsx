@@ -8,6 +8,8 @@ import {
   Popconfirm,
   Table,
   TableProps,
+  Tag,
+  Tooltip,
   Typography,
   message,
 } from "antd";
@@ -36,9 +38,12 @@ interface DataType {
   constant: string;
 }
 
+const PROTECTED_CONSTANTS = new Set(["CHUNHIEM", "PHOCHUNHIEM", "MEMBER"]);
+
 function PositionManagementModule() {
   const params = useParams();
 
+  const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
   const addModal = useModal();
@@ -51,30 +56,29 @@ function PositionManagementModule() {
   const [deletePosition] = useDeletePositionMutation();
   const [createPosition] = useCreatePositionMutation();
   const [editPosition] = useEditPositionMutation();
-  const { result, isFetching, refetch } = useGetAllPositionQuery(undefined, {
-    selectFromResult: ({ data, isFetching }) => {
-      return {
-        result: data?.data ?? [],
-        isFetching,
-      };
-    },
-  });
+  const { data: positionData, isFetching, refetch } = useGetAllPositionQuery(undefined);
+  const result = positionData?.data ?? [];
 
   const handleDelete = async (id: string) => {
     try {
       await deletePosition(id).unwrap();
-      message.success("Xóa thành công");
-      refetch();
-    } catch (error) {}
+      message.success("Xóa chức vụ thành công");
+      refetch?.();
+    } catch (error: any) {
+      message.error(error?.data?.message || "Xóa chức vụ thất bại");
+    }
   };
 
   const handleAdd = async (values: any) => {
     try {
       await createPosition(values).unwrap();
-      message.success("Thêm thành công");
-      refetch();
+      message.success("Thêm chức vụ thành công");
+      addForm.resetFields();
+      refetch?.();
       addModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Thêm chức vụ thất bại");
+    }
   };
 
   const handleEdit = async (values: any) => {
@@ -83,37 +87,49 @@ function PositionManagementModule() {
         params: { id: PositionId },
         body: values,
       }).unwrap();
-      message.success("Sửa thành công");
-      refetch();
+      message.success("Cập nhật chức vụ thành công");
+      refetch?.();
       editModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Sửa chức vụ thất bại");
+    }
   };
 
   const columns: TableProps<DataType>["columns"] = [
     {
-      title: "ID",
-      dataIndex: "_id",
-      key: "_id",
-      width: 50,
+      title: "STT",
+      key: "stt",
+      width: 60,
+      render: (_, __, index) => index + 1,
     },
     {
       title: t("name"),
       dataIndex: "name",
       key: "name",
+      render: (name, record) => (
+        <Flex align="center" gap={8}>
+          <span style={{ fontWeight: 500 }}>{name}</span>
+          {PROTECTED_CONSTANTS.has(record.constant) && (
+            <Tag color="geekblue">Cốt lõi</Tag>
+          )}
+        </Flex>
+      ),
     },
     {
       title: t("value"),
       dataIndex: "constant",
       key: "constant",
-      width: 200,
+      width: 220,
+      render: (constant) => <Tag color="default">{constant}</Tag>,
     },
     {
       title: t("function"),
       key: "action",
-      width: 200,
+      width: 160,
       render: (_, record) => {
+        const isProtected = PROTECTED_CONSTANTS.has(record?.constant);
         return (
-          <Flex justify="center" gap={20}>
+          <Flex justify="center" gap={12}>
             <Button
               type="default"
               shape="circle"
@@ -127,20 +143,32 @@ function PositionManagementModule() {
                 });
               }}
             />
-            <Popconfirm
-              title={t("deletePosition.title")}
-              description={t("deletePosition.description")}
-              okText={t("deletePosition.okText")}
-              cancelText={t("deletePosition.cancelText")}
-              onConfirm={() => handleDelete(record?._id)}
-            >
-              <Button
-                type="primary"
-                shape="circle"
-                danger
-                icon={<DeleteOutlined />}
-              />
-            </Popconfirm>
+            {isProtected ? (
+              <Tooltip title="Chức vụ hệ thống không thể xóa">
+                <Button
+                  type="primary"
+                  shape="circle"
+                  danger
+                  disabled
+                  icon={<DeleteOutlined />}
+                />
+              </Tooltip>
+            ) : (
+              <Popconfirm
+                title={t("deletePosition.title")}
+                description={t("deletePosition.description")}
+                okText={t("deletePosition.okText")}
+                cancelText={t("deletePosition.cancelText")}
+                onConfirm={() => handleDelete(record?._id)}
+              >
+                <Button
+                  type="primary"
+                  shape="circle"
+                  danger
+                  icon={<DeleteOutlined />}
+                />
+              </Popconfirm>
+            )}
           </Flex>
         );
       },
@@ -156,7 +184,10 @@ function PositionManagementModule() {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={addModal.openModal}
+          onClick={() => {
+            addForm.resetFields();
+            addModal.openModal();
+          }}
         >
           {t("addPosition.title")}
         </Button>
@@ -171,12 +202,16 @@ function PositionManagementModule() {
       </S.TableWrapper>
       <Modal
         open={addModal.visible}
-        onCancel={addModal.closeModal}
+        onCancel={() => {
+          addForm.resetFields();
+          addModal.closeModal();
+        }}
         footer={[]}
         title={t("addPosition.title")}
       >
         <Form
-          name="basic"
+          form={addForm}
+          name="addPositionForm"
           onFinish={handleAdd}
           autoComplete="off"
           layout="vertical"
@@ -184,17 +219,17 @@ function PositionManagementModule() {
           <Form.Item
             label={t("addPosition.name")}
             name="name"
-            rules={[{ required: true, message: "Please input your Position!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên chức vụ!" }]}
           >
-            <Input />
+            <Input placeholder="Ví dụ: Trưởng Ban Kỹ Thuật" />
           </Form.Item>
 
           <Form.Item
             label={t("addPosition.value")}
             name="constant"
-            rules={[{ required: true, message: "Please input your constant!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập mã định danh constant!" }]}
           >
-            <Input />
+            <Input placeholder="Ví dụ: TRUONGBANKYTHUAT" />
           </Form.Item>
           <Button type="primary" htmlType="submit" $width="100%">
             {t("addPosition.add")}
@@ -208,7 +243,7 @@ function PositionManagementModule() {
         title={t("editPosition.title")}
       >
         <Form
-          name="basic"
+          name="editPositionForm"
           onFinish={handleEdit}
           autoComplete="off"
           layout="vertical"
@@ -217,7 +252,7 @@ function PositionManagementModule() {
           <Form.Item
             label={t("editPosition.name")}
             name="name"
-            rules={[{ required: true, message: "Please input your Position!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên chức vụ!" }]}
           >
             <Input />
           </Form.Item>
@@ -225,9 +260,9 @@ function PositionManagementModule() {
           <Form.Item
             label={t("editPosition.value")}
             name="constant"
-            rules={[{ required: true, message: "Please input your constant!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập mã constant!" }]}
           >
-            <Input />
+            <Input disabled={PROTECTED_CONSTANTS.has(editForm.getFieldValue("constant"))} />
           </Form.Item>
           <Button type="primary" htmlType="submit" $width="100%">
             {t("editPosition.edit")}

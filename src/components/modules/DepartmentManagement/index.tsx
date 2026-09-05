@@ -39,6 +39,7 @@ interface DataType {
 function DepartmentManagementModule() {
   const params = useParams();
 
+  const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
   const addModal = useModal();
@@ -54,30 +55,29 @@ function DepartmentManagementModule() {
   const [deleteDepartment] = useDeleteDepartmentMutation();
   const [createDepartment] = useCreateDepartmentMutation();
   const [editDepartment] = useEditDepartmentMutation();
-  const { result, isFetching, refetch } = useGetAllDepartmentsQuery(undefined, {
-    selectFromResult: ({ data, isFetching }) => {
-      return {
-        result: data?.data ?? [],
-        isFetching,
-      };
-    },
-  });
+  const { data: deptData, isFetching, refetch } = useGetAllDepartmentsQuery(undefined);
+  const result = deptData?.data ?? [];
 
   const handleDelete = async (id: string) => {
     try {
       await deleteDepartment(id).unwrap();
-      message.success("Xóa thành công");
-      refetch();
-    } catch (error) {}
+      message.success("Xóa ban chuyên môn thành công");
+      refetch?.();
+    } catch (error: any) {
+      message.error(error?.data?.message || "Xóa ban thất bại");
+    }
   };
 
   const handleAdd = async (values: any) => {
     try {
       await createDepartment(values).unwrap();
-      message.success("Thêm thành công");
-      refetch();
+      message.success("Thêm ban chuyên môn thành công");
+      addForm.resetFields();
+      refetch?.();
       addModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Thêm ban thất bại");
+    }
   };
 
   const handleEdit = async (values: any) => {
@@ -86,10 +86,12 @@ function DepartmentManagementModule() {
         params: { id: departmentId },
         body: values,
       }).unwrap();
-      message.success("Sửa thành công");
-      refetch();
+      message.success("Cập nhật ban chuyên môn thành công");
+      refetch?.();
       editModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Sửa ban thất bại");
+    }
   };
 
   const columns: TableProps<DataType>["columns"] = [
@@ -174,12 +176,16 @@ function DepartmentManagementModule() {
       </S.TableWrapper>
       <Modal
         open={addModal.visible}
-        onCancel={addModal.closeModal}
+        onCancel={() => {
+          addForm.resetFields();
+          addModal.closeModal();
+        }}
         footer={[]}
         title={t("addDepartment.title")}
       >
         <Form
-          name="basic"
+          form={addForm}
+          name="addDepartmentForm"
           onFinish={handleAdd}
           autoComplete="off"
           layout="vertical"

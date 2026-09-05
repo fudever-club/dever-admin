@@ -18,6 +18,7 @@ import {
   Popconfirm,
   Row,
   Col,
+  Switch,
   type UploadFile,
 } from "antd";
 import {
@@ -29,6 +30,8 @@ import {
   ReloadOutlined,
   FileTextOutlined,
   FolderOpenOutlined,
+  StarFilled,
+  StarOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
 
@@ -45,6 +48,7 @@ interface ResourceData {
   description?: string;
   fileUrl: string;
   size: string;
+  isFeatured?: boolean;
   createdAt?: string;
 }
 
@@ -57,6 +61,7 @@ export default function ResourceManagementModule() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingFeaturedId, setUpdatingFeaturedId] = useState<string | null>(null);
   const [form] = Form.useForm();
 
   const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:5000";
@@ -159,6 +164,7 @@ export default function ResourceManagementModule() {
           description: values.description || "",
           fileUrl: finalFileUrl,
           size: finalSize,
+          isFeatured: Boolean(values.isFeatured),
         }),
       });
       const json = await res.json();
@@ -198,6 +204,47 @@ export default function ResourceManagementModule() {
       fetchResources();
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleToggleFeatured = async (id: string, checked: boolean) => {
+    setUpdatingFeaturedId(id);
+    const token = webStorageClient.getToken();
+    if (!token) {
+      message.warning("Vui lòng đăng nhập với tài khoản Quản trị viên để thực hiện!");
+      setUpdatingFeaturedId(null);
+      return;
+    }
+
+    // Optimistic UI update
+    setResources((prev) =>
+      prev.map((r) =>
+        r._id === id ? { ...r, isFeatured: checked } : r
+      )
+    );
+
+    try {
+      const res = await fetch(`${API_SERVER}/api/v1/resources/${id}/featured`, {
+        method: "PATCH",
+        headers: authHeaders(true),
+        body: JSON.stringify({ isFeatured: checked }),
+      });
+      const json = await res.json();
+      if (res.ok && json.status === "success") {
+        message.success(
+          checked
+            ? "Đã ghim tài liệu lên mục TÀI LIỆU TIÊU ĐIỂM (Landing Page)!"
+            : "Đã bỏ ghim tài liệu khỏi mục tiêu điểm."
+        );
+      } else {
+        message.error(json?.message || "Không thể cập nhật trạng thái tiêu điểm!");
+        fetchResources();
+      }
+    } catch (err: any) {
+      message.error(err?.message || "Lỗi khi cập nhật trạng thái tiêu điểm!");
+      fetchResources();
+    } finally {
+      setUpdatingFeaturedId(null);
     }
   };
 
@@ -277,6 +324,28 @@ export default function ResourceManagementModule() {
         >
           <LinkOutlined /> Xem File ↗
         </a>
+      ),
+    },
+    {
+      title: (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+          <StarFilled style={{ color: "#F59E0B" }} /> Tiêu Điểm
+        </span>
+      ),
+      dataIndex: "isFeatured",
+      key: "isFeatured",
+      width: 120,
+      render: (isFeatured: boolean, record: ResourceData) => (
+        <Switch
+          checked={!!isFeatured}
+          checkedChildren={<StarFilled />}
+          unCheckedChildren={<StarOutlined />}
+          loading={updatingFeaturedId === record._id}
+          disabled={updatingFeaturedId !== null && updatingFeaturedId !== record._id}
+          aria-label={`Đặt tài liệu ${record.title} làm tiêu điểm`}
+          onChange={(checked) => handleToggleFeatured(record._id!, checked)}
+          style={{ backgroundColor: isFeatured ? "#F59E0B" : undefined }}
+        />
       ),
     },
     {
@@ -484,6 +553,13 @@ export default function ResourceManagementModule() {
 
           <Form.Item label="Dung lượng file / Nguồn" name="size">
             <Input placeholder="Ví dụ: 12.5 MB (PDF) hoặc Google Drive Link" />
+          </Form.Item>
+
+          <Form.Item name="isFeatured" valuePropName="checked" style={{ marginBottom: 16 }}>
+            <Switch checkedChildren={<StarFilled />} unCheckedChildren={<StarOutlined />} />
+            <span style={{ marginLeft: 8, fontSize: 13, fontWeight: 600 }}>
+              Ghim lên mục &quot;TÀI LIỆU TIÊU ĐIỂM&quot; (Trang chủ Landing Page)
+            </span>
           </Form.Item>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>

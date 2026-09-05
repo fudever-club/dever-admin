@@ -12,6 +12,7 @@ export const authAPI = baseApi.injectEndpoints({
         method: "GET",
         flashError: true,
       }),
+      providesTags: ["Major"],
     }),
     getMajorById: build.query<any, string>({
       query: (id) => ({
@@ -19,6 +20,7 @@ export const authAPI = baseApi.injectEndpoints({
         method: "GET",
         flashError: true,
       }),
+      providesTags: ["Major"],
     }),
     deleteMajor: build.mutation({
       query: (id: string) => ({
@@ -26,6 +28,7 @@ export const authAPI = baseApi.injectEndpoints({
         method: "DELETE",
         flashError: true,
       }),
+      invalidatesTags: ["Major"],
     }),
     createMajor: build.mutation({
       query: (data: any) => ({
@@ -34,6 +37,7 @@ export const authAPI = baseApi.injectEndpoints({
         body: data,
         flashError: true,
       }),
+      invalidatesTags: ["Major"],
     }),
     editMajor: build.mutation({
       query: (data: any) => ({
@@ -45,6 +49,7 @@ export const authAPI = baseApi.injectEndpoints({
         body: data?.body,
         flashError: true,
       }),
+      invalidatesTags: ["Major"],
     }),
   }),
 });

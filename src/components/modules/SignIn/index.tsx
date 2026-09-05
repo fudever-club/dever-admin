@@ -14,6 +14,8 @@ import themeColors from "@/style/themes/default/colors";
 import { useTranslation } from "@/app/i18n/client";
 import { useSignInMutation } from "@/store/queries/auth";
 import webStorageClient from "@/utils/webStorageClient";
+import LoadingScreen from "@/components/core/common/LoadingScreen";
+import { useState } from "react";
 
 import * as S from "./styles";
 
@@ -32,7 +34,7 @@ function SignInModule() {
   const { t } = useTranslation(params?.locale as string, "signIn");
 
   const [signIn, { isLoading }] = useSignInMutation();
-
+  const [isNavigatingToAdmin, setIsNavigatingToAdmin] = useState<boolean>(false);
 
   const onFinish = async (values: FieldType) => {
     try {
@@ -55,11 +57,14 @@ function SignInModule() {
       }
 
       message.success(t("signInSuccess"));
-      if (typeof window !== "undefined") {
-        window.location.href = `/${locale}/user-management`;
-      } else {
-        router?.push(`/${locale}/user-management`);
-      }
+      setIsNavigatingToAdmin(true);
+      setTimeout(() => {
+        if (typeof window !== "undefined") {
+          window.location.href = `/${locale}/user-management`;
+        } else {
+          router?.push(`/${locale}/user-management`);
+        }
+      }, 450);
     } catch (err: any) {
       const errMsg = err?.data?.message || err?.message || t("signInFailed");
       message.error(errMsg);
@@ -68,6 +73,9 @@ function SignInModule() {
 
   return (
     <S.Wrapper>
+      {isNavigatingToAdmin && (
+        <LoadingScreen message="Đang kết nối trung tâm điều hành DEVER..." />
+      )}
       <Flex justify="space-between">
         <Image alt="" src={"/icons/layout/logo.svg"} width={40} height={40} />
         <SelectLanguage />

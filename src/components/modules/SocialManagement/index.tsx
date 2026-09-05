@@ -39,6 +39,7 @@ interface DataType {
 function SocialManagementModule() {
   const params = useParams();
 
+  const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
   const addModal = useModal();
@@ -51,30 +52,29 @@ function SocialManagementModule() {
   const [deleteSocial] = useDeleteSocialMutation();
   const [createSocial] = useCreateSocialMutation();
   const [editSocial] = useEditSocialMutation();
-  const { result, isFetching, refetch } = useGetAllSocialsQuery(undefined, {
-    selectFromResult: ({ data, isFetching }) => {
-      return {
-        result: data?.data ?? [],
-        isFetching,
-      };
-    },
-  });
+  const { data: socialData, isFetching, refetch } = useGetAllSocialsQuery(undefined);
+  const result = socialData?.data ?? [];
 
   const handleDelete = async (id: string) => {
     try {
       await deleteSocial(id).unwrap();
-      message.success("Xóa thành công");
-      refetch();
-    } catch (error) {}
+      message.success("Xóa mạng xã hội thành công");
+      refetch?.();
+    } catch (error: any) {
+      message.error(error?.data?.message || "Xóa mạng xã hội thất bại");
+    }
   };
 
   const handleAdd = async (values: any) => {
     try {
       await createSocial(values).unwrap();
-      message.success("Thêm thành công");
-      refetch();
+      message.success("Thêm mạng xã hội thành công");
+      addForm.resetFields();
+      refetch?.();
       addModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Thêm mạng xã hội thất bại");
+    }
   };
 
   const handleEdit = async (values: any) => {
@@ -83,10 +83,12 @@ function SocialManagementModule() {
         params: { id: SocialId },
         body: values,
       }).unwrap();
-      message.success("Sửa thành công");
-      refetch();
+      message.success("Cập nhật mạng xã hội thành công");
+      refetch?.();
       editModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Sửa mạng xã hội thất bại");
+    }
   };
 
   const columns: TableProps<DataType>["columns"] = [
@@ -171,12 +173,16 @@ function SocialManagementModule() {
       </S.TableWrapper>
       <Modal
         open={addModal.visible}
-        onCancel={addModal.closeModal}
+        onCancel={() => {
+          addForm.resetFields();
+          addModal.closeModal();
+        }}
         footer={[]}
         title={t("addSocial.title")}
       >
         <Form
-          name="basic"
+          form={addForm}
+          name="addSocialForm"
           onFinish={handleAdd}
           autoComplete="off"
           layout="vertical"

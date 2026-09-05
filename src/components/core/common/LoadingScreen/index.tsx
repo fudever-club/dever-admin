@@ -1,22 +1,33 @@
 "use client";
 
-import { Flex } from "antd";
-
-import Typography from "../Typography";
-
-import themeColors from "@/style/themes/default/colors";
-
+import React from "react";
 import * as S from "./style";
 
-function LoadingScreen() {
+interface LoadingScreenProps {
+  message?: string;
+  fadeOut?: boolean;
+}
+
+function LoadingScreen({ message, fadeOut = false }: LoadingScreenProps) {
+  const displayMessage = message || "Đang xác thực quyền quản trị...";
+
   return (
-    <S.wrapper>
-      <Flex vertical gap={20} align="center">
-        <span className="loader" />
-        <Typography.Title level={3} $color={themeColors?.primary}>
-          Đang xác thực tài khoản
-        </Typography.Title>
-      </Flex>
+    <S.wrapper role="status" aria-live="polite" $fadeOut={fadeOut}>
+      {/* Central Modern Micro Dual-Ring Spinner */}
+      <S.SpinnerContainer>
+        <S.OuterRing />
+        <S.InnerRing />
+        <S.CenterBadge>&lt;/&gt;</S.CenterBadge>
+      </S.SpinnerContainer>
+
+      {/* Brand & Status Text */}
+      <S.BrandTitle>DEVER ADMIN CONSOLE</S.BrandTitle>
+      <S.StatusText>{displayMessage}</S.StatusText>
+
+      {/* Modern Shimmer Progress Indicator */}
+      <S.ShimmerBarWrapper>
+        <S.ShimmerBar />
+      </S.ShimmerBarWrapper>
     </S.wrapper>
   );
 }

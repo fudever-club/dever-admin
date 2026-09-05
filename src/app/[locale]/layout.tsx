@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 
 import Providers from "@/providers";
+import DeverRouteLoader from "@/components/ui/DeverRouteLoader";
+import { Suspense } from "react";
 
 const deverSans = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
@@ -57,7 +59,12 @@ export default async function RootLayout({
         />
       </head>
       <body className={deverSans.className} suppressHydrationWarning={true}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Suspense fallback={null}>
+            <DeverRouteLoader />
+          </Suspense>
+          {children}
+        </Providers>
       </body>
     </html>
   );

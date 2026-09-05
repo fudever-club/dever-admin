@@ -1,9 +1,7 @@
 "use client";
 
 import {
-  endpointAuth,
   endpointDepartmentManagement,
-  endpointUsersManagement,
 } from "@/helpers/enpoints";
 import { baseApi } from "../base";
 
@@ -16,6 +14,7 @@ export const authAPI = baseApi.injectEndpoints({
         method: "GET",
         flashError: true,
       }),
+      providesTags: ["Department"],
     }),
     getDepartmentById: build.query<any, string>({
       query: (id) => ({
@@ -26,6 +25,7 @@ export const authAPI = baseApi.injectEndpoints({
         method: "GET",
         flashError: true,
       }),
+      providesTags: ["Department"],
     }),
     deleteDepartment: build.mutation({
       query: (id: string) => ({
@@ -33,6 +33,7 @@ export const authAPI = baseApi.injectEndpoints({
         method: "DELETE",
         flashError: true,
       }),
+      invalidatesTags: ["Department"],
     }),
     createDepartment: build.mutation({
       query: (data: any) => ({
@@ -41,6 +42,7 @@ export const authAPI = baseApi.injectEndpoints({
         body: data,
         flashError: true,
       }),
+      invalidatesTags: ["Department"],
     }),
     editDepartment: build.mutation({
       query: (data: any) => ({
@@ -52,6 +54,7 @@ export const authAPI = baseApi.injectEndpoints({
         body: data?.body,
         flashError: true,
       }),
+      invalidatesTags: ["Department"],
     }),
   }),
 });
