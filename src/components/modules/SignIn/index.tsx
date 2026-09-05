@@ -33,18 +33,6 @@ function SignInModule() {
 
   const [signIn, { isLoading }] = useSignInMutation();
 
-  const handleQuickAdminLogin = () => {
-    form.setFieldsValue({
-      email: "admin@fudever.com",
-      password: "admin123",
-      remember: true,
-    });
-    onFinish({
-      email: "admin@fudever.com",
-      password: "admin123",
-      remember: true,
-    });
-  };
 
   const onFinish = async (values: FieldType) => {
     try {
@@ -167,31 +155,6 @@ function SignInModule() {
           </Button>
         </Form.Item>
 
-        <div style={{ marginTop: 12 }}>
-          <button
-            type="button"
-            onClick={handleQuickAdminLogin}
-            disabled={isLoading}
-            style={{
-              width: "100%",
-              padding: "10px 16px",
-              borderRadius: "12px",
-              background: "#F0F7FF",
-              border: "1px dashed #0066CC",
-              color: "#0066CC",
-              fontWeight: 700,
-              fontSize: "13px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              transition: "all 0.2s",
-            }}
-          >
-            ⚡ Đăng nhập nhanh Admin (admin@fudever.com)
-          </button>
-        </div>
       </Form>
       <S.AccountHint>{t("accountHint")}</S.AccountHint>
     </S.Wrapper>
