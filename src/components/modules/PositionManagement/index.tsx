@@ -198,6 +198,7 @@ function PositionManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
+          pagination={{ pageSize: 25, showSizeChanger: true, pageSizeOptions: ["10", "25", "50"] }}
         />
       </S.TableWrapper>
       <Modal
