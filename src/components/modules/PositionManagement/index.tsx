@@ -52,6 +52,7 @@ function PositionManagementModule() {
   const { t } = useTranslation(params?.locale as string, "positionManagement");
 
   const [PositionId, setPositionID] = useState<string>("");
+  const [pageSize, setPageSize] = useState<number>(25);
 
   const [deletePosition] = useDeletePositionMutation();
   const [createPosition] = useCreatePositionMutation();
@@ -198,7 +199,18 @@ function PositionManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
-          pagination={{ pageSize: 25, showSizeChanger: true, pageSizeOptions: ["10", "25", "50"] }}
+          pagination={{
+            pageSize,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "25", "50"],
+            onShowSizeChange: (_current, size) => setPageSize(size),
+            onChange: (_page, size) => {
+              if (size && size !== pageSize) {
+                setPageSize(size);
+              }
+            },
+            showTotal: (total) => `Tổng cộng ${total} chức vụ`,
+          }}
         />
       </S.TableWrapper>
       <Modal
