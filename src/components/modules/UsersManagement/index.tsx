@@ -214,6 +214,7 @@ function UsersManagementModule() {
   const majorId = searchParams.get("majorId") || "";
   const departments = searchParams.get("departments") || "";
   const kGeneration = searchParams.get("kGeneration") || "";
+  const isLeaderParam = searchParams.get("isLeader") || "";
 
   const { t } = useTranslation(params?.locale as string, "usersManagement");
 
@@ -224,7 +225,13 @@ function UsersManagementModule() {
       page: page,
       limit: limit,
       search: search,
-      filter: JSON.stringify({ positionId, departments, majorId, kGeneration }),
+      filter: JSON.stringify({
+        positionId,
+        departments,
+        majorId,
+        kGeneration,
+        ...(isLeaderParam !== "" ? { isLeader: isLeaderParam === "true" } : {}),
+      }),
     },
     {
       selectFromResult: ({ data, isFetching }) => {
@@ -704,6 +711,10 @@ function UsersManagementModule() {
     router.push(createQueryString("departments", `${e ?? ""}`));
   }, 300);
 
+  const handleFilterLeader = _.debounce((e: string) => {
+    router.push(createQueryString("isLeader", `${e ?? ""}`));
+  }, 300);
+
   return (
     <S.PageWrapper>
       <S.Head>
@@ -765,8 +776,8 @@ function UsersManagementModule() {
           onClose={() => setCsvFeedback(null)}
         />
       )}
-      <Row gutter={16}>
-        <Col span={6}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} md={8} lg={5}>
           <Typography.Title level={5}>Chức vụ</Typography.Title>
           <Select
             placeholder="Chọn vị trí"
@@ -776,7 +787,7 @@ function UsersManagementModule() {
             options={positionData?.result}
           />
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={8} lg={5}>
           <Typography.Title level={5}>Ban hoạt động</Typography.Title>
           <Select
             placeholder="Chọn ban hoạt động"
@@ -787,7 +798,7 @@ function UsersManagementModule() {
             mode="multiple"
           />
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={8} lg={5}>
           <Typography.Title level={5}>Chuyên ngành</Typography.Title>
           <Select
             placeholder="Chọn chuyên ngành"
@@ -797,7 +808,7 @@ function UsersManagementModule() {
             options={majorData?.result}
           />
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={8} lg={4}>
           <Typography.Title level={5}>Khoá</Typography.Title>
           <Select
             placeholder="Chọn khoá"
@@ -832,6 +843,25 @@ function UsersManagementModule() {
               {
                 label: "Khoá K15 (Gen 3)",
                 value: 15,
+              },
+            ]}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8} lg={5}>
+          <Typography.Title level={5}>Trưởng nhóm/Ban</Typography.Title>
+          <Select
+            placeholder="Lọc vai trò"
+            allowClear
+            onChange={handleFilterLeader}
+            defaultValue={isLeaderParam || undefined}
+            options={[
+              {
+                label: "⭐ Trưởng nhóm/Ban (Leader)",
+                value: "true",
+              },
+              {
+                label: "Thành viên thường (Member)",
+                value: "false",
               },
             ]}
           />
