@@ -5,6 +5,7 @@ import {
   App,
   AutoComplete,
   Avatar,
+  Badge,
   Button,
   Card,
   Col,
@@ -37,8 +38,13 @@ import {
   SearchOutlined,
   UserOutlined,
   UsergroupAddOutlined,
+  CheckOutlined,
+  EyeInvisibleOutlined,
+  CheckCircleFilled,
+  ClockCircleFilled,
 } from "@ant-design/icons";
 import {
+  useApproveOpenSourceProjectMutation,
   useCreateAlumniMutation,
   useCreateOpenSourceProjectMutation,
   useCreateProjectLabMutation,
@@ -48,6 +54,7 @@ import {
   useGetAlumniQuery,
   useGetOpenSourceProjectsQuery,
   useGetProjectLabsQuery,
+  useRejectOpenSourceProjectMutation,
   useUpdateAlumniMutation,
   useUpdateOpenSourceProjectMutation,
   useUpdateProjectLabMutation,
@@ -129,6 +136,12 @@ export default function CommunityContentManagement() {
   const [createOpenSource, openSourceCreateState] = useCreateOpenSourceProjectMutation();
   const [updateOpenSource, openSourceUpdateState] = useUpdateOpenSourceProjectMutation();
   const [deleteOpenSource] = useDeleteOpenSourceProjectMutation();
+  const [approveOpenSource] = useApproveOpenSourceProjectMutation();
+  const [rejectOpenSource] = useRejectOpenSourceProjectMutation();
+
+  const [openSourceStatusFilter, setOpenSourceStatusFilter] = useState<"all" | "pending" | "published">("all");
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
 
   const [createAlumnus, alumniCreateState] = useCreateAlumniMutation();
   const [updateAlumnus, alumniUpdateState] = useUpdateAlumniMutation();
@@ -149,6 +162,29 @@ export default function CommunityContentManagement() {
       ? openSourceProjects.data?.data || []
       : alumni.data?.data || [];
 
+  const pendingOpenSourceCount = useMemo(() => {
+    const list = openSourceProjects.data?.data || [];
+    return list.filter((p: any) => !p.isPublished).length;
+  }, [openSourceProjects.data?.data]);
+
+  const publishedOpenSourceCount = useMemo(() => {
+    const list = openSourceProjects.data?.data || [];
+    return list.filter((p: any) => p.isPublished === true).length;
+  }, [openSourceProjects.data?.data]);
+
+  const totalOpenSourceCount = useMemo(() => {
+    return (openSourceProjects.data?.data || []).length;
+  }, [openSourceProjects.data?.data]);
+
+  const filteredOpenSourceRows = useMemo(() => {
+    if (mode !== "opensource") return rawRows;
+    return (rawRows as any[]).filter((item) => {
+      if (openSourceStatusFilter === "pending") return !item.isPublished;
+      if (openSourceStatusFilter === "published") return item.isPublished === true;
+      return true;
+    });
+  }, [mode, rawRows, openSourceStatusFilter]);
+
   const filteredAlumniRows = useMemo(() => {
     if (mode !== "alumni") return rawRows;
     return (rawRows as any[]).filter((item) => {
@@ -162,7 +198,12 @@ export default function CommunityContentManagement() {
     });
   }, [mode, rawRows, alumniSearch, alumniGenFilter]);
 
-  const rows = mode === "alumni" ? filteredAlumniRows : rawRows;
+  const rows =
+    mode === "alumni"
+      ? filteredAlumniRows
+      : mode === "opensource"
+      ? filteredOpenSourceRows
+      : rawRows;
 
   const openEditor = (record?: any) => {
     setEditing(record || null);
@@ -225,6 +266,32 @@ export default function CommunityContentManagement() {
       message.success(`Đã cập nhật trạng thái Mentoring cho ${record.name}`);
     } catch {
       message.error("Lỗi khi cập nhật trạng thái");
+    }
+  };
+
+  const handleApproveOpenSource = async (record: any) => {
+    try {
+      setApprovingId(record._id);
+      await approveOpenSource(record._id).unwrap();
+      await openSourceProjects.refetch();
+      message.success(`Đã phê duyệt dự án "${record.title}". Tác giả đã nhận +150 EXP & Huy hiệu Core Contributor!`);
+    } catch (err: any) {
+      message.error(err?.data?.message || "Lỗi khi phê duyệt dự án");
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  const handleRejectOpenSource = async (record: any) => {
+    try {
+      setRejectingId(record._id);
+      await rejectOpenSource(record._id).unwrap();
+      await openSourceProjects.refetch();
+      message.success(`Đã chuyển dự án "${record.title}" về trạng thái Chưa xuất bản`);
+    } catch (err: any) {
+      message.error(err?.data?.message || "Lỗi khi cập nhật trạng thái");
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -393,13 +460,19 @@ export default function CommunityContentManagement() {
           ),
         },
         {
-          title: "Hiển thị",
+          title: "Trạng thái",
           dataIndex: "isPublished",
-          width: 100,
+          width: 170,
           render: (value: boolean) => (
-            <Tag color={value !== false ? "success" : "error"}>
-              {value !== false ? "Đang hiện" : "Ẩn"}
-            </Tag>
+            value !== false ? (
+              <Tag color="success" icon={<CheckCircleFilled />}>
+                Đã xuất bản
+              </Tag>
+            ) : (
+              <Tag color="warning" icon={<ClockCircleFilled />}>
+                Chờ duyệt (+150 EXP)
+              </Tag>
+            )
           ),
         },
       ];
@@ -462,31 +535,73 @@ export default function CommunityContentManagement() {
 
   const actionColumn = {
     title: "Thao tác",
-    width: 150,
-    render: (_: unknown, record: any) => (
-      <Space>
-        <Button type="text" icon={<EditOutlined />} onClick={() => openEditor(record)}>
-          Sửa
-        </Button>
-        <Popconfirm
-          title="Xóa nội dung này?"
-          description="Dữ liệu sẽ bị xóa vĩnh viễn khỏi hệ thống."
-          okText="Xóa"
-          cancelText="Hủy"
-          okButtonProps={{ loading: deletingId === record._id, danger: true }}
-          onConfirm={() => remove(record)}
-        >
-          <Button
-            danger
-            type="text"
-            icon={<DeleteOutlined />}
-            loading={deletingId === record._id}
-          >
-            Xóa
+    width: 220,
+    render: (_: unknown, record: any) => {
+      const isPending = mode === "opensource" && !record.isPublished;
+      return (
+        <Space wrap size={4}>
+          {mode === "opensource" && (
+            isPending ? (
+              <Popconfirm
+                title="Phê duyệt dự án cá nhân này?"
+                description="Dự án sẽ hiển thị công khai trên Showcase, đồng thời cộng 150 EXP và cấp huy hiệu Core Contributor cho tác giả."
+                okText="Duyệt ngay"
+                cancelText="Hủy"
+                okButtonProps={{ style: { backgroundColor: "#52c41a" } }}
+                onConfirm={() => handleApproveOpenSource(record)}
+              >
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<CheckOutlined />}
+                  loading={approvingId === record._id}
+                  style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+                >
+                  Duyệt ngay
+                </Button>
+              </Popconfirm>
+            ) : (
+              <Popconfirm
+                title="Ẩn dự án này khỏi Showcase?"
+                description="Dự án sẽ chuyển về trạng thái Chưa xuất bản."
+                okText="Ẩn đi"
+                cancelText="Hủy"
+                onConfirm={() => handleRejectOpenSource(record)}
+              >
+                <Button
+                  size="small"
+                  icon={<EyeInvisibleOutlined />}
+                  loading={rejectingId === record._id}
+                >
+                  Ẩn đi
+                </Button>
+              </Popconfirm>
+            )
+          )}
+          <Button type="text" size="small" icon={<EditOutlined />} onClick={() => openEditor(record)}>
+            Sửa
           </Button>
-        </Popconfirm>
-      </Space>
-    ),
+          <Popconfirm
+            title="Xóa nội dung này?"
+            description="Dữ liệu sẽ bị xóa vĩnh viễn khỏi hệ thống."
+            okText="Xóa"
+            cancelText="Hủy"
+            okButtonProps={{ loading: deletingId === record._id, danger: true }}
+            onConfirm={() => remove(record)}
+          >
+            <Button
+              danger
+              type="text"
+              size="small"
+              icon={<DeleteOutlined />}
+              loading={deletingId === record._id}
+            >
+              Xóa
+            </Button>
+          </Popconfirm>
+        </Space>
+      );
+    },
   };
 
   return (
@@ -509,11 +624,63 @@ export default function CommunityContentManagement() {
             form.resetFields();
           }}
           items={[
-            { key: "opensource", label: "Dự Án Cá Nhân & Open Source" },
+            {
+              key: "opensource",
+              label: (
+                <Space size={6}>
+                  <span>Dự Án Cá Nhân &amp; Open Source</span>
+                  {pendingOpenSourceCount > 0 && (
+                    <Badge
+                      count={pendingOpenSourceCount}
+                      style={{ backgroundColor: "#faad14" }}
+                      title={`${pendingOpenSourceCount} dự án đang chờ kiểm duyệt`}
+                    />
+                  )}
+                </Space>
+              ),
+            },
             { key: "project", label: "Project Lab" },
             { key: "alumni", label: "Mạng Lưới Alumni (Gen 1 - Gen 6)" },
           ]}
         />
+
+        {/* OPEN SOURCE CONTROLS BAR */}
+        {mode === "opensource" && (
+          <Card style={{ borderRadius: 16, backgroundColor: "#F8FCFF", borderColor: "#E2F0FD" }}>
+            <Row gutter={[16, 16]} align="middle" justify="space-between">
+              <Col xs={24} sm={16}>
+                <Space wrap align="center">
+                  <Typography.Text strong style={{ color: "#475569", fontSize: "13px" }}>
+                    Lọc trạng thái kiểm duyệt:
+                  </Typography.Text>
+                  <Radio.Group
+                    value={openSourceStatusFilter}
+                    onChange={(e) => setOpenSourceStatusFilter(e.target.value)}
+                    buttonStyle="solid"
+                  >
+                    <Radio.Button value="all">Tất cả ({totalOpenSourceCount})</Radio.Button>
+                    <Radio.Button value="pending">
+                      Chờ duyệt ({pendingOpenSourceCount})
+                    </Radio.Button>
+                    <Radio.Button value="published">
+                      Đã xuất bản ({publishedOpenSourceCount})
+                    </Radio.Button>
+                  </Radio.Group>
+                </Space>
+              </Col>
+              <Col xs={24} sm={8} style={{ display: "flex", justifyContent: "flex-end" }}>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => openEditor()}
+                  style={{ backgroundColor: "#0066CC", borderRadius: 8, height: "34px", fontWeight: 600, fontSize: "13px" }}
+                >
+                  Thêm Dự Án Mới
+                </Button>
+              </Col>
+            </Row>
+          </Card>
+        )}
 
         {/* ALUMNI CONTROLS BAR */}
         {mode === "alumni" && (
@@ -562,14 +729,14 @@ export default function CommunityContentManagement() {
           </Card>
         )}
 
-        {mode !== "alumni" && (
+        {mode === "project" && (
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => openEditor()}
             style={{ width: "fit-content", backgroundColor: "#0066CC", borderRadius: 8, height: "34px", fontWeight: 600, fontSize: "13px" }}
           >
-            Thêm {mode === "opensource" ? "dự án Open Source" : "dự án Lab"}
+            Thêm dự án Lab
           </Button>
         )}
 

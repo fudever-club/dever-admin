@@ -82,6 +82,8 @@ const endpointOpenSourceManagement = {
   OPEN_SOURCE: `${prefixBase}/opensource-projects`,
   OPEN_SOURCE_ADMIN_ALL: `${prefixBase}/opensource-projects/admin/all`,
   OPEN_SOURCE_BY_ID: `${prefixBase}/opensource-projects/{id}`,
+  OPEN_SOURCE_APPROVE: `${prefixBase}/opensource-projects/{id}/approve`,
+  OPEN_SOURCE_REJECT: `${prefixBase}/opensource-projects/{id}/reject`,
 };
 
 const endpointNotifications = {

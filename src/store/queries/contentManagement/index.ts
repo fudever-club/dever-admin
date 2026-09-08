@@ -59,6 +59,14 @@ export const contentManagementApi = baseApi.injectEndpoints({
       query: (id) => ({ url: endpointOpenSourceManagement.OPEN_SOURCE_BY_ID.replace("{id}", id), method: "DELETE" }),
       invalidatesTags: ["Content"],
     }),
+    approveOpenSourceProject: build.mutation<any, string>({
+      query: (id) => ({ url: endpointOpenSourceManagement.OPEN_SOURCE_APPROVE.replace("{id}", id), method: "PATCH" }),
+      invalidatesTags: ["Content"],
+    }),
+    rejectOpenSourceProject: build.mutation<any, string>({
+      query: (id) => ({ url: endpointOpenSourceManagement.OPEN_SOURCE_REJECT.replace("{id}", id), method: "PATCH" }),
+      invalidatesTags: ["Content"],
+    }),
   }),
 });
 
@@ -75,4 +83,6 @@ export const {
   useCreateOpenSourceProjectMutation,
   useUpdateOpenSourceProjectMutation,
   useDeleteOpenSourceProjectMutation,
+  useApproveOpenSourceProjectMutation,
+  useRejectOpenSourceProjectMutation,
 } = contentManagementApi;
