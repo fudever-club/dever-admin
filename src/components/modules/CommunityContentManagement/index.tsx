@@ -621,7 +621,7 @@ export default function CommunityContentManagement() {
             Nội dung cộng đồng &amp; Mạng lưới Alumni
           </Typography.Title>
           <Typography.Text type="secondary">
-            Quản trị các dự án Open Source, Project Lab nghiên cứu và mạng lưới cựu thành viên (Gen 1 - Gen 6) hiển thị trên Landing Page.
+            Quản trị các dự án Open Source, Project Lab nghiên cứu và mạng lưới cựu thành viên hiển thị trên Landing Page.
           </Typography.Text>
         </div>
 
@@ -649,7 +649,7 @@ export default function CommunityContentManagement() {
               ),
             },
             { key: "project", label: "Project Lab" },
-            { key: "alumni", label: "Mạng Lưới Alumni (Gen 1 - Gen 6)" },
+            { key: "alumni", label: "Mạng Lưới Cựu Thành Viên (Alumni)" },
           ]}
         />
 
@@ -710,7 +710,7 @@ export default function CommunityContentManagement() {
                     onChange={(val) => setAlumniGenFilter(val)}
                     style={{ width: 170 }}
                     options={[
-                      { value: "All", label: "Tất Cả Thế Hệ (Gen 1 - 6)" },
+                      { value: "All", label: "Tất Cả Thế Hệ (Alumni)" },
                       ...GEN_CHOICES,
                     ]}
                   />
