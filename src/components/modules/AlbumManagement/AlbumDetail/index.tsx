@@ -138,7 +138,7 @@ function AlbumDetailModule() {
           <Space wrap>
             <Upload
               name="file"
-              action="https://api.imgbb.com/1/upload?expiration=600&key=488e7d944b2bedd5020e1ace8585d1df"
+              action="https://api.imgbb.com/1/upload?key=488e7d944b2bedd5020e1ace8585d1df"
               headers={{
                 authorization: "authorization-text",
               }}
