@@ -555,6 +555,7 @@ export default function CommunityContentManagement() {
                   size="small"
                   icon={<CheckOutlined />}
                   loading={approvingId === record._id}
+                  disabled={approvingId !== null || rejectingId !== null || deletingId !== null}
                   style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
                 >
                   Duyệt ngay
@@ -572,13 +573,20 @@ export default function CommunityContentManagement() {
                   size="small"
                   icon={<EyeInvisibleOutlined />}
                   loading={rejectingId === record._id}
+                  disabled={approvingId !== null || rejectingId !== null || deletingId !== null}
                 >
                   Ẩn đi
                 </Button>
               </Popconfirm>
             )
           )}
-          <Button type="text" size="small" icon={<EditOutlined />} onClick={() => openEditor(record)}>
+          <Button
+            type="text"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => openEditor(record)}
+            disabled={approvingId !== null || rejectingId !== null || deletingId !== null}
+          >
             Sửa
           </Button>
           <Popconfirm
@@ -595,6 +603,7 @@ export default function CommunityContentManagement() {
               size="small"
               icon={<DeleteOutlined />}
               loading={deletingId === record._id}
+              disabled={approvingId !== null || rejectingId !== null || deletingId !== null}
             >
               Xóa
             </Button>
@@ -1018,15 +1027,24 @@ export default function CommunityContentManagement() {
             </>
           )}
 
-          <Button
-            htmlType="submit"
-            type="primary"
-            loading={saving}
-            block
-            style={{ backgroundColor: "#0066CC", borderRadius: 10, marginTop: 8 }}
-          >
-            Lưu nội dung
-          </Button>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16, paddingTop: 12, borderTop: "1px solid #f0f0f0" }}>
+            <Button
+              onClick={() => setOpen(false)}
+              disabled={saving}
+              style={{ borderRadius: 8, height: 36 }}
+            >
+              Hủy
+            </Button>
+            <Button
+              htmlType="submit"
+              type="primary"
+              loading={saving}
+              disabled={saving}
+              style={{ backgroundColor: "#0066CC", borderRadius: 8, height: 36, fontWeight: 600 }}
+            >
+              {editing ? "Cập nhật nội dung" : "Tạo mới nội dung"}
+            </Button>
+          </div>
         </Form>
       </Modal>
     </div>
