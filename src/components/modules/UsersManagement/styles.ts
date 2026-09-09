@@ -19,16 +19,44 @@ export const Head = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   margin-bottom: 24px;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    h2 {
+      font-size: 22px !important;
+      margin-bottom: 0 !important;
+      text-align: left;
+    }
+
+    button {
+      width: 100%;
+      height: 42px;
+      font-weight: 600;
+      border-radius: 10px;
+    }
+  }
 `;
 
 export const TableWrapper = styled.div`
   width: 100%;
-
   margin-bottom: 24px;
+  margin-top: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 
-  margin-top: 24px;
+  .ant-table-wrapper {
+    width: 100%;
+  }
+
+  .ant-table {
+    border-radius: 12px;
+    overflow: hidden;
+  }
 `;
 
 export const FilterWrapper = styled.div`
@@ -39,7 +67,7 @@ export const FilterWrapper = styled.div`
   align-items: flex-start;
 
   gap: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 
   input[type="file"] {
     width: 0;
@@ -57,6 +85,8 @@ export const FilterWrapper = styled.div`
   @media (max-width: 640px) {
     align-items: stretch;
     flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
 
     .item {
       width: 100%;
@@ -64,6 +94,21 @@ export const FilterWrapper = styled.div`
 
     .input_csv {
       text-align: left;
+
+      .ant-space {
+        width: 100%;
+        align-items: stretch !important;
+      }
+
+      .ant-space-item {
+        width: 100%;
+      }
+
+      button {
+        flex: 1;
+        height: 40px;
+        border-radius: 8px;
+      }
     }
   }
 `;

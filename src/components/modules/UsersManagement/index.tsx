@@ -31,7 +31,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/app/i18n/client";
 import {
@@ -206,6 +206,16 @@ function UsersManagementModule() {
     message: string;
   } | null>(null);
   const [issuedCredentials, setIssuedCredentials] = useState<OneTimeCredential[]>([]);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(typeof window !== "undefined" && window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const page = Number(searchParams.get("page")) || 1;
   const limit = Number(searchParams.get("limit")) || 10;
@@ -235,8 +245,6 @@ function UsersManagementModule() {
     },
     {
       selectFromResult: ({ data, isFetching }) => {
-        console.log(data);
-
         return {
           result: data?.data?.users ?? [],
           total: data?.total ?? 0,
@@ -303,7 +311,7 @@ function UsersManagementModule() {
       dataIndex: "",
       key: "",
       width: 65,
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       render: (text, _, index) => (
         <Typography.Text>{limit * (page - 1) + index + 1}</Typography.Text>
       ),
@@ -312,11 +320,11 @@ function UsersManagementModule() {
       title: t("name"),
       dataIndex: "",
       key: "name",
-      fixed: "left",
+      fixed: isMobile ? false : "left",
       width: 200,
       render: (value, record) => {
         return (
-          <Typography.Text>
+          <Typography.Text strong>
             {record?.firstname} {record?.lastname}
           </Typography.Text>
         );
@@ -477,7 +485,7 @@ function UsersManagementModule() {
     {
       title: "Hành động",
       key: "action",
-      fixed: "right",
+      fixed: isMobile ? false : "right",
       width: 140,
       render: (_, record) => {
         return (

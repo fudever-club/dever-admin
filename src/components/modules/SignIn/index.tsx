@@ -76,8 +76,15 @@ function SignInModule() {
       {isNavigatingToAdmin && (
         <LoadingScreen message="Đang kết nối trung tâm điều hành DEVER..." />
       )}
-      <Flex justify="space-between">
-        <Image alt="" src={"/icons/layout/logo.svg"} width={40} height={40} />
+      <Flex justify="space-between" align="center">
+        <Image
+          alt="FU-DEVER Logo"
+          src={"/icons/layout/fu-dever-logo.png"}
+          width={42}
+          height={42}
+          priority
+          style={{ objectFit: "contain" }}
+        />
         <SelectLanguage />
       </Flex>
       <Typography.Title

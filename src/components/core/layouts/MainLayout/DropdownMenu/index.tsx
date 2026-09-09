@@ -112,24 +112,62 @@ function DropdownMenu() {
         </Flex>
       </Flex>
       <Divider $margin={6} />
-      <div className="flex flex-col gap-1 p-1">
+      <Flex vertical gap={4} style={{ padding: "4px" }}>
         <a
           href={landingUrl}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-slate-700 hover:text-[#0066CC] flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-colors font-medium"
+          style={{
+            fontSize: "12.5px",
+            color: "#334155",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "6px 8px",
+            borderRadius: "6px",
+            textDecoration: "none",
+            fontWeight: 500,
+            transition: "background-color 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#f1f5f9";
+            e.currentTarget.style.color = "#0066CC";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.color = "#334155";
+          }}
         >
-          <GlobalOutlined aria-hidden="true" /> Trang Chủ Landing Page
+          <GlobalOutlined style={{ color: "#0066CC" }} aria-hidden="true" /> Trang Chủ Landing Page
         </a>
         <a
           href={`${clientAppUrl}/${locale}/dashboard`}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-slate-700 hover:text-[#0066CC] flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-colors font-medium"
+          style={{
+            fontSize: "12.5px",
+            color: "#334155",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "6px 8px",
+            borderRadius: "6px",
+            textDecoration: "none",
+            fontWeight: 500,
+            transition: "background-color 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#f1f5f9";
+            e.currentTarget.style.color = "#0066CC";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.color = "#334155";
+          }}
         >
-          <UserOutlined aria-hidden="true" /> Cổng Member Portal
+          <UserOutlined style={{ color: "#0066CC" }} aria-hidden="true" /> Cổng Member Portal
         </a>
-      </div>
+      </Flex>
       <Divider $margin={4} />
       <S.MenuCustom
         items={sideBarMenuFormat}

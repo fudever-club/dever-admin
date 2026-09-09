@@ -25,24 +25,28 @@ export const SiderCustom = styled(Layout.Sider)<{ $mobileOpen?: boolean }>`
   bottom: 0;
   z-index: 1001 !important;
   overflow: auto;
-  transition: transform 0.3s ease !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 
   @media (max-width: 991.9px) {
+    width: 275px !important;
+    max-width: 85vw !important;
+    flex: 0 0 275px !important;
     transform: translateX(${(props) => (props.$mobileOpen ? "0" : "-100%")});
     box-shadow: ${(props) =>
-      props.$mobileOpen ? "0 0 24px rgba(0,0,0,0.3)" : "none"};
+      props.$mobileOpen ? "4px 0 28px rgba(0,0,0,0.25)" : "none"};
   }
 `;
 
 export const LogoWrapper = styled.div`
-  padding: 16px;
+  padding: 16px 16px 12px 16px;
   cursor: pointer;
 `;
 
 export const ButtonWrap = styled.div<{ $collapsed: boolean }>`
-  width: fit-content;
+  min-width: 42px;
+  min-height: 42px;
   line-height: normal;
-  padding: 6px;
+  padding: 8px;
   border-radius: 8px;
   cursor: pointer;
   display: flex;
@@ -50,9 +54,14 @@ export const ButtonWrap = styled.div<{ $collapsed: boolean }>`
   justify-content: center;
   transition: all 0.2s ease;
   transform: scaleX(${(props) => (props?.$collapsed ? -1 : 1)});
+  touch-action: manipulation;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &:active {
+    transform: scaleX(${(props) => (props?.$collapsed ? -1 : 1)}) scale(0.95);
   }
 `;
 

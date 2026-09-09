@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined, CloseOutlined } from "@ant-design/icons";
 import { Flex, Layout, Menu, Popover, message } from "antd";
 import { useParams, usePathname } from "next/navigation";
 import { AppProgressBar, useRouter } from "next-nprogress-bar";
@@ -143,20 +143,25 @@ const MainLayout = ({
             width={200}
             collapsedWidth={80}
           >
-            <S.LogoWrapper
-              onClick={() => {
-                setMobileOpen(false);
-                router?.push(`/${localActive}/user-management`);
-              }}
-            >
+            <S.LogoWrapper>
               <div className="demo-logo-vertical">
                 <Flex align="center" justify="space-between">
-                  <Flex align="center" gap={12}>
+                  <Flex
+                    align="center"
+                    gap={12}
+                    onClick={() => {
+                      setMobileOpen(false);
+                      router?.push(`/${localActive}/user-management`);
+                    }}
+                    style={{ cursor: "pointer", flex: 1 }}
+                  >
                     <Image
-                      alt="Logo"
-                      src={"/icons/layout/logo.svg"}
+                      alt="DEVER Logo"
+                      src={"/icons/layout/fu-dever-logo.png"}
                       width={36}
                       height={36}
+                      priority
+                      style={{ objectFit: "contain" }}
                     />
                     {!collapsed && (
                       <Typography.Title
@@ -168,6 +173,27 @@ const MainLayout = ({
                       </Typography.Title>
                     )}
                   </Flex>
+                  {mobileOpen && (
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMobileOpen(false);
+                      }}
+                      style={{
+                        padding: "6px 8px",
+                        cursor: "pointer",
+                        borderRadius: "6px",
+                        color: "#64748b",
+                        fontSize: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      aria-label="Đóng thanh điều hướng"
+                    >
+                      <CloseOutlined />
+                    </div>
+                  )}
                 </Flex>
               </div>
             </S.LogoWrapper>
