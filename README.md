@@ -24,22 +24,23 @@
 `dever-admin` là nền tảng quản trị dành riêng cho Ban Chủ Nhiệm, Trưởng Ban Chuyên Môn và Quản trị viên CLB FU-DEVER nhằm điều hành toàn bộ dữ liệu hệ sinh thái:
 - **Executive Overview Analytics:** Thống kê tổng quan số lượng thành viên, sự kiện mở, bài viết cần duyệt và bài tập LeetCode theo thời gian thực.
 - **Quy trình Duyệt Tech Blog (Review Queue):** Đọc bài viết Markdown, xem thông tin tác giả, phản hồi ý kiến góp ý (*Review Notes*) và duyệt xuất bản với 1 cú click.
+- **Nội Dung Cộng Đồng & Alumni (Open Source & Project Showcase):** Quản lý và phê duyệt dự án mã nguồn mở do thành viên đóng góp (`/vi/community-content`), liên kết trực tiếp với hệ thống phê duyệt 1-Click của Telegram Bot (`@Fudever_bot`).
 - **Quản lý Sự kiện & Workshop:** Tạo lịch hoạt động, gắn link Google Form đăng ký/check-in, cập nhật trạng thái sự kiện.
 - **Quản lý Thành viên & Phân quyền:** Quản lý chức vụ, ban chuyên môn, cấp quyền Admin và kích hoạt tài khoản.
-- **Quản lý Dự án, Album & Kho tài liệu:** Quản lý dự án mã nguồn mở, cẩm nang PE và slide workshop FPTU.
+- **Quản lý Dự án, Album & Kho tài liệu:** Quản lý 500+ hình ảnh Album thành viên, cẩm nang PE và slide workshop FPTU trên Cloudflare R2.
 
 ---
 
 ## ✨ Tính Năng Nổi Bật (Key Features)
 
 - 📊 **Live Realtime Metrics:** Nạp số liệu trực tiếp từ các endpoint API backend với Skeleton pulse loading và cơ chế Error Retry thông minh.
-- 📝 **Quy Trình Duyệt Bài Viết 3 Bước:**
+- 📝 **Quy Trình Duyệt Bài Viết & Dự Án Đa Kênh:**
   - Lọc theo Tab trạng thái (`Chờ duyệt`, `Cần chỉnh sửa`, `Bản nháp`, `Tất cả`).
-  - Hộp thoại xem trước Markdown, trường nhập lời nhắn phản hồi cho tác giả.
-  - Phím tắt `ESC` đóng nhanh hộp thoại, nút duyệt tức thì gửi thông báo tự động qua Telegram bot.
+  - Duyệt trực tiếp trên Dashboard hoặc qua nút bấm tương tác 1-Click trên Telegram bot (@Fudever_bot) với cơ chế tự động trao thưởng EXP (+150 EXP) và huy hiệu *Core Contributor*.
 - 👥 **Quản lý Thành viên Toàn Diện:** Tra cứu nhanh, lọc theo Ban (Kỹ Thuật, Chuyên Môn, Truyền Thông), cập nhật hồ sơ và chức vụ.
 - 🛡️ **Role-Based Access Control (RBAC):** Bảo vệ các route quản trị nghiêm ngặt, tự động điều hướng người dùng chưa đăng nhập.
-- ☁️ **Lưu Trữ Chuẩn Cloudflare R2 (Zero-ImgBB):** Toàn bộ hình ảnh Dự án, Album ảnh, Ảnh hoạt động, Banner sự kiện và Mã QR Quỹ đều được nén Client-First và đẩy lên Cloudflare R2 nội bộ của CLB, loại bỏ hoàn toàn dịch vụ bên thứ ba.
+- ☁️ **Lưu Trữ Chuẩn Cloudflare R2 (100% Thuần Khiết):** Toàn bộ hình ảnh Dự án, Album ảnh (gồm 328 ảnh thành viên CLB), Ảnh hoạt động, Banner sự kiện và Mã QR Quỹ được lưu trữ vĩnh viễn trên Cloudflare R2 nội bộ, loại bỏ hoàn toàn các liên kết ImgBB rác khỏi cơ sở dữ liệu.
+- 🖼️ **Nén ảnh Client-First:** Tự động nén ảnh qua HTML5 Canvas trước khi tải lên, bảo toàn chất lượng và giảm 90% dung lượng truyền tải.
 - 🛡️ **Lưới An Toàn Bảng Điều Khiển (ErrorBoundary):** Bọc độc lập vùng Content; khi một bảng hoặc form quản trị gặp lỗi render, thanh Sidebar và Header vẫn hoạt động bình thường, giúp Admin không bao giờ bị trắng trang.
 
 ---
