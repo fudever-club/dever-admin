@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Avatar, Flex, message } from "antd";
 import { GlobalOutlined, UserOutlined } from "@ant-design/icons";
 import Image from "next/image";
@@ -19,6 +20,16 @@ function DropdownMenu() {
   const router = useRouter();
   const locale = useLocale();
   const userInfo = useAppSelector((state) => state.auth.userInfo);
+  const [avatarError, setAvatarError] = useState(false);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [userInfo?.avatar]);
+
+  const safeMenuAvatar = !avatarError && userInfo?.avatar
+    ? userInfo.avatar
+    : "/images/avatar/avatar.jpg";
+
   const clientAppUrl = (process.env.NEXT_PUBLIC_CLIENT_APP_URL || process.env.NEXT_PUBLIC_CLIENT_URL || "https://client.fudever.com").replace(/\/$/, "");
   const landingUrl = (process.env.NEXT_PUBLIC_LANDING_URL || "https://fudever.com").replace(/\/$/, "");
 
@@ -62,10 +73,13 @@ function DropdownMenu() {
           size={28}
           src={
             <Image
-              src={userInfo?.avatar || "/images/avatar/avatar.jpg"}
+              src={safeMenuAvatar}
               alt="avatar"
               width={28}
               height={28}
+              unoptimized={safeMenuAvatar.endsWith('.svg') || safeMenuAvatar.startsWith('data:')}
+              onError={() => setAvatarError(true)}
+              style={{ objectFit: "cover", width: 28, height: 28, borderRadius: "50%" }}
             />
           }
         />

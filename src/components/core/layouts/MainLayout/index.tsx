@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useLayoutEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Flex, Layout, Menu, Popover, message } from "antd";
@@ -35,7 +35,16 @@ const MainLayout = ({
   const params = useParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const userInfo = useAppSelector((state) => state.auth.userInfo);
+  const { userInfo } = useAppSelector((state) => state.auth);
+  const [headerAvatarError, setHeaderAvatarError] = useState<boolean>(false);
+
+  useEffect(() => {
+    setHeaderAvatarError(false);
+  }, [userInfo?.avatar]);
+
+  const safeHeaderAvatar = !headerAvatarError && userInfo?.avatar
+    ? userInfo.avatar
+    : "/images/avatar/avatar.jpg";
   const localActive = useLocale();
   const pathname = usePathname();
 
@@ -202,10 +211,13 @@ const MainLayout = ({
                       size={36}
                       src={
                         <Image
-                          src={userInfo?.avatar || "/images/avatar/avatar.jpg"}
+                          src={safeHeaderAvatar}
                           alt="avatar"
-                          width={64}
-                          height={64}
+                          width={36}
+                          height={36}
+                          unoptimized={safeHeaderAvatar.endsWith('.svg') || safeHeaderAvatar.startsWith('data:')}
+                          onError={() => setHeaderAvatarError(true)}
+                          style={{ objectFit: "cover", width: 36, height: 36, borderRadius: "50%" }}
                         />
                       }
                     />
