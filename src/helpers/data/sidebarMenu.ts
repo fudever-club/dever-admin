@@ -76,6 +76,6 @@ export const sidebarMenu: MenuProps["items"] = [
   {
     key: "community-content",
     icon: React.createElement(AimOutlined),
-    label: "Nội dung cộng đồng",
+    label: "Nội dung cộng đồng & Alumni",
   },
 ];

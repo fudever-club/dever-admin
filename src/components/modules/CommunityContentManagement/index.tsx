@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   App,
   AutoComplete,
@@ -98,6 +99,7 @@ const COMPANY_SUGGESTIONS = [
 
 export default function CommunityContentManagement() {
   const { message } = App.useApp();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("opensource");
   const [editing, setEditing] = useState<any | null>(null);
   const [open, setOpen] = useState(false);
@@ -108,6 +110,17 @@ export default function CommunityContentManagement() {
   const [alumniViewMode, setAlumniViewMode] = useState<"cards" | "table">("cards");
   const [alumniSearch, setAlumniSearch] = useState<string>("");
   const [alumniGenFilter, setAlumniGenFilter] = useState<string>("All");
+
+  useEffect(() => {
+    const tabParam = searchParams?.get("tab") as Mode | null;
+    if (tabParam && ["opensource", "project", "alumni"].includes(tabParam)) {
+      setMode(tabParam);
+    }
+    const filterParam = searchParams?.get("filter");
+    if (filterParam && ["all", "pending", "published"].includes(filterParam)) {
+      setOpenSourceStatusFilter(filterParam as any);
+    }
+  }, [searchParams]);
 
   // Queries
   const projects = useGetProjectLabsQuery();
