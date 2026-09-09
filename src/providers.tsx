@@ -9,6 +9,7 @@ import { App, ConfigProvider } from "antd";
 import ProviderI18n from "./services/i18n/ProviderI18n";
 import { Provider } from "react-redux";
 import { store } from "./store";
+import ErrorBoundary from "./components/core/common/ErrorBoundary";
 
 if (typeof window !== "undefined") {
   const isExtensionError = (errOrMsg: any, source?: string) => {
@@ -85,7 +86,9 @@ function Providers({
               }}
             >
               <App>
-                <Provider store={store}>{children}</Provider>
+                <Provider store={store}>
+                  <ErrorBoundary>{children}</ErrorBoundary>
+                </Provider>
               </App>
             </ConfigProvider>
           </AntdRegistry>
