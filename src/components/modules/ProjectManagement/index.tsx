@@ -15,6 +15,7 @@ import {
   EditOutlined,
   PlusOutlined,
   EyeOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import _ from "lodash";
 import { useRouter } from "next-nprogress-bar";
@@ -119,13 +120,20 @@ function ProjectManagementModule() {
       <S.Head>
         <Typography.Title level={2}>Quản lý dự án</Typography.Title>
       </S.Head>
-      <S.FilterWrapper>
+      <S.FilterWrapper style={{ display: "flex", gap: "12px", alignItems: "center" }}>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => router.push("/project-management/create")}
         >
           Thêm dự án mới
+        </Button>
+        <Button
+          style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", color: "#fff" }}
+          icon={<CheckCircleOutlined />}
+          onClick={() => router.push("/community-content")}
+        >
+          Duyệt dự án thành viên gửi (Open Source)
         </Button>
       </S.FilterWrapper>
       <S.TableWrapper>
