@@ -14,6 +14,7 @@ import NotificationBell from "@/components/ui/NotificationBell";
 import Typography from "../../common/Typography";
 import LoadingScreen from "../../common/LoadingScreen";
 import DeverRouteLoader from "@/components/ui/DeverRouteLoader";
+import ErrorBoundary from "../../common/ErrorBoundary";
 
 import { sidebarMenu } from "@/helpers/data/sidebarMenu";
 import { useTranslation } from "@/app/i18n/client";
@@ -213,7 +214,9 @@ const MainLayout = ({
               </Flex>
             </S.HeaderCustom>
 
-            <S.ContentCustom>{children}</S.ContentCustom>
+            <S.ContentCustom>
+              <ErrorBoundary scope="page">{children}</ErrorBoundary>
+            </S.ContentCustom>
 
             <S.FooterCustom>
               <p style={{ margin: 0 }}>
