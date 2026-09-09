@@ -49,6 +49,7 @@ import {
   PictureOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
+import { compressImage } from "@/utils/imageCompressor";
 import dayjs from "dayjs";
 
 const { Title, Text, Paragraph } = Typography;
@@ -205,43 +206,40 @@ export default function FundManagementModule() {
   const handleUploadQrFile = async (file: File) => {
     setUploadingQr(true);
     try {
+      // Compress QR code image client-side before upload
+      const compressedFile = await compressImage(file, {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1200,
+        quality: 0.85,
+      });
+
       const token = webStorageClient.getToken();
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", compressedFile);
+      formData.append("folder", "fund-qr");
 
-      const res = await fetch(`${apiServer}/api/v1/upload`, {
+      const res = await fetch(`${apiServer}/api/v1/upload/image`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
       });
 
       if (res.ok) {
         const json = await res.json();
-        const url = json.url || json.data?.url || json.secure_url;
-        setCustomQrImage(url);
-        campaignForm.setFieldValue("customQrUrl", url);
-        message.success("Tải ảnh mã QR thủ quỹ thành công!");
-      } else {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const url = reader.result as string;
+        const url = json.data?.url || json.url || json.secure_url;
+        if (url) {
           setCustomQrImage(url);
           campaignForm.setFieldValue("customQrUrl", url);
-          message.success("Đã chọn ảnh mã QR!");
-        };
-        reader.readAsDataURL(file);
+          message.success("Tải ảnh mã QR lên Cloudflare R2 thành công!");
+          return false;
+        }
       }
-    } catch {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const url = reader.result as string;
-        setCustomQrImage(url);
-        campaignForm.setFieldValue("customQrUrl", url);
-        message.success("Đã chọn ảnh mã QR!");
-      };
-      reader.readAsDataURL(file);
+
+      const errJson = await res.json().catch(() => null);
+      throw new Error(errJson?.message || "Tải ảnh mã QR lên thất bại");
+    } catch (err: any) {
+      console.error("Upload QR code error:", err);
+      message.error(err?.message || "Không thể tải ảnh mã QR lên máy chủ. Vui lòng thử lại!");
     } finally {
       setUploadingQr(false);
     }

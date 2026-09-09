@@ -41,6 +41,7 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
+import { compressImage } from "@/utils/imageCompressor";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -170,16 +171,19 @@ export default function EventManagementModule() {
   }, []);
 
   const uploadImageFile = async (file: File): Promise<string | null> => {
-    if (file.size > 8 * 1024 * 1024) {
-      message.error("Kích thước file ảnh không được vượt quá 8MB!");
-      return null;
-    }
     const token = webStorageClient.getToken();
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("folder", "events");
-
     try {
+      // Compress event banner image client-side before upload to prevent high bandwidth and payload limits
+      const compressedFile = await compressImage(file, {
+        maxSizeMB: 1.5,
+        maxWidthOrHeight: 1920,
+        quality: 0.85,
+      });
+
+      const formData = new FormData();
+      formData.append("file", compressedFile);
+      formData.append("folder", "events");
+
       const res = await fetch(`${API_SERVER}/api/v1/upload/image`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -191,6 +195,7 @@ export default function EventManagementModule() {
       }
       throw new Error(json.message || "Tải ảnh lên máy chủ không thành công");
     } catch (err: any) {
+      console.error("Upload event image error:", err);
       message.error(err.message || "Không thể tải file ảnh lên máy chủ!");
       return null;
     }

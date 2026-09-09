@@ -16,6 +16,9 @@ import {
 
 import CustomEditor from "@/components/core/common/CustomEditor";
 import Button from "@/components/core/common/Button";
+import { compressImage } from "@/utils/imageCompressor";
+import webStorageClient from "@/utils/webStorageClient";
+import { constants } from "@/settings";
 
 import * as S from "./styles";
 
@@ -53,20 +56,41 @@ function CreateProject() {
 
   const handleUpload = async ({ onSuccess, onError, file }: any) => {
     setIsUploading(true);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64Url = e.target?.result as string;
-      setImageUrl(base64Url);
+    try {
+      const compressedFile = await compressImage(file, {
+        maxSizeMB: 1.0,
+        maxWidthOrHeight: 1920,
+        quality: 0.82,
+      });
+
+      const token = webStorageClient.getToken();
+      const formData = new FormData();
+      formData.append("file", compressedFile);
+      formData.append("folder", "projects");
+
+      const res = await axios.post(`${constants.API_SERVER}/api/v1/upload/image`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+
+      const uploadedUrl = res.data?.data?.url;
+      if (!uploadedUrl) {
+        throw new Error(res.data?.message || "Tải ảnh lên máy chủ thất bại");
+      }
+
+      setImageUrl(uploadedUrl);
+      myForm.setFieldsValue({ imageInput: uploadedUrl });
       setIsUploading(false);
       if (onSuccess) onSuccess("Ok");
-      message.success("Tải ảnh dự án từ máy tính thành công!");
-    };
-    reader.onerror = (err) => {
-      if (onError) onError({ err });
+      message.success("Tải ảnh dự án lên Cloudflare R2 thành công!");
+    } catch (err: any) {
+      console.error("Upload project image error:", err);
       setIsUploading(false);
-      message.error("Lỗi khi đọc file ảnh!");
-    };
-    reader.readAsDataURL(file);
+      if (onError) onError({ err });
+      message.error(err?.response?.data?.message || err?.message || "Lỗi khi tải ảnh lên máy chủ!");
+    }
   };
 
   const handleChangeEditor = (value: string) => {
