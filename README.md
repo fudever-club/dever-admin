@@ -39,6 +39,8 @@
   - Phím tắt `ESC` đóng nhanh hộp thoại, nút duyệt tức thì gửi thông báo tự động qua Telegram bot.
 - 👥 **Quản lý Thành viên Toàn Diện:** Tra cứu nhanh, lọc theo Ban (Kỹ Thuật, Chuyên Môn, Truyền Thông), cập nhật hồ sơ và chức vụ.
 - 🛡️ **Role-Based Access Control (RBAC):** Bảo vệ các route quản trị nghiêm ngặt, tự động điều hướng người dùng chưa đăng nhập.
+- ☁️ **Lưu Trữ Chuẩn Cloudflare R2 (Zero-ImgBB):** Toàn bộ hình ảnh Dự án, Album ảnh, Ảnh hoạt động, Banner sự kiện và Mã QR Quỹ đều được nén Client-First và đẩy lên Cloudflare R2 nội bộ của CLB, loại bỏ hoàn toàn dịch vụ bên thứ ba.
+- 🛡️ **Lưới An Toàn Bảng Điều Khiển (ErrorBoundary):** Bọc độc lập vùng Content; khi một bảng hoặc form quản trị gặp lỗi render, thanh Sidebar và Header vẫn hoạt động bình thường, giúp Admin không bao giờ bị trắng trang.
 
 ---
 
