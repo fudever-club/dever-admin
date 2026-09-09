@@ -67,28 +67,51 @@ function DropdownMenu() {
   };
 
   return (
-    <Flex vertical>
-      <Flex gap={8} align="center">
+    <div style={{ minWidth: 230, maxWidth: 280 }}>
+      <Flex gap={10} align="center" style={{ padding: "4px 4px 6px 4px" }}>
         <Avatar
-          size={28}
+          size={36}
           src={
             <Image
               src={safeMenuAvatar}
               alt="avatar"
-              width={28}
-              height={28}
+              width={36}
+              height={36}
               unoptimized={safeMenuAvatar.endsWith('.svg') || safeMenuAvatar.startsWith('data:')}
               onError={() => setAvatarError(true)}
-              style={{ objectFit: "cover", width: 28, height: 28, borderRadius: "50%" }}
+              style={{ objectFit: "cover", width: 36, height: 36, borderRadius: "50%" }}
             />
           }
         />
-        <Flex vertical>
-          <p>{[userInfo?.firstname, userInfo?.lastname].filter(Boolean).join(" ") || "Thành viên FU-DEVER"}</p>
-          <span className="text-xs text-gray-500">@{userInfo?.email || "fudever-club"}</span>
+        <Flex vertical style={{ minWidth: 0, flex: 1 }}>
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: "14px",
+              color: "#0f172a",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {[userInfo?.firstname, userInfo?.lastname].filter(Boolean).join(" ") || "Thành viên FU-DEVER"}
+          </span>
+          <span
+            style={{
+              fontSize: "12px",
+              color: "#64748b",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+            title={userInfo?.email || undefined}
+          >
+            @{userInfo?.email || "fudever-club"}
+          </span>
         </Flex>
       </Flex>
-      <Divider $margin={8} />
+      <Divider $margin={6} />
       <div className="flex flex-col gap-1 p-1">
         <a
           href={landingUrl}
@@ -112,7 +135,7 @@ function DropdownMenu() {
         items={sideBarMenuFormat}
         onClick={(e) => handleClickItem(e?.key)}
       />
-    </Flex>
+    </div>
   );
 }
 
