@@ -115,8 +115,7 @@ function AlbumDetailModule() {
     if (!imageUrl) {
       return;
     }
-    setFileList([...fileList, imageUrl]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setFileList((prev) => (prev.includes(imageUrl) ? prev : [...prev, imageUrl]));
   }, [imageUrl]);
 
   useEffect(() => {

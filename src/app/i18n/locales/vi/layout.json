@@ -5,8 +5,14 @@
   "positionManagement": "Quản lí chức vụ",
   "majorManagement": "Quản lí chuyên ngành",
   "socialManagement": "Quản lí Mạng xã hội",
+  "imageActivityManagement": "Quản lý ảnh hoạt động",
   "projectManagement": "Quản lý dự án",
   "albumManagement": "Quản lý album",
+  "fundManagement": "Quản lý Quỹ CLB",
+  "blogManagement": "Duyệt & Quản lý Tech Blog",
+  "eventManagement": "Quản lý Sự kiện & Workshop",
+  "resourceManagement": "Quản lý Tài liệu & Slide",
+  "communityContent": "Nội dung cộng đồng & Alumni",
 
   "english": "Tiếng Anh",
   "vietnamese": "Tiếng Việt"

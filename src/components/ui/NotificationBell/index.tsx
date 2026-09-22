@@ -10,6 +10,7 @@ import {
   Skeleton,
   Empty,
   message,
+  Popconfirm,
 } from "antd";
 import {
   BellOutlined,
@@ -314,17 +315,24 @@ export default function NotificationBell() {
         <span style={{ fontSize: 11, color: "#64748b", display: "flex", alignItems: "center", gap: 4 }}>
           <RobotOutlined style={{ color: "#0088cc" }} /> @Fudever_bot
         </span>
-        <Button
-          size="small"
-          type="primary"
-          ghost
-          icon={<SendOutlined style={{ fontSize: 11 }} />}
-          loading={isTestingTelegram}
-          onClick={handleTestTelegram}
-          style={{ fontSize: 11 }}
+        <Popconfirm
+          title="Test gửi Bot Telegram"
+          description="Gửi một tin nhắn kiểm tra tới bot production?"
+          okText="Gửi"
+          cancelText="Hủy"
+          onConfirm={handleTestTelegram}
         >
-          Test Gửi Bot Telegram
-        </Button>
+          <Button
+            size="small"
+            type="primary"
+            ghost
+            icon={<SendOutlined style={{ fontSize: 11 }} />}
+            loading={isTestingTelegram}
+            style={{ fontSize: 11 }}
+          >
+            Test Gửi Bot Telegram
+          </Button>
+        </Popconfirm>
       </div>
     </div>
   );

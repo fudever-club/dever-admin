@@ -145,7 +145,16 @@ function parseMemberCsv(source: string): CsvValidationResult {
   const users: CsvMember[] = [];
   const errors: string[] = [];
 
-  rows.slice(1).forEach((row, rowIndex) => {
+  const dataRows = rows.slice(1);
+  const MAX_CSV_ROWS = 500;
+  if (dataRows.length > MAX_CSV_ROWS) {
+    return {
+      users: [],
+      errors: [`Tệp vượt quá ${MAX_CSV_ROWS} thành viên. Chia nhỏ tệp rồi import từng phần.`],
+    };
+  }
+
+  dataRows.forEach((row, rowIndex) => {
     const values = parseCsvLine(row);
     const record = headers.reduce<Record<string, string>>((result, header, index) => {
       result[header] = values[index]?.trim() ?? "";
@@ -164,6 +173,15 @@ function parseMemberCsv(source: string): CsvValidationResult {
     }
     if (seenEmails.has(email)) {
       errors.push(`Hàng ${rowNumber}: email bị trùng trong tệp.`);
+      return;
+    }
+    const phoneDigits = record.phone.replace(/\D/g, "");
+    if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+      errors.push(`Hàng ${rowNumber}: số điện thoại phải có 8–15 chữ số.`);
+      return;
+    }
+    if (record.mssv && !/^[A-Za-z0-9]{4,20}$/.test(record.mssv)) {
+      errors.push(`Hàng ${rowNumber}: MSSV chỉ gồm chữ và số (4–20 ký tự).`);
       return;
     }
 
@@ -506,7 +524,7 @@ function UsersManagementModule() {
               description="Bạn có chắc chắn muốn reset mật khẩu của tài khoản này?"
               okText={"Đồng ý"}
               cancelText="Huỷ bỏ"
-              onConfirm={() => handleResetPassword(record?._id)}
+              onConfirm={() => handleResetPassword(record)}
             >
               <Button shape="circle" icon={<RollbackOutlined />} />
             </Popconfirm>
@@ -557,11 +575,21 @@ function UsersManagementModule() {
     }
   };
 
-  const handleResetPassword = async (id: string) => {
+  const handleResetPassword = async (record: { _id?: string; email?: string }) => {
+    const userId = record?._id;
+    if (!userId) {
+      return;
+    }
     try {
-      await resetPassword(id).unwrap();
+      const response: any = await resetPassword(userId).unwrap();
+      const temporaryPassword = response?.data?.temporaryPassword;
       refetch();
-      message.success("Reset mật khẩu thành công!");
+      if (temporaryPassword && record?.email) {
+        // Same one-time credential flow as manual/CSV provisioning.
+        setIssuedCredentials([{ email: record.email, temporaryPassword }]);
+      } else {
+        message.success("Reset mật khẩu thành công!");
+      }
     } catch (err: any) {
       message.error(err?.data?.message || "Không thể reset mật khẩu. Vui lòng thử lại.");
     }
@@ -615,9 +643,10 @@ function UsersManagementModule() {
   };
 
   const importCsv = async (source: string) => {
-    const { users, errors } = parseMemberCsv(source);
-    if (errors.length > 0) {
-      const summary = `CSV chưa hợp lệ: ${errors.slice(0, 2).join(" ")}`;
+    const { users, errors: clientErrors } = parseMemberCsv(source);
+    // Fatal file problems (missing headers, over row cap): nothing to submit.
+    if (users.length === 0) {
+      const summary = `CSV chưa hợp lệ: ${clientErrors.slice(0, 2).join(" ")}`;
       setCsvFeedback({ type: "error", message: summary });
       message.error("CSV chưa hợp lệ. Sửa dữ liệu rồi thử lại.");
       return;
@@ -642,13 +671,23 @@ function UsersManagementModule() {
 
       setIssuedCredentials(credentials);
 
-      if (skippedCount > 0 || errorCount > 0) {
-        const summary = `Đã tạo ${createdCount} thành viên; bỏ qua ${skippedCount}, lỗi ${errorCount}.`;
-        setCsvFeedback({ type: "warning", message: summary });
-        message.warning(summary);
+      // Merge client-side row skips with the server partial report so no
+      // rejected row goes unnoticed.
+      const skippedClient = clientErrors.length;
+      const detail = [
+        `Đã tạo ${createdCount} thành viên`,
+        skippedCount > 0 ? `bỏ qua ${skippedCount}` : null,
+        errorCount > 0 ? `lỗi ${errorCount}` : null,
+        skippedClient > 0 ? `${skippedClient} hàng lỗi sẵn (${clientErrors.slice(0, 2).join(" ")})` : null,
+      ]
+        .filter(Boolean)
+        .join("; ") + ".";
+
+      if (skippedCount > 0 || errorCount > 0 || skippedClient > 0) {
+        setCsvFeedback({ type: "warning", message: detail });
+        message.warning(detail);
       } else {
-        const summary = `Đã tạo ${createdCount} thành viên.`;
-        setCsvFeedback({ type: "success", message: summary });
+        setCsvFeedback({ type: "success", message: detail });
         message.success("Import thành công");
       }
       refetch();
@@ -693,11 +732,10 @@ function UsersManagementModule() {
   };
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
-    current,
+    _current,
     pageSize
   ) => {
-    console.log(pageSize);
-    router.push(createQueryString("limit", `${20}`));
+    router.push(createQueryString("limit", `${pageSize}`, { page: "1" }));
   };
 
   const handleSearch = _.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -887,7 +925,9 @@ function UsersManagementModule() {
         <br />
         <Flex justify="flex-end">
           <Pagination
-            showSizeChanger={false}
+            showSizeChanger
+            pageSizeOptions={[10, 25, 50]}
+            pageSize={limit}
             onShowSizeChange={onShowSizeChange}
             defaultCurrent={page}
             total={total}

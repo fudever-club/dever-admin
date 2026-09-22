@@ -56,6 +56,7 @@ function AlbumManagementModule() {
   const { t } = useTranslation(params?.locale as string, "majorManagement");
 
   const [MajorId, setMajorID] = useState<string>("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [deleteAlbum] = useDeleteAlbumMutation();
   const [createAlbum] = useCreateAlbumMutation();
@@ -70,13 +71,19 @@ function AlbumManagementModule() {
   });
 
   const handleDelete = async (id: string) => {
-    console.log(id);
-
+    if (!id || deletingId) {
+      return;
+    }
+    setDeletingId(id);
     try {
       await deleteAlbum(id).unwrap();
       message.success("Xóa thành công");
       refetch();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Xóa album thất bại, vui lòng thử lại");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const handleAdd = async (values: any) => {
@@ -85,7 +92,9 @@ function AlbumManagementModule() {
       message.success("Thêm thành công");
       refetch();
       addModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Thêm album thất bại, vui lòng thử lại");
+    }
   };
 
   const handleEdit = async (values: any) => {
@@ -97,7 +106,9 @@ function AlbumManagementModule() {
       message.success("Sửa thành công");
       refetch();
       editModal.closeModal();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Sửa album thất bại, vui lòng thử lại");
+    }
   };
 
   const columns: TableProps<DataType>["columns"] = [
@@ -167,8 +178,8 @@ function AlbumManagementModule() {
               description="Bạn có chắc chắn muốn xoá album này không?"
               okText="Xoá"
               cancelText="Hủy"
-              okButtonProps={{ danger: true }}
-              onConfirm={() => handleDelete(record?.slug)}
+              okButtonProps={{ danger: true, loading: deletingId === record?._id }}
+              onConfirm={() => handleDelete(record?._id)}
             >
               <Button
                 type="primary"

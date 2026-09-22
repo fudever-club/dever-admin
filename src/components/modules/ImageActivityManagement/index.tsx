@@ -73,7 +73,9 @@ function ImageActivityManagementModule() {
       await deleteImage(id).unwrap();
       message.success("Xóa thành công");
       refetch();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Xóa ảnh thất bại, vui lòng thử lại");
+    }
   };
 
   const handleAdd = async () => {
@@ -86,7 +88,9 @@ function ImageActivityManagementModule() {
       message.success("Thêm thành công");
       refetch();
       setFileList([]);
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Thêm ảnh thất bại, vui lòng thử lại");
+    }
   };
 
   const handleUpload = async ({
@@ -142,7 +146,9 @@ function ImageActivityManagementModule() {
       await deleteManyImages(deleteList).unwrap();
       message.success("Xóa thành công");
       refetch();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Xóa ảnh thất bại, vui lòng thử lại");
+    }
   };
 
   useEffect(() => {

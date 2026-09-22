@@ -21,17 +21,17 @@ export const sidebarMenu: MenuProps["items"] = [
   {
     key: "fund-management",
     icon: React.createElement(WalletOutlined),
-    label: "Quản lý Quỹ CLB",
+    label: "fundManagement",
   },
   {
     key: "blog-management",
     icon: React.createElement(FileTextOutlined),
-    label: "Duyệt & Quản lý Tech Blog",
+    label: "blogManagement",
   },
   {
     key: "event-management",
     icon: React.createElement(CalendarOutlined),
-    label: "Quản lý Sự kiện & Workshop",
+    label: "eventManagement",
   },
   {
     key: "department-management",
@@ -71,11 +71,11 @@ export const sidebarMenu: MenuProps["items"] = [
   {
     key: "resource-management",
     icon: React.createElement(BookOutlined),
-    label: "Quản lý Tài liệu & Slide",
+    label: "resourceManagement",
   },
   {
     key: "community-content",
     icon: React.createElement(AimOutlined),
-    label: "Nội dung cộng đồng & Alumni",
+    label: "communityContent",
   },
 ];

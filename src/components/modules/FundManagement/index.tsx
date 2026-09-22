@@ -49,6 +49,7 @@ import {
   PictureOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
+import { constants } from "@/settings";
 import { compressImage } from "@/utils/imageCompressor";
 import dayjs from "dayjs";
 
@@ -144,7 +145,7 @@ export default function FundManagementModule() {
   // Bill Image Zoom Modal State
   const [billImageModal, setBillImageModal] = useState<string | null>(null);
 
-  const apiServer = process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:5000";
+  const apiServer = constants.API_SERVER;
 
   // Escape key listener for Modals
   useEffect(() => {

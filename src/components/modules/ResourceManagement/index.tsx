@@ -34,6 +34,7 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
+import { constants } from "@/settings";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -64,7 +65,7 @@ export default function ResourceManagementModule() {
   const [updatingFeaturedId, setUpdatingFeaturedId] = useState<string | null>(null);
   const [form] = Form.useForm();
 
-  const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:5000";
+  const API_SERVER = constants.API_SERVER;
 
   const authHeaders = (json = false) => {
     const token = webStorageClient.getToken();

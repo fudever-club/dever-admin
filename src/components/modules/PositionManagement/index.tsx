@@ -66,7 +66,8 @@ function PositionManagementModule() {
       message.success("Xóa chức vụ thành công");
       refetch?.();
     } catch (error: any) {
-      message.error(error?.data?.message || "Xóa chức vụ thất bại");
+      // 409 = still referenced by members or protected — keep the message visible longer.
+      message.error(error?.data?.message || "Xóa chức vụ thất bại", error?.status === 409 ? 6 : 3);
     }
   };
 

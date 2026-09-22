@@ -61,7 +61,8 @@ function MajorManagementModule() {
       message.success("Xóa chuyên ngành thành công");
       refetch?.();
     } catch (error: any) {
-      message.error(error?.data?.message || "Xóa chuyên ngành thất bại");
+      // 409 = still referenced by members — keep the message visible longer.
+      message.error(error?.data?.message || "Xóa chuyên ngành thất bại", error?.status === 409 ? 6 : 3);
     }
   };
 

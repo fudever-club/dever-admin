@@ -38,6 +38,7 @@ import {
   FireOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
+import { constants } from "@/settings";
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -74,10 +75,9 @@ export default function BlogManagement() {
   const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
   const [reviewFeedback, setReviewFeedback] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const [togglingFeaturedId, setTogglingFeaturedId] = useState<string | null>(null);
 
-  const API_SERVER =
-    process.env.NEXT_PUBLIC_API_SERVER ||
-    "https://dever-backend-production.up.railway.app";
+  const API_SERVER = constants.API_SERVER;
 
   const fetchBlogs = useCallback(async () => {
     setLoading(true);
@@ -121,6 +121,10 @@ export default function BlogManagement() {
   }, [reviewModalVisible]);
 
   const handleToggleFeatured = async (record: BlogPost) => {
+    if (!record?._id || togglingFeaturedId) {
+      return;
+    }
+    setTogglingFeaturedId(record._id);
     const token = webStorageClient.getToken();
     const oldFeatured = Boolean(record.isFeatured);
     const newFeatured = !oldFeatured;
@@ -157,6 +161,8 @@ export default function BlogManagement() {
         prev.map((b) => (b._id === record._id ? { ...b, isFeatured: oldFeatured } : b))
       );
       message.error("Lỗi kết nối máy chủ");
+    } finally {
+      setTogglingFeaturedId(null);
     }
   };
 
@@ -278,7 +284,10 @@ export default function BlogManagement() {
         >
           <Switch
             checked={Boolean(isFeatured)}
+            loading={togglingFeaturedId === record._id}
+            disabled={togglingFeaturedId !== null && togglingFeaturedId !== record._id}
             onChange={() => handleToggleFeatured(record)}
+            aria-label={isFeatured ? "Bỏ ghim khỏi nổi bật" : "Ghim lên nổi bật"}
             checkedChildren={<StarFilled className="text-amber-300" />}
             unCheckedChildren={<StarOutlined />}
             className={isFeatured ? "!bg-amber-500" : ""}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   App,
@@ -159,6 +159,7 @@ export default function CommunityContentManagement() {
   const [createAlumnus, alumniCreateState] = useCreateAlumniMutation();
   const [updateAlumnus, alumniUpdateState] = useUpdateAlumniMutation();
   const [deleteAlumnus] = useDeleteAlumniMutation();
+  const [togglingAlumniId, setTogglingAlumniId] = useState<string | null>(null);
 
   const saving =
     projectCreateState.isLoading ||
@@ -262,25 +263,43 @@ export default function CommunityContentManagement() {
     }
   };
 
-  const handleToggleAlumniPublish = async (record: any, checked: boolean) => {
-    try {
-      await updateAlumnus({ id: record._id, body: { isPublished: checked } }).unwrap();
-      await alumni.refetch();
-      message.success(`Đã ${checked ? "hiển thị" : "ẩn"} cựu thành viên ${record.name} trên Landing Page`);
-    } catch {
-      message.error("Lỗi khi cập nhật trạng thái");
-    }
-  };
+  const handleToggleAlumniPublish = useCallback(
+    async (record: any, checked: boolean) => {
+      if (!record?._id || togglingAlumniId) {
+        return;
+      }
+      setTogglingAlumniId(record._id);
+      try {
+        await updateAlumnus({ id: record._id, body: { isPublished: checked } }).unwrap();
+        await alumni.refetch();
+        message.success(`Đã ${checked ? "hiển thị" : "ẩn"} cựu thành viên ${record.name} trên Landing Page`);
+      } catch {
+        message.error("Lỗi khi cập nhật trạng thái");
+      } finally {
+        setTogglingAlumniId(null);
+      }
+    },
+    [updateAlumnus, alumni, togglingAlumniId, message]
+  );
 
-  const handleToggleAlumniMentor = async (record: any, checked: boolean) => {
-    try {
-      await updateAlumnus({ id: record._id, body: { isMentor: checked } }).unwrap();
-      await alumni.refetch();
-      message.success(`Đã cập nhật trạng thái Mentoring cho ${record.name}`);
-    } catch {
-      message.error("Lỗi khi cập nhật trạng thái");
-    }
-  };
+  const handleToggleAlumniMentor = useCallback(
+    async (record: any, checked: boolean) => {
+      if (!record?._id || togglingAlumniId) {
+        return;
+      }
+      setTogglingAlumniId(record._id);
+      try {
+        await updateAlumnus({ id: record._id, body: { isMentor: checked } }).unwrap();
+        await alumni.refetch();
+        message.success(`Đã cập nhật trạng thái Mentoring cho ${record.name}`);
+      } catch {
+        message.error("Lỗi khi cập nhật trạng thái");
+      } finally {
+        setTogglingAlumniId(null);
+      }
+    },
+    [updateAlumnus, alumni, togglingAlumniId, message]
+  );
 
   const handleApproveOpenSource = async (record: any) => {
     try {
@@ -524,7 +543,10 @@ export default function CommunityContentManagement() {
           render: (isMentor: boolean, record: any) => (
             <Switch
               checked={isMentor !== false}
+              loading={togglingAlumniId === record._id}
+              disabled={togglingAlumniId !== null && togglingAlumniId !== record._id}
               onChange={(checked) => handleToggleAlumniMentor(record, checked)}
+              aria-label={`Mentoring của ${record.name || "cựu thành viên"}`}
               checkedChildren="Sẵn sàng"
               unCheckedChildren="Tạm tắt"
             />
@@ -536,7 +558,10 @@ export default function CommunityContentManagement() {
           render: (isPublished: boolean, record: any) => (
             <Switch
               checked={isPublished !== false}
+              loading={togglingAlumniId === record._id}
+              disabled={togglingAlumniId !== null && togglingAlumniId !== record._id}
               onChange={(checked) => handleToggleAlumniPublish(record, checked)}
+              aria-label={`Hiển thị ${record.name || "cựu thành viên"} trên Landing`}
               checkedChildren="Hiện"
               unCheckedChildren="Ẩn"
             />
@@ -544,7 +569,7 @@ export default function CommunityContentManagement() {
         },
       ];
     }
-  }, [mode]);
+  }, [mode, togglingAlumniId, handleToggleAlumniMentor, handleToggleAlumniPublish]);
 
   const actionColumn = {
     title: "Thao tác",
@@ -848,7 +873,10 @@ export default function CommunityContentManagement() {
                       <Switch
                         size="small"
                         checked={alumnus.isPublished !== false}
+                        loading={togglingAlumniId === alumnus._id}
+                        disabled={togglingAlumniId !== null && togglingAlumniId !== alumnus._id}
                         onChange={(checked) => handleToggleAlumniPublish(alumnus, checked)}
+                        aria-label={`Hiển thị ${alumnus.name || "cựu thành viên"} trên Landing`}
                       />
                     </div>
                   </Card>

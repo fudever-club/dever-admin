@@ -8,6 +8,11 @@
   "imageActivityManagement": "Image Activity Management",
   "albumManagement": "Album Management",
   "projectManagement": "Project Management",
+  "fundManagement": "Club Fund Management",
+  "blogManagement": "Tech Blog Review & Management",
+  "eventManagement": "Events & Workshops Management",
+  "resourceManagement": "Resources & Slides Management",
+  "communityContent": "Community Content & Alumni",
 
   "english": "English",
   "vietnamese": "Vietnamese"

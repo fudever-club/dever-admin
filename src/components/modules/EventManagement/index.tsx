@@ -41,6 +41,7 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
+import { constants } from "@/settings";
 import { compressImage } from "@/utils/imageCompressor";
 
 const { Title, Text, Paragraph } = Typography;
@@ -143,13 +144,14 @@ export default function EventManagementModule() {
   const [previewCoverUrl, setPreviewCoverUrl] = useState("");
   const [previewEditCoverUrl, setPreviewEditCoverUrl] = useState("");
   const [updatingFeaturedId, setUpdatingFeaturedId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingEditImage, setIsUploadingEditImage] = useState(false);
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  const API_SERVER = process.env.NEXT_PUBLIC_API_SERVER || "http://localhost:5000";
+  const API_SERVER = constants.API_SERVER;
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -365,14 +367,17 @@ export default function EventManagementModule() {
   };
 
   const handleQuickStatusChange = async (id?: string, newStatus?: string) => {
-    if (!id || !newStatus) return;
+    if (!id || !newStatus || updatingStatusId) return;
+    setUpdatingStatusId(id);
     const token = webStorageClient.getToken();
     if (!token) {
       message.warning("Vui lòng đăng nhập với tài khoản Quản trị viên để thực hiện!");
+      setUpdatingStatusId(null);
       return;
     }
 
     // Optimistic UI update
+    const previousEvents = events;
     setEvents((prev) =>
       prev.map((ev) => (ev._id === id ? { ...ev, status: newStatus } : ev))
     );
@@ -394,11 +399,13 @@ export default function EventManagementModule() {
           ? json.message.join(", ")
           : (json?.message || "Không thể cập nhật trạng thái!");
         message.error(errMsg);
-        fetchEvents();
+        setEvents(previousEvents);
       }
     } catch (err: any) {
       message.error(err?.message || "Lỗi khi cập nhật trạng thái!");
-      fetchEvents();
+      setEvents(previousEvents);
+    } finally {
+      setUpdatingStatusId(null);
     }
   };
 
@@ -628,6 +635,9 @@ export default function EventManagementModule() {
             onChange={(newStatus) => handleQuickStatusChange(record._id, newStatus)}
             size="small"
             bordered={false}
+            loading={updatingStatusId === record._id}
+            disabled={updatingStatusId !== null}
+            aria-label={`Đổi trạng thái sự kiện ${record.title}`}
             style={{
               width: 155,
               backgroundColor: currentCfg.bg,
