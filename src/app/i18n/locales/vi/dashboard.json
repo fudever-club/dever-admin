@@ -1,3 +1,13 @@
 {
-  "title": "Bảng điều khiển"
+  "title": "Bảng điều khiển",
+  "overview": "Tổng quan hoạt động câu lạc bộ",
+  "refresh": "Làm mới số liệu",
+  "refreshing": "Đang đồng bộ...",
+  "retry": "Thử lại",
+  "loadError": "Không thể tải một số chỉ số. Vui lòng thử lại.",
+  "unavailable": "Chưa có dữ liệu",
+  "totalUsers": "Thành viên",
+  "activeEvents": "Sự kiện mở đăng ký và đang diễn ra",
+  "pendingBlogs": "Bài viết chờ duyệt",
+  "leetcodeSubmissions": "Lượt nộp LeetCode được chấp nhận đã ghi nhận"
 }

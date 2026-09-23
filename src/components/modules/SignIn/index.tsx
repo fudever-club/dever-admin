@@ -15,7 +15,10 @@ import { useTranslation } from "@/app/i18n/client";
 import { useSignInMutation } from "@/store/queries/auth";
 import webStorageClient from "@/utils/webStorageClient";
 import LoadingScreen from "@/components/core/common/LoadingScreen";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAppDispatch } from "@/hooks/redux-toolkit";
+import { setAuthenticatedUser } from "@/store/slices/auth";
+import { clearSession } from "@/store/session";
 
 import * as S from "./styles";
 
@@ -27,6 +30,17 @@ type FieldType = {
 
 function SignInModule() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const submitting = useRef(false);
+  const mounted = useRef(true);
+  const navigationTimer = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      clearTimeout(navigationTimer.current);
+    };
+  }, []);
   const params = useParams();
   const locale = useLocale();
   const [form] = Form.useForm<FieldType>();
@@ -37,28 +51,36 @@ function SignInModule() {
   const [isNavigatingToAdmin, setIsNavigatingToAdmin] = useState<boolean>(false);
 
   const onFinish = async (values: FieldType) => {
+    if (submitting.current) return;
+    submitting.current = true;
+    let navigating = false;
     try {
       const res: any = await signIn(values).unwrap();
+      if (!mounted.current) return;
 
       const user = res?.data?.user;
       const token = res?.data?.token;
 
-      if (!user?.isAdmin) {
+      if (user?.isAdmin !== true) {
+        dispatch(clearSession());
         message.error(t("notAdmin"));
         return;
       }
 
-      if (token) {
-        webStorageClient.setToken(token);
-        webStorageClient.set("_access_token", token);
-        if (user) {
-          webStorageClient.set("_user_info", user);
-        }
+      if (typeof token !== "string" || !token.trim()) {
+        dispatch(clearSession());
+        message.error(t("signInFailed"));
+        return;
       }
+      dispatch(clearSession());
+      webStorageClient.setToken(token);
+      webStorageClient.set("_user_info", user);
+      dispatch(setAuthenticatedUser(user));
 
       message.success(t("signInSuccess"));
+      navigating = true;
       setIsNavigatingToAdmin(true);
-      setTimeout(() => {
+      navigationTimer.current = setTimeout(() => {
         if (typeof window !== "undefined") {
           window.location.href = `/${locale}/user-management`;
         } else {
@@ -66,8 +88,11 @@ function SignInModule() {
         }
       }, 450);
     } catch (err: any) {
+      if (!mounted.current) return;
       const errMsg = err?.data?.message || err?.message || t("signInFailed");
       message.error(errMsg);
+    } finally {
+      if (!navigating) submitting.current = false;
     }
   };
 
@@ -109,7 +134,7 @@ function SignInModule() {
         onFinish={onFinish}
         layout="vertical"
         validateTrigger={["onBlur", "onChange"]}
-        aria-busy={isLoading}
+        aria-busy={isLoading || isNavigatingToAdmin}
       >
         <Form.Item<FieldType>
           label={t("emailLabel")}
@@ -126,7 +151,7 @@ function SignInModule() {
             placeholder={t("emailPlaceholder")}
             autoComplete="email"
             autoFocus
-            disabled={isLoading}
+            disabled={isLoading || isNavigatingToAdmin}
             aria-label={t("emailLabel")}
           />
         </Form.Item>
@@ -141,7 +166,7 @@ function SignInModule() {
           <Input.Password
             placeholder={t("passwordPlaceholder")}
             autoComplete="current-password"
-            disabled={isLoading}
+            disabled={isLoading || isNavigatingToAdmin}
             aria-label={t("passwordLabel")}
           />
         </Form.Item>
@@ -152,7 +177,7 @@ function SignInModule() {
               name="remember"
               valuePropName="checked"
             >
-              <Checkbox disabled={isLoading}>{t("remember")}</Checkbox>
+              <Checkbox disabled={isLoading || isNavigatingToAdmin}>{t("remember")}</Checkbox>
             </Form.Item>
             <S.RecoveryHint role="note">{t("recoveryHint")}</S.RecoveryHint>
         </S.LoginOptions>
@@ -163,7 +188,7 @@ function SignInModule() {
             htmlType="submit"
             $width="100%"
             loading={isLoading}
-            disabled={isLoading}
+            disabled={isLoading || isNavigatingToAdmin}
             aria-label={isLoading ? t("submitting") : t("submit")}
           >
             {isLoading ? t("submitting") : t("submit")}

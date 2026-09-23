@@ -1,3 +1,13 @@
 {
-  "title": "Dashboard"
+  "title": "Dashboard",
+  "overview": "Club activity overview",
+  "refresh": "Refresh metrics",
+  "refreshing": "Refreshing...",
+  "retry": "Retry",
+  "loadError": "Some metrics could not be loaded. Please try again.",
+  "unavailable": "Unavailable",
+  "totalUsers": "Members",
+  "activeEvents": "Open and ongoing events",
+  "pendingBlogs": "Blogs awaiting review",
+  "leetcodeSubmissions": "Recorded LeetCode accepted submissions"
 }

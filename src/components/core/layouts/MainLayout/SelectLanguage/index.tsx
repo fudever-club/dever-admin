@@ -7,7 +7,7 @@ import { useRouter } from "next-nprogress-bar";
 import { useParams, usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 
-import { getPathname } from "@/utils/getPathname";
+import { getLocalizedPath } from "@/utils/getPathname";
 import { useTranslation } from "@/app/i18n/client";
 
 import usa from "@public/images/languages/usa.webp";
@@ -28,7 +28,7 @@ function SelectLanguage() {
 
   const handleClick: MenuProps["onClick"] = (e) => {
     startTransition(() => {
-      router.replace(`/${e?.key}/${getPathname(pathname)}`);
+      router.replace(getLocalizedPath(pathname, e.key, window.location.search, window.location.hash));
     });
   };
 

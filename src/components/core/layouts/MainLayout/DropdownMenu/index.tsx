@@ -10,14 +10,15 @@ import Divider from "@/components/core/common/Divider";
 
 import { useTranslation } from "@/app/i18n/client";
 import { userDropdownMenu } from "@/helpers/data/userDropdownMenu";
-import webStorageClient from "@/utils/webStorageClient";
-import { useAppSelector } from "@/hooks/redux-toolkit";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux-toolkit";
+import { clearSession } from "@/store/session";
 
 import * as S from "./styles";
 
 function DropdownMenu() {
   const params = useParams();
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const locale = useLocale();
   const userInfo = useAppSelector((state) => state.auth.userInfo);
   const [avatarError, setAvatarError] = useState(false);
@@ -58,8 +59,8 @@ function DropdownMenu() {
         window.open(`${clientAppUrl}/${locale}/settings`, "_blank", "noopener,noreferrer");
         break;
       case "logout":
-        webStorageClient.remove("_access_token");
-        router.push(`/${locale}/sign-in`);
+        dispatch(clearSession());
+        router.replace(`/${locale}/sign-in`);
         break;
       default:
         break;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { MenuFoldOutlined, MenuUnfoldOutlined, CloseOutlined } from "@ant-design/icons";
 import { Flex, Layout, Menu, Popover, message } from "antd";
@@ -22,6 +22,7 @@ import { themes } from "@/style/themes";
 import { useVerifyTokenMutation } from "@/store/queries/auth";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux-toolkit";
 import { setAuthenticatedUser } from "@/store/slices/auth";
+import { clearSession } from "@/store/session";
 import webStorageClient from "@/utils/webStorageClient";
 import themeColors from "@/style/themes/default/colors";
 
@@ -59,52 +60,46 @@ const MainLayout = ({
 
   const [verifyToken] = useVerifyTokenMutation();
 
-  const handleVerifyToken = useCallback(async () => {
+  useEffect(() => {
+    let active = true;
+    let request: ReturnType<typeof verifyToken> | undefined;
+    let revealTimer: ReturnType<typeof setTimeout> | undefined;
+    let hideTimer: ReturnType<typeof setTimeout> | undefined;
     const startTime = Date.now();
-    try {
-      if (!webStorageClient.get("_access_token")) {
-        message.error("Bạn cần đăng nhập để truy cập trang này");
-        throw new Error("Bạn cần đăng nhập để truy cập trang này");
-      }
-      const res: any = await verifyToken(
-        webStorageClient.get("_access_token") || "??"
-      ).unwrap();
-      if (!res?.data?.isAdmin) {
-        message.error("Bạn không có quyền truy cập trang này");
-        throw new Error("Bạn không có quyền truy cập trang này");
-      }
+    setIsAuth(false);
+    setLoadingVisible(true);
+    setLoadingFadeOut(false);
 
-      // Guarantee minimum 450ms display time so the user sees the crisp branded LoadingScreen
-      const elapsed = Date.now() - startTime;
-      const minDisplayMs = 450;
-      if (elapsed < minDisplayMs) {
-        await new Promise((resolve) => setTimeout(resolve, minDisplayMs - elapsed));
-      }
+    const verify = async () => {
+      try {
+        const token = webStorageClient.getToken();
+        if (!token) throw new Error("Missing session");
+        request = verifyToken(token);
+        const res = await request.unwrap();
+        if (!active) return;
+        if (res?.data?.isAdmin !== true) throw new Error("Administrator access required");
 
-      dispatch(setAuthenticatedUser(res.data));
-      setIsAuth(true);
-      setLoadingFadeOut(true);
-      setTimeout(() => {
-        setLoadingVisible(false);
-      }, 350);
-    } catch (error) {
-      const elapsed = Date.now() - startTime;
-      if (elapsed < 300) {
-        await new Promise((resolve) => setTimeout(resolve, 300 - elapsed));
+        revealTimer = setTimeout(() => {
+          dispatch(setAuthenticatedUser(res.data));
+          setIsAuth(true);
+          setLoadingFadeOut(true);
+          hideTimer = setTimeout(() => setLoadingVisible(false), 350);
+        }, Math.max(0, 450 - (Date.now() - startTime)));
+      } catch {
+        if (!active) return;
+        dispatch(clearSession());
+        setIsAuth(false);
+        router.replace(`/${localActive}/sign-in`);
       }
-      setIsAuth(false);
-      setLoadingFadeOut(true);
-      setTimeout(() => {
-        setLoadingVisible(false);
-      }, 300);
-      webStorageClient.remove("_access_token");
-      router.push(`/${localActive}/sign-in`);
-    }
+    };
+    void verify();
+    return () => {
+      active = false;
+      request?.abort();
+      clearTimeout(revealTimer);
+      clearTimeout(hideTimer);
+    };
   }, [dispatch, localActive, router, verifyToken]);
-
-  useLayoutEffect(() => {
-    handleVerifyToken();
-  }, [handleVerifyToken]);
 
   const sideBarMenuFormat = sidebarMenu?.map((item: any) => ({
     ...item,
@@ -128,7 +123,7 @@ const MainLayout = ({
   return (
     <>
       {loadingVisible && <LoadingScreen fadeOut={loadingFadeOut} />}
-      {isAuth && (
+      {isAuth && userInfo?.isAdmin === true && (
         <Layout hasSider style={{ minHeight: "100vh" }}>
           <S.MobileBackdrop
             $visible={mobileOpen}

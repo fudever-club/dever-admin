@@ -1,6 +1,4 @@
-import { authAPI } from "@/store/queries/auth";
-import webStorageClient from "@/utils/webStorageClient";
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthSlickInterface {
@@ -28,22 +26,10 @@ export const authSlice = createSlice({
     setAuthenticatedUser: (state, action: PayloadAction<any>) => {
       state.userInfo = action.payload;
     },
-  },
-  extraReducers: (builder) => {
-    builder.addMatcher(
-      authAPI.endpoints.signIn.matchFulfilled,
-      (state, action) => {
-        webStorageClient.setToken(action?.payload?.data?.token);
-        // webStorageClient.set(constants.USER_INFO, action?.payload);
-        // webStorageClient.set(constants.IS_AUTH, true);
-        // state.isAuth = true;
-        state.userInfo = action?.payload?.data?.user;
-        state.access_token = action?.payload?.data?.token;
-      }
-    );
+    clearAuthenticatedUser: () => initialState,
   },
 });
 
-export const { actionLogin, setAuthenticatedUser } = authSlice.actions;
+export const { actionLogin, setAuthenticatedUser, clearAuthenticatedUser } = authSlice.actions;
 
 export default authSlice.reducer;
