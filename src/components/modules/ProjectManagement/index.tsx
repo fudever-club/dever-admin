@@ -129,7 +129,7 @@ function ProjectManagementModule() {
       <S.Head>
         <Typography.Title level={2}>Quản lý dự án</Typography.Title>
       </S.Head>
-      <S.FilterWrapper style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+      <S.FilterWrapper>
         <Button
           type="primary"
           icon={<PlusOutlined />}

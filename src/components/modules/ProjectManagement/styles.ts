@@ -25,11 +25,13 @@ export const TableWrapper = styled.div`
 `;
 
 export const FilterWrapper = styled.div`
-  width: 30%;
+  width: 100%;
 
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
 
   margin-bottom: 24px;
 `;
