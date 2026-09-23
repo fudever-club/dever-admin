@@ -14,7 +14,7 @@ const deverSans = Be_Vietnam_Pro({
 export const metadata: Metadata = {
   title: "FU-DEVER",
   description: "Trang quản trị FU-DEVER",
-  icons: "/icons/layout/logo.svg",
+  icons: "/icons/layout/fu-dever-logo.png",
 };
 
 export default async function RootLayout({
