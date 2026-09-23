@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import {
+  Alert,
   Table,
   Button,
   Modal,
@@ -136,6 +137,8 @@ interface EventAdminData {
 export default function EventManagementModule() {
   const [events, setEvents] = useState<EventAdminData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -155,14 +158,18 @@ export default function EventManagementModule() {
 
   const fetchEvents = async () => {
     setLoading(true);
+    setFetchError(false);
     try {
       const res = await fetch(`${API_SERVER}/api/v1/events`);
       const json = await res.json();
-      if (json.data) {
+      if (res.ok && json.data) {
         setEvents(json.data.map((item: any) => ({ ...item, key: item._id })));
+      } else {
+        setFetchError(true);
       }
     } catch (err) {
       console.warn("MongoDB API error, using local state:", err);
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -463,11 +470,13 @@ export default function EventManagementModule() {
 
   const handleDelete = async (id?: string) => {
     if (!id) return;
+    if (deletingId) return;
     const token = webStorageClient.getToken();
     if (!token) {
       message.warning("Vui lòng đăng nhập với tài khoản Quản trị viên để thực hiện!");
       return;
     }
+    setDeletingId(id);
     try {
       const res = await fetch(`${API_SERVER}/api/v1/events/${id}`, {
         method: "DELETE",
@@ -485,6 +494,8 @@ export default function EventManagementModule() {
       }
     } catch (err: any) {
       message.error(err?.message || "Lỗi khi xóa sự kiện!");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -720,7 +731,7 @@ export default function EventManagementModule() {
             onConfirm={() => handleDelete(record._id)}
             okText="Xóa"
             cancelText="Hủy"
-            okButtonProps={{ danger: true }}
+            okButtonProps={{ danger: true, loading: deletingId === record._id }}
           >
             <Button
               danger
@@ -858,6 +869,20 @@ export default function EventManagementModule() {
           })}
         </div>
 
+        {fetchError && !loading && (
+          <Alert
+            type="error"
+            showIcon
+            message="Không thể tải danh sách sự kiện"
+            description="Vui lòng kiểm tra kết nối và thử lại."
+            action={
+              <Button size="small" danger onClick={fetchEvents}>
+                Thử lại
+              </Button>
+            }
+            style={{ marginBottom: 12 }}
+          />
+        )}
         <Table
           dataSource={filteredEvents}
           columns={columns}

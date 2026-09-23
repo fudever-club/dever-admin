@@ -260,6 +260,7 @@ function ImageActivityManagementModule() {
             dataSource={result}
             loading={isFetching}
             pagination={false}
+            scroll={{ x: 640 }}
             rowKey={(record) => record._id}
             rowSelection={{
               type: "checkbox",

@@ -1,7 +1,6 @@
 {
   "title": "User Management",
   "name": "Name",
-  "postion": "Position",
   "department": "Department",
   "major": "Major",
   "admin": "Admin",
@@ -10,12 +9,12 @@
   "email": "Email",
   "search": "Search",
   "import": "Import csv",
-
   "deleteDepartment": {
     "title": "Delete department",
-    "description": "Are you sure to delete this user ?",
+    "description": "Are you sure to delete this department?",
     "cancelText": "Cancel",
     "okText": "Ok",
     "delete": "Delete"
-  }
+  },
+  "position": "Position"
 }

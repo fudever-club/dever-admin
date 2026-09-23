@@ -861,7 +861,7 @@ export default function FundManagementModule() {
         open={Boolean(billImageModal)}
         onCancel={() => setBillImageModal(null)}
         footer={null}
-        width={750}
+        width="min(750px, 95vw)"
         style={{ textAlign: "center" }}
       >
         {billImageModal && (
@@ -878,7 +878,7 @@ export default function FundManagementModule() {
         confirmLoading={submittingCampaign}
         okText="Lưu Kỳ Thu Quỹ"
         okButtonProps={{ style: { backgroundColor: "#0066CC" } }}
-        width={720}
+        width="min(720px, 95vw)"
         style={{ borderRadius: 16 }}
       >
         <Form

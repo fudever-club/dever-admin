@@ -225,6 +225,8 @@ function UsersManagementModule() {
   } | null>(null);
   const [issuedCredentials, setIssuedCredentials] = useState<OneTimeCredential[]>([]);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [resettingId, setResettingId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -514,7 +516,7 @@ function UsersManagementModule() {
                 style={{ color: "#0066CC", borderColor: "#93C5FD", backgroundColor: "#EFF6FF" }}
                 icon={<TrophyOutlined />}
                 onClick={() => {
-                  router.push(`/vi/community-content`);
+                  router.push(`/${params?.locale || "vi"}/community-content`);
                   message.info(`Đang mở Quản lý Alumni. Chọn "+ Thêm Cựu Thành Viên" và chọn ${record.firstname || ""} ${record.lastname || ""} để lấy Avatar tự động!`);
                 }}
               />
@@ -524,6 +526,7 @@ function UsersManagementModule() {
               description="Bạn có chắc chắn muốn reset mật khẩu của tài khoản này?"
               okText={"Đồng ý"}
               cancelText="Huỷ bỏ"
+              okButtonProps={{ loading: resettingId === record?._id }}
               onConfirm={() => handleResetPassword(record)}
             >
               <Button shape="circle" icon={<RollbackOutlined />} />
@@ -533,6 +536,7 @@ function UsersManagementModule() {
               description={"Bạn có chắc chắn muốn xoá thành viên này?"}
               okText={"Xác nhận"}
               cancelText={"Huỷ bỏ"}
+              okButtonProps={{ danger: true, loading: deletingId === record?._id }}
               onConfirm={() => handleDelete(record?._id)}
             >
               <Button
@@ -566,20 +570,25 @@ function UsersManagementModule() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!id || deletingId) return;
+    setDeletingId(id);
     try {
       await deleteUser(id).unwrap();
       refetch();
       message.success("Xóa thành công");
     } catch (err: any) {
       message.error(err?.data?.message || "Không thể xóa thành viên. Vui lòng thử lại.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const handleResetPassword = async (record: { _id?: string; email?: string }) => {
     const userId = record?._id;
-    if (!userId) {
+    if (!userId || resettingId) {
       return;
     }
+    setResettingId(userId);
     try {
       const response: any = await resetPassword(userId).unwrap();
       const temporaryPassword = response?.data?.temporaryPassword;
@@ -592,6 +601,8 @@ function UsersManagementModule() {
       }
     } catch (err: any) {
       message.error(err?.data?.message || "Không thể reset mật khẩu. Vui lòng thử lại.");
+    } finally {
+      setResettingId(null);
     }
   };
 

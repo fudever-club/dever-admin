@@ -170,6 +170,7 @@ function SocialManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
+          scroll={{ x: 640 }}
         />
       </S.TableWrapper>
       <Modal

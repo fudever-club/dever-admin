@@ -11,6 +11,7 @@ import {
   Card,
   Col,
   Divider,
+  Empty,
   Form,
   Input,
   InputNumber,
@@ -79,6 +80,8 @@ const GEN_CHOICES = [
   { value: "Gen 6", label: "Gen 6" },
   { value: "Gen 7", label: "Gen 7" },
   { value: "Gen 8", label: "Gen 8" },
+  { value: "Gen 9", label: "Gen 9" },
+  { value: "Gen 10", label: "Gen 10" },
 ];
 
 const COMPANY_SUGGESTIONS = [
@@ -528,7 +531,7 @@ export default function CommunityContentManagement() {
         {
           title: "Thế hệ",
           dataIndex: "graduationGen",
-          render: (gen: string) => <Tag color="blue">{gen || "Gen 6"}</Tag>,
+                      render: (gen: string) => <Tag color="blue">{gen || "Chưa rõ"}</Tag>,
         },
         {
           title: "Đơn vị / Công ty",
@@ -790,6 +793,22 @@ export default function CommunityContentManagement() {
         {/* ALUMNI CARDS VIEW */}
         {mode === "alumni" && alumniViewMode === "cards" && (
           <div style={{ marginTop: 8 }}>
+            {filteredAlumniRows.length === 0 ? (
+              <Empty
+                description="Không tìm thấy cựu thành viên phù hợp"
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              >
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setAlumniSearch("");
+                    setAlumniGenFilter("All");
+                  }}
+                >
+                  Xóa bộ lọc
+                </Button>
+              </Empty>
+            ) : (
             <Row gutter={[16, 16]}>
               {filteredAlumniRows.map((alumnus: any) => (
                 <Col key={alumnus._id} xs={24} sm={12} lg={8} xl={6}>
@@ -841,7 +860,7 @@ export default function CommunityContentManagement() {
                         {alumnus.name?.charAt(0)}
                       </Avatar>
                       <div>
-                        <Tag color="blue" style={{ fontWeight: "bold" }}>{alumnus.graduationGen || "Gen 6"}</Tag>
+                        <Tag color="blue" style={{ fontWeight: "bold" }}>{alumnus.graduationGen || "Chưa rõ"}</Tag>
                         {alumnus.workplace && <Tag color="cyan">{alumnus.workplace}</Tag>}
                       </div>
                       <Typography.Title level={5} style={{ margin: "6px 0 2px 0" }}>
@@ -883,6 +902,7 @@ export default function CommunityContentManagement() {
                 </Col>
               ))}
             </Row>
+            )}
           </div>
         )}
 

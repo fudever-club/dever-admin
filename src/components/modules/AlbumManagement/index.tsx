@@ -156,7 +156,7 @@ function AlbumManagementModule() {
               icon={<EyeOutlined />}
               aria-label="Xem chi tiết album"
               onClick={() => {
-                router.push(`/album-management/${record?.slug}`);
+                router.push(`/${params?.locale || "vi"}/album-management/${record?.slug}`);
               }}
             />
             <Button

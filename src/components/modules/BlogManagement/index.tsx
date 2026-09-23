@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
+  Alert,
   Table,
   Card,
   Tag,
@@ -76,11 +77,14 @@ export default function BlogManagement() {
   const [reviewFeedback, setReviewFeedback] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [togglingFeaturedId, setTogglingFeaturedId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);
 
   const API_SERVER = constants.API_SERVER;
 
   const fetchBlogs = useCallback(async () => {
     setLoading(true);
+    setFetchError(false);
     const token = webStorageClient.getToken();
     try {
       // First try /api/v1/blogs/admin/all, fallback to review-queue
@@ -96,9 +100,11 @@ export default function BlogManagement() {
       if (res.ok && data.status === "success") {
         setBlogs(data.data || []);
       } else {
+        setFetchError(true);
         message.error(data.message || "Không thể tải danh sách bài viết");
       }
     } catch (err) {
+      setFetchError(true);
       message.error("Lỗi kết nối máy chủ API");
     } finally {
       setLoading(false);
@@ -209,6 +215,8 @@ export default function BlogManagement() {
   };
 
   const handleDeleteBlog = async (id: string) => {
+    if (!id || deletingId) return;
+    setDeletingId(id);
     const token = webStorageClient.getToken();
     try {
       const res = await fetch(`${API_SERVER}/api/v1/blogs/${id}`, {
@@ -223,6 +231,8 @@ export default function BlogManagement() {
       }
     } catch (e) {
       message.error("Lỗi kết nối");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -352,6 +362,7 @@ export default function BlogManagement() {
             onConfirm={() => handleDeleteBlog(record._id)}
             okText="Xóa"
             cancelText="Hủy"
+            okButtonProps={{ danger: true, loading: deletingId === record._id }}
           >
             <Button size="small" danger icon={<DeleteOutlined />} className="!rounded-lg" />
           </Popconfirm>
@@ -485,6 +496,20 @@ export default function BlogManagement() {
           />
         </div>
 
+        {fetchError && !loading && (
+          <Alert
+            type="error"
+            showIcon
+            message="Không thể tải danh sách bài viết"
+            description="Vui lòng kiểm tra kết nối và thử lại."
+            action={
+              <Button size="small" danger onClick={fetchBlogs}>
+                Thử lại
+              </Button>
+            }
+            style={{ marginBottom: 16 }}
+          />
+        )}
         <Table
           dataSource={filteredBlogs}
           columns={columns}
@@ -493,6 +518,7 @@ export default function BlogManagement() {
           pagination={{ pageSize: 10 }}
           scroll={{ x: 880 }}
           className="dever-admin-table"
+          locale={{ emptyText: <Empty description="Chưa có bài viết nào" /> }}
         />
       </Card>
 

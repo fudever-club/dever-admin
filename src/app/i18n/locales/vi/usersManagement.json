@@ -12,7 +12,7 @@
   "import": "Import csv",
   "deleteDepartment": {
     "title": "Xóa ban",
-    "description": "Bạn có chắc chắn muốn xoá người dùng này?",
+    "description": "Bạn có chắc chắn muốn xoá ban này?",
     "cancelText": "Hủy",
     "okText": "Xác nhận",
     "delete": "Xóa"

@@ -200,6 +200,7 @@ function PositionManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
+          scroll={{ x: 640 }}
           pagination={{
             pageSize,
             showSizeChanger: true,

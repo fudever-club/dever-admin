@@ -10,6 +10,7 @@ import {
   message,
 } from "antd";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -51,6 +52,7 @@ function ProjectManagementModule() {
   const { t } = useTranslation(params?.locale as string, "socialManagement");
 
   const [deleteProject] = useDeleteProjectMutation();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const { result, isFetching, refetch } = useGetAllProjectsQuery(undefined, {
     selectFromResult: ({ data, isFetching }) => {
       return {
@@ -61,11 +63,17 @@ function ProjectManagementModule() {
   });
 
   const handleDelete = async (id: string) => {
+    if (!id || deletingId) return;
+    setDeletingId(id);
     try {
       await deleteProject(id).unwrap();
       message.success("Xóa thành công");
       refetch();
-    } catch (error) {}
+    } catch (error: any) {
+      message.error(error?.data?.message || "Không thể xóa dự án. Vui lòng thử lại.");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const columns: TableProps<DataType>["columns"] = [
@@ -92,7 +100,7 @@ function ProjectManagementModule() {
               shape="circle"
               icon={<EditOutlined />}
               onClick={() => {
-                router?.push(`/project-management/${record?.slug}`);
+                router?.push(`/${params?.locale || "vi"}/project-management/${record?.slug}`);
               }}
             />
             <Popconfirm
@@ -100,6 +108,7 @@ function ProjectManagementModule() {
               description={t("deleteSocial.description")}
               okText={t("deleteSocial.okText")}
               cancelText={t("deleteSocial.cancelText")}
+              okButtonProps={{ danger: true, loading: deletingId === record?._id }}
               onConfirm={() => handleDelete(record?._id)}
             >
               <Button
@@ -124,14 +133,14 @@ function ProjectManagementModule() {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => router.push("/project-management/create")}
+          onClick={() => router.push(`/${params?.locale || "vi"}/project-management/create`)}
         >
           Thêm dự án mới
         </Button>
         <Button
           style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", color: "#fff" }}
           icon={<CheckCircleOutlined />}
-          onClick={() => router.push("/community-content")}
+          onClick={() => router.push(`/${params?.locale || "vi"}/community-content`)}
         >
           Duyệt dự án thành viên gửi (Open Source)
         </Button>
@@ -142,6 +151,7 @@ function ProjectManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
+          scroll={{ x: 640 }}
         />
       </S.TableWrapper>
     </S.PageWrapper>
