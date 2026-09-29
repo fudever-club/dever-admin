@@ -49,7 +49,7 @@ function ProjectManagementModule() {
   const addModal = useModal();
   const editModal = useModal();
 
-  const { t } = useTranslation(params?.locale as string, "socialManagement");
+  const { t } = useTranslation(params?.locale as string, "projectManagement");
 
   const [deleteProject] = useDeleteProjectMutation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -62,6 +62,7 @@ function ProjectManagementModule() {
     },
   });
 
+  // TODO(audit-log): project delete has no audit-trail endpoint yet; keep deletingId lock until audit API lands.
   const handleDelete = async (id: string) => {
     if (!id || deletingId) return;
     setDeletingId(id);
@@ -104,10 +105,10 @@ function ProjectManagementModule() {
               }}
             />
             <Popconfirm
-              title={t("deleteSocial.title")}
-              description={t("deleteSocial.description")}
-              okText={t("deleteSocial.okText")}
-              cancelText={t("deleteSocial.cancelText")}
+              title={t("deleteProject.title")}
+              description={t("deleteProject.description")}
+              okText={t("deleteProject.okText")}
+              cancelText={t("deleteProject.cancelText")}
               okButtonProps={{ danger: true, loading: deletingId === record?._id }}
               onConfirm={() => handleDelete(record?._id)}
             >
@@ -152,6 +153,10 @@ function ProjectManagementModule() {
           loading={isFetching}
           rowKey={(record) => record._id}
           scroll={{ x: 640 }}
+          pagination={{
+            pageSize: 10,
+            showTotal: (total) => `Tổng cộng ${total} dự án`,
+          }}
         />
       </S.TableWrapper>
     </S.PageWrapper>

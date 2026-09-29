@@ -1,0 +1,10 @@
+{
+  "title": "Project Management",
+  "deleteProject": {
+    "title": "Delete project",
+    "description": "Are you sure to delete this project?",
+    "cancelText": "Cancel",
+    "okText": "Ok",
+    "delete": "Delete"
+  }
+}

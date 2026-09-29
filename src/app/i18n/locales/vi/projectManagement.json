@@ -1,0 +1,10 @@
+{
+  "title": "Quản lý dự án",
+  "deleteProject": {
+    "title": "Xóa dự án",
+    "description": "Bạn có chắc chắn muốn xoá dự án này?",
+    "cancelText": "Hủy",
+    "okText": "Xác nhận",
+    "delete": "Xóa"
+  }
+}

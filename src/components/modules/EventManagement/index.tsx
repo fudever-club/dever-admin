@@ -887,7 +887,12 @@ export default function EventManagementModule() {
           dataSource={filteredEvents}
           columns={columns}
           loading={loading}
-          pagination={{ pageSize: 5 }}
+          // Client-side slice: toàn bộ events đã tải về client; showSizeChanger chỉ đổi pageSize hiển thị, không phân trang server.
+          pagination={{
+            pageSize: 5,
+            showSizeChanger: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} sự kiện`,
+          }}
           scroll={{ x: 920 }}
         />
       </Card>

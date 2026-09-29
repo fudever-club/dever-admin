@@ -28,6 +28,7 @@ import {
   Tooltip,
   Popconfirm,
   QRCode,
+  Skeleton,
 } from "antd";
 import {
   WalletOutlined,
@@ -126,6 +127,10 @@ export default function FundManagementModule() {
   const [campaigns, setCampaigns] = useState<FundCampaign[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  // Error flags keep KPI from showing misleading 0đ when fetch fails
+  // (same pattern as ExecutiveAnalytics: Alert + retry, Skeleton instead of zeros).
+  const [paymentsError, setPaymentsError] = useState<boolean>(false);
+  const [campaignsError, setCampaignsError] = useState<boolean>(false);
 
   // Review Modal State
   const [reviewModalOpen, setReviewModalOpen] = useState<boolean>(false);
@@ -162,6 +167,7 @@ export default function FundManagementModule() {
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
+    setPaymentsError(false);
     try {
       const token = webStorageClient.getToken();
       const statusParam = selectedStatus !== "all" ? `?status=${selectedStatus}` : "";
@@ -173,8 +179,12 @@ export default function FundManagementModule() {
       if (res.ok) {
         const json = await res.json();
         setPayments(json.data || []);
+      } else {
+        setPaymentsError(true);
+        message.error("Không thể tải danh sách nộp quỹ.");
       }
     } catch {
+      setPaymentsError(true);
       message.error("Không thể tải danh sách nộp quỹ.");
     } finally {
       setLoading(false);
@@ -182,6 +192,7 @@ export default function FundManagementModule() {
   }, [apiServer, selectedStatus]);
 
   const fetchCampaigns = useCallback(async () => {
+    setCampaignsError(false);
     try {
       const token = webStorageClient.getToken();
       const res = await fetch(`${apiServer}/api/v1/funds/admin/campaigns`, {
@@ -192,11 +203,23 @@ export default function FundManagementModule() {
       if (res.ok) {
         const json = await res.json();
         setCampaigns(json.data || []);
+      } else {
+        setCampaignsError(true);
+        message.error("Không thể tải danh sách kỳ thu quỹ.");
       }
     } catch {
+      setCampaignsError(true);
       message.error("Không thể tải danh sách kỳ thu quỹ.");
     }
   }, [apiServer]);
+
+  const retryFundFetch = useCallback(() => {
+    fetchPayments();
+    fetchCampaigns();
+  }, [fetchPayments, fetchCampaigns]);
+
+  // KPI must not render 0đ when the fetch failed; show Skeleton/unavailable instead.
+  const hasFundError = paymentsError || campaignsError;
 
   useEffect(() => {
     fetchPayments();
@@ -248,8 +271,10 @@ export default function FundManagementModule() {
   };
 
   // Handle Review Submission
+  // TODO(audit-log): fund review mutation has no audit-trail endpoint yet; keep Popconfirm/modal loading until audit API lands.
   const handleReview = async () => {
-    if (!selectedPayment) return;
+    if (!selectedPayment || submittingReview) return;
+    if (selectedPayment.status !== "pending") return;
     setSubmittingReview(true);
     try {
       const token = webStorageClient.getToken();
@@ -470,36 +495,48 @@ export default function FundManagementModule() {
     {
       title: "Hành động",
       key: "actions",
-      render: (_: any, record: FundPayment) => (
-        <Space size={6}>
-          <Button
-            type="primary"
-            size="small"
-            style={{ backgroundColor: "#0066CC", borderRadius: 8, fontSize: 11, fontWeight: "bold" }}
-            onClick={() => {
-              setSelectedPayment(record);
-              setReviewAction("approved");
-              setReviewNotes("");
-              setReviewModalOpen(true);
-            }}
-          >
-            Duyệt
-          </Button>
-          <Button
-            danger
-            size="small"
-            style={{ borderRadius: 8, fontSize: 11, fontWeight: "bold" }}
-            onClick={() => {
-              setSelectedPayment(record);
-              setReviewAction("rejected");
-              setReviewNotes("");
-              setReviewModalOpen(true);
-            }}
-          >
-            Từ chối
-          </Button>
-        </Space>
-      ),
+      render: (_: any, record: FundPayment) => {
+        // Concurrency lock + status guard (same as Event deletingId/updatingStatusId):
+        // only pending payments can be reviewed; block keyboard+mouse via native disabled.
+        const isPending = record.status === "pending";
+        const locked = submittingReview || !isPending;
+        return (
+          <Space size={6}>
+            <Button
+              type="primary"
+              size="small"
+              disabled={locked}
+              loading={submittingReview && selectedPayment?._id === record._id && reviewAction === "approved"}
+              style={{ backgroundColor: "#0066CC", borderRadius: 8, fontSize: 11, fontWeight: "bold" }}
+              onClick={() => {
+                if (!isPending || submittingReview) return;
+                setSelectedPayment(record);
+                setReviewAction("approved");
+                setReviewNotes("");
+                setReviewModalOpen(true);
+              }}
+            >
+              Duyệt
+            </Button>
+            <Button
+              danger
+              size="small"
+              disabled={locked}
+              loading={submittingReview && selectedPayment?._id === record._id && reviewAction === "rejected"}
+              style={{ borderRadius: 8, fontSize: 11, fontWeight: "bold" }}
+              onClick={() => {
+                if (!isPending || submittingReview) return;
+                setSelectedPayment(record);
+                setReviewAction("rejected");
+                setReviewNotes("");
+                setReviewModalOpen(true);
+              }}
+            >
+              Từ chối
+            </Button>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -555,6 +592,21 @@ export default function FundManagementModule() {
       </div>
 
       {/* KPI Overview Cards */}
+      {/* Error state (ExecutiveAnalytics pattern): Alert + retry, KPI shows Skeleton/unavailable, never misleading 0đ. */}
+      {hasFundError && !loading && (
+        <Alert
+          type="error"
+          showIcon
+          message="Không thể tải dữ liệu quỹ"
+          description="Số liệu bên dưới có thể không đầy đủ. Vui lòng kiểm tra kết nối và thử lại."
+          action={
+            <Button size="small" danger onClick={retryFundFetch}>
+              Thử lại
+            </Button>
+          }
+          style={{ marginBottom: 16 }}
+        />
+      )}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} lg={6}>
           <Card
@@ -566,14 +618,23 @@ export default function FundManagementModule() {
               background: "linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%)",
             }}
           >
-            <Statistic
-              title={<span style={{ fontSize: 12, fontWeight: 700, color: "#0369A1", textTransform: "uppercase" }}>Tổng tiền quỹ đã thu</span>}
-              value={totalMoneyCollected}
-              precision={0}
-              suffix="đ"
-              valueStyle={{ color: "#0066CC", fontWeight: 800, fontSize: 24 }}
-              prefix={<DollarOutlined />}
-            />
+            {loading ? (
+              <Skeleton active paragraph={{ rows: 2 }} />
+            ) : paymentsError ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#0369A1", textTransform: "uppercase" }}>Tổng tiền quỹ đã thu</span>
+                <Text type="secondary" style={{ fontSize: 14 }}>Không khả dụng</Text>
+              </div>
+            ) : (
+              <Statistic
+                title={<span style={{ fontSize: 12, fontWeight: 700, color: "#0369A1", textTransform: "uppercase" }}>Tổng tiền quỹ đã thu</span>}
+                value={totalMoneyCollected}
+                precision={0}
+                suffix="đ"
+                valueStyle={{ color: "#0066CC", fontWeight: 800, fontSize: 24 }}
+                prefix={<DollarOutlined />}
+              />
+            )}
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
@@ -586,12 +647,21 @@ export default function FundManagementModule() {
               background: "linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%)",
             }}
           >
-            <Statistic
-              title={<span style={{ fontSize: 12, fontWeight: 700, color: "#15803D", textTransform: "uppercase" }}>Lượt đóng đã duyệt</span>}
-              value={approvedPaymentsCount}
-              valueStyle={{ color: "#16A34A", fontWeight: 800, fontSize: 24 }}
-              prefix={<CheckCircleOutlined />}
-            />
+            {loading ? (
+              <Skeleton active paragraph={{ rows: 2 }} />
+            ) : paymentsError ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#15803D", textTransform: "uppercase" }}>Lượt đóng đã duyệt</span>
+                <Text type="secondary" style={{ fontSize: 14 }}>Không khả dụng</Text>
+              </div>
+            ) : (
+              <Statistic
+                title={<span style={{ fontSize: 12, fontWeight: 700, color: "#15803D", textTransform: "uppercase" }}>Lượt đóng đã duyệt</span>}
+                value={approvedPaymentsCount}
+                valueStyle={{ color: "#16A34A", fontWeight: 800, fontSize: 24 }}
+                prefix={<CheckCircleOutlined />}
+              />
+            )}
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
@@ -604,12 +674,21 @@ export default function FundManagementModule() {
               background: "linear-gradient(135deg, #FFFFFF 0%, #FFFBEB 100%)",
             }}
           >
-            <Statistic
-              title={<span style={{ fontSize: 12, fontWeight: 700, color: "#B45309", textTransform: "uppercase" }}>Biên lai chờ duyệt</span>}
-              value={pendingPaymentsCount}
-              valueStyle={{ color: "#D97706", fontWeight: 800, fontSize: 24 }}
-              prefix={<ClockCircleOutlined />}
-            />
+            {loading ? (
+              <Skeleton active paragraph={{ rows: 2 }} />
+            ) : paymentsError ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#B45309", textTransform: "uppercase" }}>Biên lai chờ duyệt</span>
+                <Text type="secondary" style={{ fontSize: 14 }}>Không khả dụng</Text>
+              </div>
+            ) : (
+              <Statistic
+                title={<span style={{ fontSize: 12, fontWeight: 700, color: "#B45309", textTransform: "uppercase" }}>Biên lai chờ duyệt</span>}
+                value={pendingPaymentsCount}
+                valueStyle={{ color: "#D97706", fontWeight: 800, fontSize: 24 }}
+                prefix={<ClockCircleOutlined />}
+              />
+            )}
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
@@ -682,12 +761,27 @@ export default function FundManagementModule() {
                   </div>
 
                   {/* Table */}
+                  {paymentsError && !loading && (
+                    <Alert
+                      type="error"
+                      showIcon
+                      message="Không thể tải danh sách nộp quỹ"
+                      description="Vui lòng kiểm tra kết nối và thử lại."
+                      action={
+                        <Button size="small" danger onClick={retryFundFetch}>
+                          Thử lại
+                        </Button>
+                      }
+                      style={{ marginBottom: 12 }}
+                    />
+                  )}
                   <Table
                     columns={paymentColumns}
                     dataSource={filteredPayments}
                     rowKey="_id"
                     loading={loading}
                     pagination={{ pageSize: 8, showTotal: (total) => `Tổng cộng ${total} lượt nộp` }}
+                    scroll={{ x: 1000 }}
                     style={{ borderRadius: 12, overflow: "hidden" }}
                   />
                 </div>
@@ -702,6 +796,20 @@ export default function FundManagementModule() {
               ),
               children: (
                 <div style={{ paddingTop: 12 }}>
+                  {campaignsError && (
+                    <Alert
+                      type="error"
+                      showIcon
+                      message="Không thể tải danh sách kỳ thu quỹ"
+                      description="Vui lòng kiểm tra kết nối và thử lại."
+                      action={
+                        <Button size="small" danger onClick={retryFundFetch}>
+                          Thử lại
+                        </Button>
+                      }
+                      style={{ marginBottom: 12 }}
+                    />
+                  )}
                   <Row gutter={[20, 20]}>
                     {campaigns.map((camp) => (
                       <Col xs={24} lg={12} key={camp._id}>

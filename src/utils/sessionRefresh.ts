@@ -26,7 +26,13 @@ export function refreshSession(): Promise<boolean> {
   return inflightRefresh;
 }
 
-/** Auth endpoints must never trigger a refresh loop. */
+/** Auth endpoints must never trigger a refresh loop.
+ * verifyToken runs in MainLayout on every mount; a 401 there must redirect to
+ * sign-in instead of 401 -> refresh -> verify retry. */
 export function isAuthEndpoint(url: string): boolean {
-  return url.includes("/api/v1/auth/login") || url.includes("/api/v1/auth/refresh");
+  return (
+    url.includes("/api/v1/auth/login") ||
+    url.includes("/api/v1/auth/refresh") ||
+    url.includes("/api/v1/verifyToken")
+  );
 }

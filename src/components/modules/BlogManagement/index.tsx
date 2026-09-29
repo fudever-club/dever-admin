@@ -515,7 +515,12 @@ export default function BlogManagement() {
           columns={columns}
           rowKey="_id"
           loading={loading}
-          pagination={{ pageSize: 10 }}
+          // Client-side slice: toàn bộ blogs đã tải về client; showSizeChanger chỉ đổi pageSize hiển thị, không phân trang server.
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total) => `Tổng cộng ${total} bài viết`,
+          }}
           scroll={{ x: 880 }}
           className="dever-admin-table"
           locale={{ emptyText: <Empty description="Chưa có bài viết nào" /> }}

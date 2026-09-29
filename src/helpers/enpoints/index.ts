@@ -102,6 +102,10 @@ const endpointFundManagement = {
   ANALYTICS: `${prefixBase}/funds/admin/analytics`,
 };
 
+const endpointAdminAudit = {
+  AUDIT_LOG: `${prefixBase}/admin/audit-log`,
+};
+
 const endpointOther = {};
 
 export {
@@ -120,4 +124,5 @@ export {
   endpointOpenSourceManagement,
   endpointNotifications,
   endpointFundManagement,
+  endpointAdminAudit,
 };
