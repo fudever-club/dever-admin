@@ -55,6 +55,7 @@ export const baseApi = createApi({
     "Social",
     "AdminAudit",
     "Invites",
+    "Seasons",
   ],
   endpoints: () => ({}),
 });

@@ -115,6 +115,11 @@ const endpointInvite = {
   RESEND: `${prefixBase}/users/invites/{id}/resend`,
 };
 
+const endpointSeasonManagement = {
+  SEASONS: `${prefixBase}/seasons`,
+  SEASON_BY_ID: `${prefixBase}/seasons/{id}`,
+};
+
 const endpointOther = {};
 
 export {
@@ -135,4 +140,5 @@ export {
   endpointFundManagement,
   endpointAdminAudit,
   endpointInvite,
+  endpointSeasonManagement,
 };

@@ -9,6 +9,7 @@ import {
   AimOutlined,
   CalendarOutlined,
   FileTextOutlined,
+  TrophyOutlined,
   WalletOutlined,
   AuditOutlined,
   MailOutlined,
@@ -39,6 +40,11 @@ export const sidebarMenu: MenuProps["items"] = [
     key: "event-management",
     icon: React.createElement(CalendarOutlined),
     label: "eventManagement",
+  },
+  {
+    key: "season-management",
+    icon: React.createElement(TrophyOutlined),
+    label: "seasonManagement",
   },
   {
     key: "department-management",
