@@ -104,6 +104,7 @@ const endpointFundManagement = {
 
 const endpointAdminAudit = {
   AUDIT_LOG: `${prefixBase}/admin/audit-log`,
+  SUMMARY: `${prefixBase}/admin/audit-log/summary`,
 };
 
 const endpointInvite = {

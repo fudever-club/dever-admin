@@ -19,6 +19,7 @@ import {
 import { AuditOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useGetAdminAuditLogQuery } from "@/store/queries/adminAudit";
+import AuditFunnelSummary from "./AuditFunnelSummary";
 
 const { Title, Text } = Typography;
 
@@ -48,25 +49,33 @@ interface AuditEntry {
 }
 
 const ACTION_OPTIONS = [
-  { value: "user.created", label: "user.created" },
-  { value: "user.updated", label: "user.updated" },
-  { value: "user.deleted", label: "user.deleted" },
-  { value: "fund.submitted", label: "fund.submitted" },
-  { value: "fund.approved", label: "fund.approved" },
-  { value: "fund.rejected", label: "fund.rejected" },
-  { value: "blog.submitted", label: "blog.submitted" },
-  { value: "blog.approved", label: "blog.approved" },
-  { value: "blog.rejected", label: "blog.rejected" },
-  { value: "opensource.submitted", label: "opensource.submitted" },
-  { value: "opensource.approved", label: "opensource.approved" },
-  { value: "opensource.rejected", label: "opensource.rejected" },
+  { value: "user.role_granted", label: "Cấp quyền admin" },
+  { value: "user.role_revoked", label: "Thu hồi quyền admin" },
+  { value: "user.position_changed", label: "Đổi chức vụ" },
+  { value: "user.leadership_changed", label: "Đổi cờ lãnh đạo" },
+  { value: "user.deleted", label: "Xóa thành viên" },
+  { value: "user.password_reset", label: "Reset mật khẩu" },
+  { value: "user.sessions_revoked", label: "Thu hồi sessions" },
+  { value: "user.invited", label: "Mời thành viên" },
+  { value: "user.accepted", label: "Nhận lời mời" },
+  { value: "user.invite_revoked", label: "Thu hồi thư mời" },
+  { value: "fund.payment_approved", label: "Duyệt quỹ" },
+  { value: "fund.payment_rejected", label: "Từ chối quỹ" },
+  { value: "blog.reviewed", label: "Duyệt blog" },
+  { value: "opensource.approved", label: "Duyệt open-source" },
+  { value: "opensource.rejected", label: "Từ chối open-source" },
+  { value: "opensource.deleted", label: "Xóa open-source" },
 ];
 
 const TARGET_TYPE_OPTIONS = [
-  { value: "user", label: "user" },
-  { value: "fund", label: "fund" },
-  { value: "blog", label: "blog" },
-  { value: "opensource", label: "opensource" },
+  { value: "user", label: "Thành viên" },
+  { value: "fund_payment", label: "Thanh toán quỹ" },
+  { value: "blog", label: "Blog" },
+  { value: "open_source", label: "Mã nguồn mở" },
+  { value: "event", label: "Sự kiện" },
+  { value: "project", label: "Dự án" },
+  { value: "campaign", label: "Kỳ quỹ" },
+  { value: "position", label: "Chức vụ" },
 ];
 
 function getActionColor(action?: string): string {
@@ -282,6 +291,8 @@ export default function AuditLogManagement() {
           </Button>
         </Space>
       </div>
+
+      <AuditFunnelSummary />
 
       <Card bordered={false} style={{ borderRadius: 20, boxShadow: "0 4px 20px rgba(0,0,0,0.04)", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF" }}>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>

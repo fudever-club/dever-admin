@@ -12,6 +12,27 @@ export interface AdminAuditLogParams {
   targetId?: string;
 }
 
+export interface AdminAuditSummaryParams {
+  days: number;
+}
+
+export interface AdminAuditSummarySeriesItem {
+  date: string;
+  action: string;
+  count: number;
+}
+
+export interface AdminAuditSummaryData {
+  days: number;
+  byAction: Record<string, number>;
+  series: AdminAuditSummarySeriesItem[];
+}
+
+export interface AdminAuditSummaryResponse {
+  status: string;
+  data: AdminAuditSummaryData;
+}
+
 export const adminAuditApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getAdminAuditLog: build.query<any, AdminAuditLogParams>({
@@ -35,7 +56,20 @@ export const adminAuditApi = baseApi.injectEndpoints({
       },
       providesTags: ["AdminAudit"],
     }),
+    getAdminAuditSummary: build.query<AdminAuditSummaryResponse, AdminAuditSummaryParams>({
+      query: ({ days }) => {
+        // Backend chấp nhận days=1..90; clamp defensive để không bắn request rác.
+        const safeDays =
+          Number.isSafeInteger(days) && days >= 1 && days <= 90 ? days : 30;
+        return {
+          url: endpointAdminAudit.SUMMARY,
+          params: { days: safeDays },
+          method: "GET",
+        };
+      },
+      providesTags: ["AdminAudit"],
+    }),
   }),
 });
 
-export const { useGetAdminAuditLogQuery } = adminAuditApi;
+export const { useGetAdminAuditLogQuery, useGetAdminAuditSummaryQuery } = adminAuditApi;
