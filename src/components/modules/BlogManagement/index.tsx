@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Alert,
   Table,
@@ -64,7 +64,17 @@ interface BlogPost {
   reviewNotes?: string;
   createdAt: string;
   updatedAt: string;
+  // SLA fields from GET /api/v1/blogs/admin/review-queue (optional for backward compat).
+  waitingHours?: number;
+  slaOverdue?: boolean;
 }
+
+interface ReviewQueueSla {
+  thresholdHours: number;
+  overdueCount: number;
+}
+
+const DEFAULT_SLA_THRESHOLD_HOURS = 72;
 
 export default function BlogManagement() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -79,6 +89,9 @@ export default function BlogManagement() {
   const [togglingFeaturedId, setTogglingFeaturedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState(false);
+  // SLA review-queue metadata (optional; absent on /admin/all legacy shape).
+  const [slaThresholdHours, setSlaThresholdHours] = useState<number>(DEFAULT_SLA_THRESHOLD_HOURS);
+  const [slaOverdueCount, setSlaOverdueCount] = useState<number | null>(null);
 
   const API_SERVER = constants.API_SERVER;
 
@@ -98,7 +111,20 @@ export default function BlogManagement() {
       }
       const data = await res.json();
       if (res.ok && data.status === "success") {
-        setBlogs(data.data || []);
+        // Backward compat: review-queue returns { results, sla, data: BlogPost[] };
+        // legacy /admin/all returns { data: BlogPost[] } without sla.
+        setBlogs(Array.isArray(data.data) ? data.data : []);
+        const sla = (data.sla ?? null) as ReviewQueueSla | null;
+        if (sla && typeof sla.thresholdHours === "number") {
+          setSlaThresholdHours(sla.thresholdHours);
+        } else {
+          setSlaThresholdHours(DEFAULT_SLA_THRESHOLD_HOURS);
+        }
+        if (sla && typeof sla.overdueCount === "number") {
+          setSlaOverdueCount(sla.overdueCount);
+        } else {
+          setSlaOverdueCount(null);
+        }
       } else {
         setFetchError(true);
         message.error(data.message || "Không thể tải danh sách bài viết");
@@ -251,11 +277,61 @@ export default function BlogManagement() {
     }
   };
 
-  const filteredBlogs = filterStatus === "all"
-    ? blogs
-    : filterStatus === "featured"
-    ? blogs.filter((b) => b.isFeatured)
-    : blogs.filter((b) => b.status === filterStatus);
+  // TODO(i18n): hard-coded Vietnamese SLA labels; move to next-intl catalog when BlogManagement is localized.
+  const isSlaOverdue = useCallback(
+    (blog: BlogPost) => {
+      if (typeof blog.slaOverdue === "boolean") return blog.slaOverdue;
+      if (typeof blog.waitingHours === "number") return blog.waitingHours > slaThresholdHours;
+      return false;
+    },
+    [slaThresholdHours]
+  );
+
+  // TODO(i18n): hard-coded Vietnamese duration format.
+  const formatWaitingHours = useCallback((hours: number) => {
+    const rounded = Math.max(0, Math.floor(hours));
+    if (rounded < 24) return `${rounded} giờ`;
+    const days = Math.floor(rounded / 24);
+    const remainder = rounded % 24;
+    if (remainder === 0) return `${days} ngày`;
+    return `${days} ngày ${remainder} giờ`;
+  }, []);
+
+  const overdueBlogs = useMemo(
+    () => blogs.filter((b) => b.status === "pending_review" && isSlaOverdue(b)),
+    [blogs, isSlaOverdue]
+  );
+  // Prefer server sla.overdueCount; fallback to client count when review-queue shape is absent.
+  const overdueCount = slaOverdueCount ?? overdueBlogs.length;
+
+  const longestWaitingBlog = useMemo(() => {
+    let longest: BlogPost | null = null;
+    for (const blog of blogs) {
+      if (blog.status !== "pending_review" || typeof blog.waitingHours !== "number") continue;
+      if (!longest || (blog.waitingHours ?? -1) > (longest.waitingHours ?? -1)) {
+        longest = blog;
+      }
+    }
+    return longest;
+  }, [blogs]);
+
+  const filteredBlogs = useMemo(() => {
+    const base =
+      filterStatus === "all"
+        ? blogs
+        : filterStatus === "featured"
+          ? blogs.filter((b) => b.isFeatured)
+          : filterStatus === "overdue"
+            ? blogs.filter((b) => b.status === "pending_review" && isSlaOverdue(b))
+            : blogs.filter((b) => b.status === filterStatus);
+    // Default order: overdue first, then longest waiting. AntD sorter on the
+    // "Chờ duyệt" column takes over once the user changes sorting.
+    return [...base].sort((a, b) => {
+      const overdueDiff = Number(isSlaOverdue(b)) - Number(isSlaOverdue(a));
+      if (overdueDiff !== 0) return overdueDiff;
+      return (b.waitingHours ?? -1) - (a.waitingHours ?? -1);
+    });
+  }, [blogs, filterStatus, isSlaOverdue]);
 
   const columns = [
     {
@@ -332,10 +408,40 @@ export default function BlogManagement() {
       render: (status: string) => getStatusTag(status),
     },
     {
+      // TODO(i18n): hard-coded Vietnamese "Chờ duyệt" / "Quá …h" labels.
+      title: "Chờ duyệt",
+      dataIndex: "waitingHours",
+      key: "waitingHours",
+      width: 170,
+      defaultSortOrder: "descend" as const,
+      sorter: (a: BlogPost, b: BlogPost) => {
+        const overdueDiff = Number(isSlaOverdue(a)) - Number(isSlaOverdue(b));
+        if (overdueDiff !== 0) return overdueDiff;
+        return (a.waitingHours ?? -1) - (b.waitingHours ?? -1);
+      },
+      render: (_: unknown, record: BlogPost) => {
+        if (typeof record.waitingHours !== "number") {
+          return <Text type="secondary">—</Text>;
+        }
+        const overdue = isSlaOverdue(record);
+        return (
+          <Space size={4} wrap>
+            <span className="inline-flex items-center gap-1 font-semibold text-slate-700">
+              <ClockCircleOutlined className={overdue ? "text-red-500" : "text-slate-400"} />
+              {formatWaitingHours(record.waitingHours)}
+            </span>
+            {overdue && <Tag color="error">Quá {slaThresholdHours}h</Tag>}
+          </Space>
+        );
+      },
+    },
+    {
       title: "Ngày cập nhật",
       dataIndex: "updatedAt",
       key: "updatedAt",
       width: 140,
+      sorter: (a: BlogPost, b: BlogPost) =>
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
       render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
     },
     {
@@ -388,6 +494,22 @@ export default function BlogManagement() {
           <Text type="secondary" className="text-sm">
             Quản lý toàn diện bài viết kỹ thuật: kiểm duyệt bài mới, ghim bài viết tiêu biểu lên trang chủ và theo dõi trạng thái xuất bản.
           </Text>
+          {/* TODO(i18n): hard-coded Vietnamese longest-waiting headline. */}
+          {longestWaitingBlog && typeof longestWaitingBlog.waitingHours === "number" ? (
+            <Text type="secondary" className="mt-1 block text-sm">
+              Bài chờ lâu nhất: <Text strong>{longestWaitingBlog.title}</Text> —{" "}
+              {formatWaitingHours(longestWaitingBlog.waitingHours)}
+              {isSlaOverdue(longestWaitingBlog) && (
+                <Tag color="error" className="ml-2">
+                  Quá {slaThresholdHours}h
+                </Tag>
+              )}
+            </Text>
+          ) : pendingCount > 0 ? (
+            <Text type="secondary" className="mt-1 block text-sm">
+              Có {pendingCount} bài đang chờ duyệt.
+            </Text>
+          ) : null}
         </div>
         <Button
           icon={<ReloadOutlined />}
@@ -450,6 +572,17 @@ export default function BlogManagement() {
                   <Badge count={pendingCount} offset={[8, 0]}>
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5">
                       <ClockCircleOutlined style={{ color: "#D97706" }} /> Chờ duyệt
+                    </span>
+                  </Badge>
+                ),
+              },
+              {
+                // TODO(i18n): hard-coded Vietnamese "Quá hạn" tab label.
+                key: "overdue",
+                label: (
+                  <Badge count={overdueCount} offset={[8, 0]} color="#DC2626">
+                    <span className="font-bold pr-2 inline-flex items-center gap-1.5 text-red-600">
+                      <ExclamationCircleOutlined /> Quá hạn ({overdueCount})
                     </span>
                   </Badge>
                 ),
