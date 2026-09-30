@@ -11,6 +11,7 @@ import {
   FileTextOutlined,
   WalletOutlined,
   AuditOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 
 export const sidebarMenu: MenuProps["items"] = [
@@ -18,6 +19,11 @@ export const sidebarMenu: MenuProps["items"] = [
     key: "user-management",
     icon: React.createElement(UserOutlined),
     label: "usersManagement",
+  },
+  {
+    key: "invite-management",
+    icon: React.createElement(MailOutlined),
+    label: "inviteManagement",
   },
   {
     key: "fund-management",

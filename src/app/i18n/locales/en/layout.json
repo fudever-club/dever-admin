@@ -1,6 +1,7 @@
 {
   "dashboard": "Dashboard",
   "usersManagement": "Users Management",
+  "inviteManagement": "Invitations",
   "departmentManagement": "Departments Management",
   "positionManagement": "Position Management",
   "majorManagement": "Major Management",

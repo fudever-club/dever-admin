@@ -106,6 +106,14 @@ const endpointAdminAudit = {
   AUDIT_LOG: `${prefixBase}/admin/audit-log`,
 };
 
+const endpointInvite = {
+  LIST: `${prefixBase}/users/invites`,
+  CREATE: `${prefixBase}/users/invites`,
+  BULK: `${prefixBase}/users/invites/bulk`,
+  REVOKE: `${prefixBase}/users/invites/{id}/revoke`,
+  RESEND: `${prefixBase}/users/invites/{id}/resend`,
+};
+
 const endpointOther = {};
 
 export {
@@ -125,4 +133,5 @@ export {
   endpointNotifications,
   endpointFundManagement,
   endpointAdminAudit,
+  endpointInvite,
 };
