@@ -120,6 +120,16 @@ const endpointSeasonManagement = {
   SEASON_BY_ID: `${prefixBase}/seasons/{id}`,
 };
 
+const endpointMentorship = {
+  // Public mentor directory (published mentors, safe fields only).
+  // Dùng được với Bearer admin.
+  MENTORS: `${prefixBase}/mentorship/mentors`,
+  // Admin moderation queue (requireAuth + requireAdmin).
+  // GET with ?status=pending|accepted|declined&alumniId&page&limit.
+  REQUESTS: `${prefixBase}/mentorship/requests`,
+  REQUEST_REVIEW: `${prefixBase}/mentorship/requests/{id}/review`,
+};
+
 const endpointOther = {};
 
 export {
@@ -141,4 +151,5 @@ export {
   endpointAdminAudit,
   endpointInvite,
   endpointSeasonManagement,
+  endpointMentorship,
 };
