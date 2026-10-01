@@ -16,7 +16,6 @@
     "accept-language": "^3.0.18",
     "antd": "^5.17.0",
     "axios": "^1.6.8",
-    "ckeditor": "^4.12.1",
     "cookies-next": "^4.1.1",
     "i18next": "^23.11.4",
     "i18next-browser-languagedetector": "^7.2.1",
