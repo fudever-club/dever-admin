@@ -1,0 +1,69 @@
+{
+  "title": "Quản lý mùa giải",
+  "subtitle": "Tạo mùa giải mới, chỉnh sửa cửa sổ tính điểm và kết thúc mùa đang chạy. Server tự ghi audit season.created/updated/ended.",
+  "refresh": "Làm mới",
+  "retry": "Thử lại",
+  "create": "Tạo mùa giải",
+  "createFirst": "Tạo mùa giải đầu tiên",
+  "table": {
+    "stt": "STT",
+    "name": "Tên mùa",
+    "window": "Cửa sổ",
+    "status": "Trạng thái",
+    "scoring": "Điểm (E/M/H)",
+    "actions": "Thao tác"
+  },
+  "status": {
+    "active": "Đang chạy",
+    "upcoming": "Sắp diễn ra",
+    "ended": "Đã kết thúc"
+  },
+  "edit": "Sửa",
+  "endSeason": "Kết thúc mùa",
+  "endTitle": "Kết thúc mùa giải?",
+  "endDesc": "Mùa đã kết thúc sẽ bị khóa chỉnh sửa. Bạn có chắc chắn?",
+  "endOk": "Kết thúc",
+  "cancel": "Hủy",
+  "modal": {
+    "createTitle": "Tạo mùa giải mới",
+    "editTitle": "Sửa mùa giải",
+    "nameLabel": "Tên mùa giải",
+    "namePlaceholder": "Ví dụ: Arena Season 1 – Fall 2026",
+    "nameRequired": "Vui lòng nhập tên mùa giải.",
+    "nameMax": "Tên mùa giải tối đa 120 ký tự.",
+    "rangeLabel": "Cửa sổ mùa giải (Bắt đầu – Kết thúc)",
+    "rangeRequired": "Vui lòng chọn cửa sổ mùa giải.",
+    "rangeStartPlaceholder": "Ngày bắt đầu",
+    "rangeEndPlaceholder": "Ngày kết thúc",
+    "statusLabel": "Trạng thái",
+    "statusRequired": "Vui lòng chọn trạng thái.",
+    "statusUpcoming": "Sắp diễn ra",
+    "statusActive": "Đang chạy (kích hoạt ngay)",
+    "easyLabel": "Điểm Easy",
+    "easyRequired": "Nhập điểm Easy.",
+    "mediumLabel": "Điểm Medium",
+    "mediumRequired": "Nhập điểm Medium.",
+    "hardLabel": "Điểm Hard",
+    "hardRequired": "Nhập điểm Hard.",
+    "activateTitle": "Kích hoạt sẽ kết thúc mùa đang chạy",
+    "activateDescCurrent": "Mùa \"{{name}}\" đang chạy sẽ tự động chuyển sang đã kết thúc.",
+    "activateDescDefault": "Mùa này sẽ trở thành mùa đang chạy duy nhất.",
+    "saveChanges": "Lưu thay đổi",
+    "createSubmit": "Tạo mùa giải"
+  },
+  "messages": {
+    "invalidRange": "Vui lòng chọn cửa sổ bắt đầu – kết thúc hợp lệ.",
+    "endAfterStart": "Ngày kết thúc phải sau ngày bắt đầu.",
+    "updated": "Cập nhật mùa giải thành công.",
+    "created": "Tạo mùa giải mới thành công.",
+    "saveFail": "Lưu mùa giải thất bại. Vui lòng thử lại.",
+    "ended": "Đã kết thúc mùa \"{{name}}\".",
+    "endFail": "Kết thúc mùa giải thất bại. Vui lòng thử lại."
+  },
+  "error": {
+    "title": "Không thể tải danh sách mùa giải",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại."
+  },
+  "empty": "Chưa có mùa giải nào.",
+  "paginationTotal": "Tổng cộng {{total}} mùa giải"
+}

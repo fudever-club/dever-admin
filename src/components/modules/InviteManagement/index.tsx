@@ -27,6 +27,8 @@ import {
   StopOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 import {
   InviteStatus,
   useBulkInvitesMutation,
@@ -39,7 +41,6 @@ import {
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-// TODO(i18n): hardcode tiếng Việt như FundManagement/AuditLog để giữ scope; full i18n (vi/en inviteManagement.json) làm sau.
 // TODO(config): settings/constants chưa có client base URL nên hardcode + cho phép
 // override qua NEXT_PUBLIC_CLIENT_BASE_URL; chuyển vào settings khi route invite bên client chốt.
 const CLIENT_BASE_URL =
@@ -73,7 +74,10 @@ interface InviteEntry {
   invitedBy?: unknown;
 }
 
-function parseBulkInput(source: string): {
+function parseBulkInput(
+  source: string,
+  invalidEmail: (row: number) => string
+): {
   totalLines: number;
   users: BulkInviteUser[];
   errors: string[];
@@ -93,7 +97,7 @@ function parseBulkInput(source: string): {
     const lastname = parts[2] || "";
     const rowNumber = index + 1;
     if (!email || !EMAIL_RE.test(email)) {
-      errors.push(`Dòng ${rowNumber}: email không hợp lệ.`);
+      errors.push(invalidEmail(rowNumber));
       return;
     }
     users.push({
@@ -126,16 +130,19 @@ function formatDateTime(value?: string): string {
   return parsed.format("HH:mm DD/MM/YYYY");
 }
 
-function getStatusTag(status?: string): { color: string; label: string } {
-  if (status === "accepted") return { color: "green", label: "Đã chấp nhận" };
-  if (status === "revoked") return { color: "red", label: "Đã thu hồi" };
-  return { color: "blue", label: "Chờ xác nhận" };
+function getStatusTag(
+  status: string | undefined,
+  labels: { accepted: string; revoked: string; pending: string }
+): { color: string; label: string } {
+  if (status === "accepted") return { color: "green", label: labels.accepted };
+  if (status === "revoked") return { color: "red", label: labels.revoked };
+  return { color: "blue", label: labels.pending };
 }
 
-async function copyText(text: string, successLabel: string): Promise<void> {
+async function copyText(text: string, successMessage: string, failMessage: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(text);
-    message.success(`Đã sao chép liên kết của ${successLabel}`);
+    message.success(successMessage);
     return;
   } catch {
     // Fallback cho trình duyệt chặn Clipboard API (http / thiếu quyền).
@@ -149,9 +156,9 @@ async function copyText(text: string, successLabel: string): Promise<void> {
     fallback.select();
     document.execCommand("copy");
     document.body.removeChild(fallback);
-    message.success(`Đã sao chép liên kết của ${successLabel}`);
+    message.success(successMessage);
   } catch {
-    message.error("Không thể sao chép tự động. Hãy copy thủ công liên kết bên dưới.");
+    message.error(failMessage);
   }
 }
 
@@ -166,6 +173,8 @@ function InviteLinkResultModal({
   results: InviteLinkResult[];
   onClose: () => void;
 }) {
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "inviteManagement");
   return (
     <Modal
       title={title}
@@ -176,15 +185,18 @@ function InviteLinkResultModal({
       centered
       footer={[
         <Button key="acknowledge" type="primary" onClick={onClose} style={{ minHeight: 44 }}>
-          Tôi đã lưu liên kết
+          {t("resultModal.ack", "Tôi đã lưu liên kết")}
         </Button>,
       ]}
     >
       <Alert
         type="warning"
         showIcon
-        message="Token chỉ hiển thị một lần"
-        description="Mỗi liên kết chứa token chỉ được backend trả về đúng một lần lúc tạo. Hãy sao chép và gửi cho thành viên qua kênh an toàn; đóng cửa sổ này sẽ không xem lại được."
+        message={t("resultModal.tokenTitle", "Token chỉ hiển thị một lần")}
+        description={t(
+          "resultModal.tokenDesc",
+          "Mỗi liên kết chứa token chỉ được backend trả về đúng một lần lúc tạo. Hãy sao chép và gửi cho thành viên qua kênh an toàn; đóng cửa sổ này sẽ không xem lại được."
+        )}
       />
       {summary && (
         <Alert type="info" showIcon message={summary} style={{ marginTop: 12 }} />
@@ -205,8 +217,17 @@ function InviteLinkResultModal({
             >
               <Text code>{result.link}</Text>
             </Typography.Paragraph>
-            <Button onClick={() => copyText(result.link, result.email)} style={{ minHeight: 44 }}>
-              Sao chép liên kết
+            <Button
+              onClick={() =>
+                copyText(
+                  result.link,
+                  t("copy.success", `Đã sao chép liên kết của ${result.email}`, { email: result.email }),
+                  t("copy.manualFail", "Không thể sao chép tự động. Hãy copy thủ công liên kết bên dưới.")
+                )
+              }
+              style={{ minHeight: 44 }}
+            >
+              {t("resultModal.copyLink", "Sao chép liên kết")}
             </Button>
           </div>
         ))}
@@ -216,13 +237,15 @@ function InviteLinkResultModal({
 }
 
 export default function InviteManagement() {
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "inviteManagement");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
   const [statusFilter, setStatusFilter] = useState<InviteStatus | undefined>(undefined);
   const [bulkSource, setBulkSource] = useState<string>("");
   const [bulkSummary, setBulkSummary] = useState<string | null>(null);
   const [linkResults, setLinkResults] = useState<InviteLinkResult[]>([]);
-  const [resultTitle, setResultTitle] = useState<string>("Liên kết thư mời");
+  const [resultTitle, setResultTitle] = useState<string>(t("resultModal.titleDefault", "Liên kết thư mời"));
   const [resultSummary, setResultSummary] = useState<string | undefined>(undefined);
   const [revokingId, setRevokingId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
@@ -254,7 +277,13 @@ export default function InviteManagement() {
   );
   const hasActiveFilter = Boolean(statusFilter);
 
-  const bulkPreview = useMemo(() => parseBulkInput(bulkSource), [bulkSource]);
+  const bulkPreview = useMemo(
+    () =>
+      parseBulkInput(bulkSource, (row) =>
+        t("bulkRow.invalidEmail", `Dòng ${row}: email không hợp lệ.`, { row })
+      ),
+    [bulkSource, t]
+  );
   const bulkOverLimit = bulkPreview.totalLines > MAX_BULK_ROWS;
 
   const handleRetry = () => {
@@ -281,26 +310,26 @@ export default function InviteManagement() {
       const invite = response?.data?.invite;
       const email: string = invite?.email || values.email.trim().toLowerCase();
       if (token) {
-        setResultTitle("Liên kết thư mời mới");
+        setResultTitle(t("resultModal.titleNew", "Liên kết thư mời mới"));
         setResultSummary(undefined);
         setLinkResults([{ email, link: buildInviteLink(token) }]);
       } else {
-        message.success("Đã tạo thư mời.");
+        message.success(t("messages.created", "Đã tạo thư mời."));
       }
       singleForm.resetFields();
       refetch();
     } catch (err: any) {
-      message.error(err?.data?.message || "Không thể tạo thư mời. Vui lòng thử lại.");
+      message.error(err?.data?.message || t("messages.createFail", "Không thể tạo thư mời. Vui lòng thử lại."));
     }
   };
 
   const handleBulkSubmit = async () => {
     if (bulkOverLimit) {
-      message.error(`Tối đa ${MAX_BULK_ROWS} thư mời mỗi lần. Hãy chia nhỏ danh sách.`);
+      message.error(t("bulk.maxError", `Tối đa ${MAX_BULK_ROWS} thư mời mỗi lần. Hãy chia nhỏ danh sách.`, { max: MAX_BULK_ROWS }));
       return;
     }
     if (bulkPreview.users.length === 0) {
-      message.error("Chưa có dòng hợp lệ nào. Mỗi dòng nhập theo dạng: email, firstname, lastname.");
+      message.error(t("bulk.empty", "Chưa có dòng hợp lệ nào. Mỗi dòng nhập theo dạng: email, firstname, lastname."));
       return;
     }
     try {
@@ -317,29 +346,33 @@ export default function InviteManagement() {
       const skippedCount = Number(response?.data?.skipped ?? 0);
       const errorCount = Number(response?.data?.errors ?? 0);
       const summary = [
-        `Đã tạo ${createdCount} thư mời`,
-        skippedCount > 0 ? `bỏ qua ${skippedCount}` : null,
-        errorCount > 0 ? `lỗi ${errorCount}` : null,
+        t("summary.created", `Đã tạo ${createdCount} thư mời`, { count: createdCount }),
+        skippedCount > 0 ? t("summary.skipped", `bỏ qua ${skippedCount}`, { count: skippedCount }) : null,
+        errorCount > 0 ? t("summary.errors", `lỗi ${errorCount}`, { count: errorCount }) : null,
         bulkPreview.errors.length > 0
-          ? `${bulkPreview.errors.length} dòng lỗi client (${bulkPreview.errors.slice(0, 2).join(" ")})`
+          ? t(
+              "summary.clientErrors",
+              `${bulkPreview.errors.length} dòng lỗi client (${bulkPreview.errors.slice(0, 2).join(" ")})`,
+              { count: bulkPreview.errors.length, errors: bulkPreview.errors.slice(0, 2).join(" ") }
+            )
           : null,
       ]
         .filter(Boolean)
         .join("; ");
       setBulkSummary(`${summary}.`);
       if (links.length > 0) {
-        setResultTitle("Liên kết thư mời hàng loạt");
+        setResultTitle(t("resultModal.titleBulk", "Liên kết thư mời hàng loạt"));
         setResultSummary(summary);
         setLinkResults(links);
       } else if (skippedCount > 0 || errorCount > 0 || bulkPreview.errors.length > 0) {
         message.warning(`${summary}.`);
       } else {
-        message.success("Tạo thư mời hàng loạt thành công.");
+        message.success(t("messages.bulkSuccess", "Tạo thư mời hàng loạt thành công."));
       }
       setBulkSource("");
       refetch();
     } catch (err: any) {
-      message.error(err?.data?.message || "Không thể tạo thư mời hàng loạt. Vui lòng thử lại.");
+      message.error(err?.data?.message || t("messages.bulkCreateFail", "Không thể tạo thư mời hàng loạt. Vui lòng thử lại."));
     }
   };
 
@@ -349,9 +382,9 @@ export default function InviteManagement() {
     try {
       await revokeInvite(id).unwrap();
       refetch();
-      message.success("Đã thu hồi thư mời.");
+      message.success(t("messages.revoked", "Đã thu hồi thư mời."));
     } catch (err: any) {
-      message.error(err?.data?.message || "Không thể thu hồi thư mời. Vui lòng thử lại.");
+      message.error(err?.data?.message || t("messages.revokeFail", "Không thể thu hồi thư mời. Vui lòng thử lại."));
     } finally {
       setRevokingId(null);
     }
@@ -367,22 +400,28 @@ export default function InviteManagement() {
       const email: string = response?.data?.invite?.email || record?.email || "";
       refetch();
       if (token && email) {
-        setResultTitle("Liên kết thư mời mới (gửi lại)");
+        setResultTitle(t("resultModal.titleResend", "Liên kết thư mời mới (gửi lại)"));
         setResultSummary(undefined);
         setLinkResults([{ email, link: buildInviteLink(token) }]);
       } else {
-        message.success("Đã gửi lại thư mời.");
+        message.success(t("messages.resent", "Đã gửi lại thư mời."));
       }
     } catch (err: any) {
-      message.error(err?.data?.message || "Không thể gửi lại thư mời. Vui lòng thử lại.");
+      message.error(err?.data?.message || t("messages.resendFail", "Không thể gửi lại thư mời. Vui lòng thử lại."));
     } finally {
       setResendingId(null);
     }
   };
 
+  const statusLabels = {
+    accepted: t("status.accepted", "Đã chấp nhận"),
+    revoked: t("status.revoked", "Đã thu hồi"),
+    pending: t("status.pending", "Chờ xác nhận"),
+  };
+
   const columns = [
     {
-      title: "STT",
+      title: t("table.stt", "STT"),
       key: "stt",
       width: 70,
       render: (_: unknown, __: InviteEntry, index: number) => (
@@ -390,14 +429,14 @@ export default function InviteManagement() {
       ),
     },
     {
-      title: "Email",
+      title: t("table.email", "Email"),
       dataIndex: "email",
       key: "email",
       width: 220,
       render: (value: string) => <Text strong>{value || "—"}</Text>,
     },
     {
-      title: "Tên",
+      title: t("table.name", "Tên"),
       key: "name",
       width: 180,
       render: (_: unknown, record: InviteEntry) => {
@@ -406,23 +445,23 @@ export default function InviteManagement() {
       },
     },
     {
-      title: "Trạng thái",
+      title: t("table.status", "Trạng thái"),
       key: "status",
       width: 200,
       render: (_: unknown, record: InviteEntry) => {
-        const tag = getStatusTag(record.status);
+        const tag = getStatusTag(record.status, statusLabels);
         return (
           <Space size={4} wrap>
             <Tag color={tag.color}>{tag.label}</Tag>
             {record.isExpired && record.status === "pending" && (
-              <Tag color="volcano">Hết hạn</Tag>
+              <Tag color="volcano">{t("status.expired", "Hết hạn")}</Tag>
             )}
           </Space>
         );
       },
     },
     {
-      title: "Hết hạn lúc",
+      title: t("table.expiresAt", "Hết hạn lúc"),
       dataIndex: "expiresAt",
       key: "expiresAt",
       width: 160,
@@ -431,7 +470,7 @@ export default function InviteManagement() {
       ),
     },
     {
-      title: "Người mời",
+      title: t("table.invitedBy", "Người mời"),
       key: "invitedBy",
       width: 200,
       render: (_: unknown, record: InviteEntry) => {
@@ -449,7 +488,7 @@ export default function InviteManagement() {
       },
     },
     {
-      title: "Thao tác",
+      title: t("table.actions", "Thao tác"),
       key: "action",
       width: 180,
       fixed: "right" as const,
@@ -458,8 +497,8 @@ export default function InviteManagement() {
           <Tooltip
             title={
               record.status === "accepted"
-                ? "Thư mời đã được chấp nhận"
-                : "Tạo token mới và hiển thị liên kết một lần"
+                ? t("resendAcceptedHint", "Thư mời đã được chấp nhận")
+                : t("resendHint", "Tạo token mới và hiển thị liên kết một lần")
             }
           >
             <Button
@@ -469,14 +508,14 @@ export default function InviteManagement() {
               disabled={record.status === "accepted" || resendingId === record._id}
               onClick={() => handleResend(record)}
             >
-              Gửi lại
+              {t("resend", "Gửi lại")}
             </Button>
           </Tooltip>
           <Popconfirm
-            title="Thu hồi thư mời"
-            description="Bạn có chắc chắn muốn thu hồi thư mời này?"
-            okText="Đồng ý"
-            cancelText="Huỷ bỏ"
+            title={t("revokeTitle", "Thu hồi thư mời")}
+            description={t("revokeDesc", "Bạn có chắc chắn muốn thu hồi thư mời này?")}
+            okText={t("confirmOk", "Đồng ý")}
+            cancelText={t("cancel", "Huỷ bỏ")}
             okButtonProps={{ danger: true, loading: revokingId === record._id }}
             onConfirm={() => handleRevoke(record._id)}
           >
@@ -486,7 +525,7 @@ export default function InviteManagement() {
               icon={<StopOutlined />}
               disabled={record.status !== "pending"}
             >
-              Thu hồi
+              {t("revoke", "Thu hồi")}
             </Button>
           </Popconfirm>
         </Space>
@@ -499,62 +538,62 @@ export default function InviteManagement() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
         <div>
           <Title level={3} style={{ margin: 0, color: "#0F172A", display: "flex", alignItems: "center", gap: 10, fontWeight: 800 }}>
-            <MailOutlined style={{ color: "#0066CC" }} /> Quản lý thư mời
+            <MailOutlined style={{ color: "#0066CC" }} /> {t("title", "Quản lý thư mời")}
           </Title>
           <Text type="secondary" style={{ fontSize: 13, marginTop: 4, display: "block" }}>
-            Tạo thư mời lẻ hoặc hàng loạt, theo dõi trạng thái và gửi lại khi cần. Token chỉ hiển thị một lần lúc tạo.
+            {t("subtitle", "Tạo thư mời lẻ hoặc hàng loạt, theo dõi trạng thái và gửi lại khi cần. Token chỉ hiển thị một lần lúc tạo.")}
           </Text>
         </div>
         <Button icon={<ReloadOutlined />} onClick={handleRetry} loading={isFetching} style={{ borderRadius: 10, fontWeight: 600, height: 38 }}>
-          Làm mới
+          {t("refresh", "Làm mới")}
         </Button>
       </div>
 
       <Card bordered={false} style={{ borderRadius: 20, marginBottom: 16, border: "1px solid #E2E8F0" }}>
-        <Title level={5} style={{ marginTop: 0 }}>Tạo thư mời lẻ</Title>
+        <Title level={5} style={{ marginTop: 0 }}>{t("single.title", "Tạo thư mời lẻ")}</Title>
         <Form form={singleForm} layout="inline" onFinish={handleCreateSingle} style={{ rowGap: 12 }}>
           <Form.Item
             name="email"
             rules={[
-              { required: true, message: "Vui lòng nhập email." },
-              { type: "email", message: "Email không hợp lệ." },
+              { required: true, message: t("single.emailRequired", "Vui lòng nhập email.") },
+              { type: "email", message: t("single.emailInvalid", "Email không hợp lệ.") },
             ]}
             style={{ minWidth: 240, flex: 1 }}
           >
-            <Input placeholder="Email *" allowClear />
+            <Input placeholder={t("single.emailPlaceholder", "Email *")} allowClear />
           </Form.Item>
           <Form.Item name="firstname" style={{ minWidth: 160 }}>
-            <Input placeholder="Tên (firstname)" allowClear />
+            <Input placeholder={t("single.firstnamePlaceholder", "Tên (firstname)")} allowClear />
           </Form.Item>
           <Form.Item name="lastname" style={{ minWidth: 160 }}>
-            <Input placeholder="Họ (lastname)" allowClear />
+            <Input placeholder={t("single.lastnamePlaceholder", "Họ (lastname)")} allowClear />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isCreating} style={{ backgroundColor: "#0066CC" }}>
-              Tạo thư mời
+              {t("single.submit", "Tạo thư mời")}
             </Button>
           </Form.Item>
         </Form>
       </Card>
 
       <Card bordered={false} style={{ borderRadius: 20, marginBottom: 16, border: "1px solid #E2E8F0" }}>
-        <Title level={5} style={{ marginTop: 0 }}>Tạo hàng loạt (tối đa {MAX_BULK_ROWS})</Title>
+        <Title level={5} style={{ marginTop: 0 }}>{t("bulk.title", `Tạo hàng loạt (tối đa ${MAX_BULK_ROWS})`, { max: MAX_BULK_ROWS })}</Title>
         <Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 8 }}>
-          Mỗi dòng một người theo dạng: email, firstname, lastname (firstname/lastname không bắt buộc).
+          {t("bulk.hint", "Mỗi dòng một người theo dạng: email, firstname, lastname (firstname/lastname không bắt buộc).")}
         </Text>
         <TextArea
           rows={5}
           value={bulkSource}
           onChange={(e) => setBulkSource(e.target.value)}
-          placeholder={"an.nguyen@fpt.edu.vn, An, Nguyen\nbinh.tran@fpt.edu.vn, Binh, Tran"}
-          aria-label="Danh sách thư mời hàng loạt"
+          placeholder={t("bulk.placeholder", "an.nguyen@fpt.edu.vn, An, Nguyen\nbinh.tran@fpt.edu.vn, Binh, Tran")}
+          aria-label={t("bulk.ariaLabel", "Danh sách thư mời hàng loạt")}
         />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, flexWrap: "wrap", gap: 8 }}>
           <Text type={bulkOverLimit ? "danger" : "secondary"} style={{ fontSize: 12 }}>
             {bulkOverLimit
-              ? `Vượt giới hạn: ${bulkPreview.totalLines}/${MAX_BULK_ROWS} dòng. Hãy chia nhỏ danh sách.`
-              : `Hợp lệ: ${bulkPreview.users.length}/${bulkPreview.totalLines} dòng.`}
-            {bulkPreview.errors.length > 0 && !bulkOverLimit && ` Lỗi: ${bulkPreview.errors.slice(0, 2).join(" ")}`}
+              ? t("bulk.overLimit", `Vượt giới hạn: ${bulkPreview.totalLines}/${MAX_BULK_ROWS} dòng. Hãy chia nhỏ danh sách.`, { current: bulkPreview.totalLines, max: MAX_BULK_ROWS })
+              : t("bulk.valid", `Hợp lệ: ${bulkPreview.users.length}/${bulkPreview.totalLines} dòng.`, { valid: bulkPreview.users.length, total: bulkPreview.totalLines })}
+            {bulkPreview.errors.length > 0 && !bulkOverLimit && ` ${t("bulk.errorsPrefix", `Lỗi: ${bulkPreview.errors.slice(0, 2).join(" ")}`, { errors: bulkPreview.errors.slice(0, 2).join(" ") })}`}
           </Text>
           <Button
             type="primary"
@@ -563,7 +602,7 @@ export default function InviteManagement() {
             disabled={bulkOverLimit || bulkPreview.users.length === 0}
             style={{ backgroundColor: "#0066CC" }}
           >
-            Tạo {bulkPreview.users.length} thư mời
+            {t("bulk.submit", `Tạo ${bulkPreview.users.length} thư mời`, { count: bulkPreview.users.length })}
           </Button>
         </div>
         {bulkSummary && (
@@ -582,7 +621,7 @@ export default function InviteManagement() {
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
           <Select
             allowClear
-            placeholder="Tất cả trạng thái"
+            placeholder={t("filter.allStatus", "Tất cả trạng thái")}
             value={statusFilter}
             onChange={(value) => {
               setStatusFilter((value || undefined) as InviteStatus | undefined);
@@ -590,14 +629,14 @@ export default function InviteManagement() {
             }}
             style={{ width: 220 }}
             options={[
-              { value: "", label: "Tất cả" },
-              { value: "pending", label: "Chờ xác nhận" },
-              { value: "accepted", label: "Đã chấp nhận" },
-              { value: "revoked", label: "Đã thu hồi" },
+              { value: "", label: t("filter.all", "Tất cả") },
+              { value: "pending", label: t("filter.pending", "Chờ xác nhận") },
+              { value: "accepted", label: t("filter.accepted", "Đã chấp nhận") },
+              { value: "revoked", label: t("filter.revoked", "Đã thu hồi") },
             ]}
           />
           <Button onClick={handleRetry} loading={isFetching} style={{ borderRadius: 10 }}>
-            Làm mới
+            {t("refresh", "Làm mới")}
           </Button>
         </div>
 
@@ -607,21 +646,21 @@ export default function InviteManagement() {
           <Alert
             type="error"
             showIcon
-            message="Không thể tải danh sách thư mời"
-            description="Vui lòng kiểm tra kết nối và thử lại."
+            message={t("error.title", "Không thể tải danh sách thư mời")}
+            description={t("error.desc", "Vui lòng kiểm tra kết nối và thử lại.")}
             action={
               <Button size="small" danger onClick={handleRetry} loading={isFetching}>
-                Thử lại
+                {t("retry", "Thử lại")}
               </Button>
             }
           />
         ) : entries.length === 0 ? (
           <Empty
-            description={hasActiveFilter ? "Không có thư mời nào khớp bộ lọc hiện tại." : "Chưa có thư mời nào."}
+            description={hasActiveFilter ? t("empty.filtered", "Không có thư mời nào khớp bộ lọc hiện tại.") : t("empty.default", "Chưa có thư mời nào.")}
           >
             {hasActiveFilter && (
               <Button type="primary" ghost onClick={handleClearFilters}>
-                Xóa bộ lọc
+                {t("clearFilters", "Xóa bộ lọc")}
               </Button>
             )}
           </Empty>
@@ -643,7 +682,7 @@ export default function InviteManagement() {
                 total={total}
                 showSizeChanger
                 pageSizeOptions={[10, 25, 50]}
-                showTotal={(t) => `Tổng cộng ${t} thư mời`}
+                showTotal={(totalCount) => t("paginationTotal", `Tổng cộng ${totalCount} thư mời`, { total: totalCount })}
                 onChange={(nextPage, nextSize) => {
                   setPage(nextPage);
                   setLimit(nextSize);

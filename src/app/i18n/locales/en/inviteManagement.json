@@ -1,0 +1,100 @@
+{
+  "title": "Invite Management",
+  "subtitle": "Create single or bulk invites, track status and resend when needed. Token is shown only once at creation.",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "table": {
+    "stt": "No.",
+    "email": "Email",
+    "name": "Name",
+    "status": "Status",
+    "expiresAt": "Expires at",
+    "invitedBy": "Invited by",
+    "actions": "Actions"
+  },
+  "status": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "revoked": "Revoked",
+    "expired": "Expired"
+  },
+  "resend": "Resend",
+  "resendAcceptedHint": "Invite already accepted",
+  "resendHint": "Create a new token and show the link once",
+  "revoke": "Revoke",
+  "revokeTitle": "Revoke invite",
+  "revokeDesc": "Are you sure you want to revoke this invite?",
+  "confirmOk": "Confirm",
+  "cancel": "Cancel",
+  "single": {
+    "title": "Create single invite",
+    "emailPlaceholder": "Email *",
+    "firstnamePlaceholder": "First name",
+    "lastnamePlaceholder": "Last name",
+    "emailRequired": "Please enter an email.",
+    "emailInvalid": "Invalid email.",
+    "submit": "Create invite"
+  },
+  "bulk": {
+    "title": "Bulk create (max {{max}})",
+    "hint": "One person per line as: email, firstname, lastname (firstname/lastname optional).",
+    "placeholder": "an.nguyen@fpt.edu.vn, An, Nguyen\nbinh.tran@fpt.edu.vn, Binh, Tran",
+    "ariaLabel": "Bulk invite list",
+    "overLimit": "Over limit: {{current}}/{{max}} lines. Please split the list.",
+    "valid": "Valid: {{valid}}/{{total}} lines.",
+    "errorsPrefix": "Errors: {{errors}}",
+    "submit": "Create {{count}} invites",
+    "empty": "No valid rows yet. Each line format: email, firstname, lastname.",
+    "maxError": "Max {{max}} invites per batch. Please split the list."
+  },
+  "bulkRow": {
+    "invalidEmail": "Line {{row}}: invalid email."
+  },
+  "summary": {
+    "created": "Created {{count}} invites",
+    "skipped": "skipped {{count}}",
+    "errors": "{{count}} errors",
+    "clientErrors": "{{count}} client-side invalid rows ({{errors}})"
+  },
+  "resultModal": {
+    "titleDefault": "Invite links",
+    "titleNew": "New invite link",
+    "titleBulk": "Bulk invite links",
+    "titleResend": "New invite link (resent)",
+    "ack": "I have saved the links",
+    "tokenTitle": "Token is shown only once",
+    "tokenDesc": "Each link contains a token returned by the backend only once at creation. Copy and send it via a safe channel; closing this dialog loses access.",
+    "copyLink": "Copy link"
+  },
+  "messages": {
+    "created": "Invite created.",
+    "createFail": "Could not create invite. Please try again.",
+    "bulkCreateFail": "Could not create bulk invites. Please try again.",
+    "bulkSuccess": "Bulk invites created successfully.",
+    "revoked": "Invite revoked.",
+    "revokeFail": "Could not revoke invite. Please try again.",
+    "resent": "Invite resent.",
+    "resendFail": "Could not resend invite. Please try again."
+  },
+  "copy": {
+    "success": "Copied link of {{email}}",
+    "manualFail": "Auto-copy failed. Please copy the link below manually."
+  },
+  "filter": {
+    "allStatus": "All statuses",
+    "all": "All",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "revoked": "Revoked"
+  },
+  "error": {
+    "title": "Could not load invite list",
+    "desc": "Please check your connection and try again."
+  },
+  "empty": {
+    "filtered": "No invites match the current filters.",
+    "default": "No invites yet."
+  },
+  "clearFilters": "Clear filters",
+  "paginationTotal": "{{total}} invites in total"
+}

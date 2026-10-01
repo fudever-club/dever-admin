@@ -19,20 +19,14 @@ import {
 } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 import {
   useGetAdminAuditSummaryQuery,
   type AdminAuditSummarySeriesItem,
 } from "@/store/queries/adminAudit";
 
 const { Text } = Typography;
-
-// TODO(i18n): hardcode tiếng Việt như AuditLogManagement để giữ scope; full i18n (vi/en auditLog.json) làm sau.
-
-const DAY_OPTIONS = [
-  { value: 7, label: "7 ngày qua" },
-  { value: 30, label: "30 ngày qua" },
-  { value: 90, label: "90 ngày qua" },
-];
 
 function isInviteAction(action: string): boolean {
   return (
@@ -62,15 +56,20 @@ function getActionColor(action?: string): string {
   return "default";
 }
 
-const GROUP_META = [
-  { key: "user", label: "Người dùng" },
-  { key: "fund", label: "Quỹ" },
-  { key: "blog", label: "Blog" },
-  { key: "opensource", label: "Opensource" },
-  { key: "invite", label: "Mời" },
-] as const;
+const GROUP_FALLBACK = {
+  user: "Người dùng",
+  fund: "Quỹ",
+  blog: "Blog",
+  opensource: "Opensource",
+  invite: "Mời",
+} as const;
+
+type GroupKey = keyof typeof GROUP_FALLBACK;
+const GROUP_KEYS: GroupKey[] = ["user", "fund", "blog", "opensource", "invite"];
 
 export default function AuditFunnelSummary() {
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "auditLog");
   const [days, setDays] = useState<number>(30);
 
   // Cùng query client (baseApi/RTK Query) với bảng log bên dưới.
@@ -112,7 +111,7 @@ export default function AuditFunnelSummary() {
   const isPartial = hasData && (!byActionValid || !seriesValid);
 
   const groups = useMemo(() => {
-    const totals: Record<(typeof GROUP_META)[number]["key"], number> = {
+    const totals: Record<GroupKey, number> = {
       user: 0,
       fund: 0,
       blog: 0,
@@ -128,6 +127,15 @@ export default function AuditFunnelSummary() {
     }
     return { totals, total };
   }, [byAction]);
+
+  const dayOptions = useMemo(
+    () => [
+      { value: 7, label: t("funnel.days7", "7 ngày qua") },
+      { value: 30, label: t("funnel.days30", "30 ngày qua") },
+      { value: 90, label: t("funnel.days90", "90 ngày qua") },
+    ],
+    [t]
+  );
 
   // Bảng series gần nhất: mới nhất trước (backend trả ascending).
   const recentSeries = useMemo(
@@ -172,11 +180,11 @@ export default function AuditFunnelSummary() {
         <Alert
           type="error"
           showIcon
-          message="Không thể tải phễu kiểm toán"
-          description="Vui lòng kiểm tra kết nối và thử lại."
+          message={t("funnel.loadError", "Không thể tải phễu kiểm toán")}
+          description={t("funnel.loadErrorDesc", "Vui lòng kiểm tra kết nối và thử lại.")}
           action={
             <Button size="small" danger onClick={handleRetry} loading={isFetching}>
-              Thử lại
+              {t("retry", "Thử lại")}
             </Button>
           }
         />
@@ -207,10 +215,10 @@ export default function AuditFunnelSummary() {
       >
         <div>
           <Text strong style={{ fontSize: 15, color: "#0F172A" }}>
-            Phễu kiểm toán
+            {t("funnel.title", "Phễu kiểm toán")}
           </Text>
           <Text type="secondary" style={{ fontSize: 12, display: "block" }}>
-            Tổng thao tác theo nhóm trong kỳ (không biểu đồ, chỉ số + bảng).
+            {t("funnel.subtitle", "Tổng thao tác theo nhóm trong kỳ (không biểu đồ, chỉ số + bảng).")}
           </Text>
         </div>
         <Space size={8}>
@@ -218,14 +226,14 @@ export default function AuditFunnelSummary() {
             value={days}
             onChange={(v) => setDays(v)}
             style={{ width: 150 }}
-            options={DAY_OPTIONS}
-            aria-label="Chọn kỳ thống kê"
+            options={dayOptions}
+            aria-label={t("funnel.periodLabel", "Chọn kỳ thống kê")}
           />
           <Button
             icon={<ReloadOutlined />}
             onClick={handleRetry}
             loading={isFetching}
-            aria-label="Làm mới phễu kiểm toán"
+            aria-label={t("funnel.refreshLabel", "Làm mới phễu kiểm toán")}
           />
         </Space>
       </div>
@@ -235,26 +243,27 @@ export default function AuditFunnelSummary() {
           type="warning"
           showIcon
           style={{ marginBottom: 16 }}
-          message="Một phần dữ liệu phễu không khả dụng"
-          description="Phần hợp lệ vẫn hiển thị; thử làm mới để lấy đủ số liệu."
+          message={t("funnel.partialTitle", "Một phần dữ liệu phễu không khả dụng")}
+          description={t("funnel.partialDesc", "Phần hợp lệ vẫn hiển thị; thử làm mới để lấy đủ số liệu.")}
           action={
             <Button size="small" onClick={handleRetry} loading={isFetching}>
-              Thử lại
+              {t("retry", "Thử lại")}
             </Button>
           }
         />
       )}
 
       <Row gutter={[12, 12]} style={{ marginBottom: series.length === 0 ? 0 : 16 }}>
-        {GROUP_META.map((group) => {
-          const value = groups.totals[group.key];
+        {GROUP_KEYS.map((key) => {
+          const value = groups.totals[key];
           const percent =
             groups.total > 0 ? Math.round((value / groups.total) * 100) : 0;
+          const label = t(`funnel.groups.${key}`, GROUP_FALLBACK[key]);
           return (
-            <Col key={group.key} xs={24} sm={12} lg={8} xl={8}>
+            <Col key={key} xs={24} sm={12} lg={8} xl={8}>
               <Card size="small" style={{ borderRadius: 12 }}>
                 <Statistic
-                  title={`${group.label} (${percent}%)`}
+                  title={`${label} (${percent}%)`}
                   value={value ?? 0}
                 />
                 <Progress percent={percent} showInfo={false} size="small" />
@@ -265,7 +274,7 @@ export default function AuditFunnelSummary() {
       </Row>
 
       {series.length === 0 ? (
-        <Empty description={`Chưa có hoạt động nào trong ${days} ngày qua.`} />
+        <Empty description={t("funnel.empty", `Chưa có hoạt động nào trong ${days} ngày qua.`, { days })} />
       ) : (
         <Table
           size="small"
@@ -275,12 +284,12 @@ export default function AuditFunnelSummary() {
           pagination={{
             pageSize: 5,
             size: "small",
-            showTotal: (t) => `Tổng cộng ${t} dòng`,
+            showTotal: (totalCount) => t("funnel.paginationTotal", `Tổng cộng ${totalCount} dòng`, { total: totalCount }),
           }}
           scroll={{ x: 750 }}
           columns={[
             {
-              title: "Ngày",
+              title: t("funnel.tableDate", "Ngày"),
               dataIndex: "date",
               key: "date",
               width: 140,
@@ -294,7 +303,7 @@ export default function AuditFunnelSummary() {
               },
             },
             {
-              title: "Hành động",
+              title: t("funnel.tableAction", "Hành động"),
               dataIndex: "action",
               key: "action",
               render: (value: string) => (
@@ -302,7 +311,7 @@ export default function AuditFunnelSummary() {
               ),
             },
             {
-              title: "Số lượng",
+              title: t("funnel.tableCount", "Số lượng"),
               dataIndex: "count",
               key: "count",
               width: 120,

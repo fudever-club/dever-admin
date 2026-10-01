@@ -1,0 +1,87 @@
+{
+  "title": "Nhật ký kiểm toán",
+  "subtitle": "Tra cứu lịch sử thao tác quản trị (chỉ đọc, phân trang server).",
+  "refresh": "Làm mới",
+  "retry": "Thử lại",
+  "search": "Tìm",
+  "table": {
+    "stt": "STT",
+    "time": "Thời gian",
+    "action": "Hành động",
+    "target": "Đối tượng",
+    "actor": "Người thực hiện",
+    "summary": "Tóm tắt",
+    "ip": "IP",
+    "system": "Hệ thống"
+  },
+  "filter": {
+    "allActions": "Tất cả hành động",
+    "allTargets": "Tất cả đối tượng",
+    "all": "Tất cả",
+    "targetIdPlaceholder": "Tìm theo targetId...",
+    "actorIdPlaceholder": "Tìm theo actorId..."
+  },
+  "actions": {
+    "user.role_granted": "Cấp quyền admin",
+    "user.role_revoked": "Thu hồi quyền admin",
+    "user.position_changed": "Đổi chức vụ",
+    "user.leadership_changed": "Đổi cờ lãnh đạo",
+    "user.deleted": "Xóa thành viên",
+    "user.password_reset": "Reset mật khẩu",
+    "user.sessions_revoked": "Thu hồi sessions",
+    "user.invited": "Mời thành viên",
+    "user.accepted": "Nhận lời mời",
+    "user.invite_revoked": "Thu hồi thư mời",
+    "fund.payment_approved": "Duyệt quỹ",
+    "fund.payment_rejected": "Từ chối quỹ",
+    "blog.reviewed": "Duyệt blog",
+    "opensource.approved": "Duyệt open-source",
+    "opensource.rejected": "Từ chối open-source",
+    "opensource.deleted": "Xóa open-source"
+  },
+  "targetTypes": {
+    "user": "Thành viên",
+    "fund_payment": "Thanh toán quỹ",
+    "blog": "Blog",
+    "open_source": "Mã nguồn mở",
+    "event": "Sự kiện",
+    "project": "Dự án",
+    "campaign": "Kỳ quỹ",
+    "position": "Chức vụ"
+  },
+  "error": {
+    "title": "Không thể tải nhật ký kiểm toán",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại."
+  },
+  "empty": {
+    "filtered": "Không có bản ghi nào khớp bộ lọc hiện tại.",
+    "default": "Chưa có bản ghi kiểm toán nào."
+  },
+  "clearFilters": "Xóa bộ lọc",
+  "paginationTotal": "Tổng cộng {{total}} bản ghi",
+  "funnel": {
+    "title": "Phễu kiểm toán",
+    "subtitle": "Tổng thao tác theo nhóm trong kỳ (không biểu đồ, chỉ số + bảng).",
+    "periodLabel": "Chọn kỳ thống kê",
+    "refreshLabel": "Làm mới phễu kiểm toán",
+    "days7": "7 ngày qua",
+    "days30": "30 ngày qua",
+    "days90": "90 ngày qua",
+    "groups": {
+      "user": "Người dùng",
+      "fund": "Quỹ",
+      "blog": "Blog",
+      "opensource": "Opensource",
+      "invite": "Mời"
+    },
+    "loadError": "Không thể tải phễu kiểm toán",
+    "loadErrorDesc": "Vui lòng kiểm tra kết nối và thử lại.",
+    "partialTitle": "Một phần dữ liệu phễu không khả dụng",
+    "partialDesc": "Phần hợp lệ vẫn hiển thị; thử làm mới để lấy đủ số liệu.",
+    "empty": "Chưa có hoạt động nào trong {{days}} ngày qua.",
+    "tableDate": "Ngày",
+    "tableAction": "Hành động",
+    "tableCount": "Số lượng",
+    "paginationTotal": "Tổng cộng {{total}} dòng"
+  }
+}

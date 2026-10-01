@@ -1,0 +1,87 @@
+{
+  "title": "Audit Log",
+  "subtitle": "Browse admin activity history (read-only, server pagination).",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "search": "Search",
+  "table": {
+    "stt": "No.",
+    "time": "Time",
+    "action": "Action",
+    "target": "Target",
+    "actor": "Actor",
+    "summary": "Summary",
+    "ip": "IP",
+    "system": "System"
+  },
+  "filter": {
+    "allActions": "All actions",
+    "allTargets": "All targets",
+    "all": "All",
+    "targetIdPlaceholder": "Search by targetId...",
+    "actorIdPlaceholder": "Search by actorId..."
+  },
+  "actions": {
+    "user.role_granted": "Grant admin role",
+    "user.role_revoked": "Revoke admin role",
+    "user.position_changed": "Change position",
+    "user.leadership_changed": "Change leadership flag",
+    "user.deleted": "Delete member",
+    "user.password_reset": "Reset password",
+    "user.sessions_revoked": "Revoke sessions",
+    "user.invited": "Invite member",
+    "user.accepted": "Accept invite",
+    "user.invite_revoked": "Revoke invite",
+    "fund.payment_approved": "Approve fund",
+    "fund.payment_rejected": "Reject fund",
+    "blog.reviewed": "Review blog",
+    "opensource.approved": "Approve open-source",
+    "opensource.rejected": "Reject open-source",
+    "opensource.deleted": "Delete open-source"
+  },
+  "targetTypes": {
+    "user": "Member",
+    "fund_payment": "Fund payment",
+    "blog": "Blog",
+    "open_source": "Open source",
+    "event": "Event",
+    "project": "Project",
+    "campaign": "Fund campaign",
+    "position": "Position"
+  },
+  "error": {
+    "title": "Could not load audit log",
+    "desc": "Please check your connection and try again."
+  },
+  "empty": {
+    "filtered": "No records match the current filters.",
+    "default": "No audit records yet."
+  },
+  "clearFilters": "Clear filters",
+  "paginationTotal": "{{total}} records in total",
+  "funnel": {
+    "title": "Audit funnel",
+    "subtitle": "Total operations by group in the period (numbers + table, no charts).",
+    "periodLabel": "Select statistics period",
+    "refreshLabel": "Refresh audit funnel",
+    "days7": "Last 7 days",
+    "days30": "Last 30 days",
+    "days90": "Last 90 days",
+    "groups": {
+      "user": "Users",
+      "fund": "Fund",
+      "blog": "Blog",
+      "opensource": "Open source",
+      "invite": "Invites"
+    },
+    "loadError": "Could not load audit funnel",
+    "loadErrorDesc": "Please check your connection and try again.",
+    "partialTitle": "Part of the funnel data is unavailable",
+    "partialDesc": "Valid parts are still shown; refresh to fetch full data.",
+    "empty": "No activity in the last {{days}} days.",
+    "tableDate": "Date",
+    "tableAction": "Action",
+    "tableCount": "Count",
+    "paginationTotal": "{{total}} rows in total"
+  }
+}

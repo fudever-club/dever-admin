@@ -1,0 +1,13 @@
+{
+  "sla": {
+    "waitingColumn": "Waiting",
+    "overdueTag": "Over {{hours}}h",
+    "overdueTab": "Overdue",
+    "overdueTabWithCount": "Overdue ({{count}})",
+    "hours": "{{count}}h",
+    "days": "{{count}}d",
+    "daysHours": "{{days}}d {{hours}}h",
+    "longestWaiting": "Longest-waiting post:",
+    "pendingCount": "{{count}} posts pending review."
+  }
+}

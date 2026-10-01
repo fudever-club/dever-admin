@@ -1,0 +1,69 @@
+{
+  "title": "Season Management",
+  "subtitle": "Create new seasons, edit scoring windows and end the running season. Server auto-records season.created/updated/ended audits.",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "create": "Create season",
+  "createFirst": "Create first season",
+  "table": {
+    "stt": "No.",
+    "name": "Season name",
+    "window": "Window",
+    "status": "Status",
+    "scoring": "Scores (E/M/H)",
+    "actions": "Actions"
+  },
+  "status": {
+    "active": "Running",
+    "upcoming": "Upcoming",
+    "ended": "Ended"
+  },
+  "edit": "Edit",
+  "endSeason": "End season",
+  "endTitle": "End season?",
+  "endDesc": "An ended season is locked for editing. Are you sure?",
+  "endOk": "End",
+  "cancel": "Cancel",
+  "modal": {
+    "createTitle": "Create new season",
+    "editTitle": "Edit season",
+    "nameLabel": "Season name",
+    "namePlaceholder": "E.g. Arena Season 1 – Fall 2026",
+    "nameRequired": "Please enter a season name.",
+    "nameMax": "Season name must be at most 120 characters.",
+    "rangeLabel": "Season window (Start – End)",
+    "rangeRequired": "Please select a season window.",
+    "rangeStartPlaceholder": "Start date",
+    "rangeEndPlaceholder": "End date",
+    "statusLabel": "Status",
+    "statusRequired": "Please select a status.",
+    "statusUpcoming": "Upcoming",
+    "statusActive": "Running (activate now)",
+    "easyLabel": "Easy score",
+    "easyRequired": "Enter Easy score.",
+    "mediumLabel": "Medium score",
+    "mediumRequired": "Enter Medium score.",
+    "hardLabel": "Hard score",
+    "hardRequired": "Enter Hard score.",
+    "activateTitle": "Activating will end the running season",
+    "activateDescCurrent": "Season \"{{name}}\" will automatically move to ended.",
+    "activateDescDefault": "This season will become the only running season.",
+    "saveChanges": "Save changes",
+    "createSubmit": "Create season"
+  },
+  "messages": {
+    "invalidRange": "Please select a valid start – end window.",
+    "endAfterStart": "End date must be after start date.",
+    "updated": "Season updated successfully.",
+    "created": "New season created successfully.",
+    "saveFail": "Could not save season. Please try again.",
+    "ended": "Season \"{{name}}\" ended.",
+    "endFail": "Could not end season. Please try again."
+  },
+  "error": {
+    "title": "Could not load season list",
+    "desc": "Please check your connection and try again."
+  },
+  "empty": "No seasons yet.",
+  "paginationTotal": "{{total}} seasons in total"
+}

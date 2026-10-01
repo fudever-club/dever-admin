@@ -40,6 +40,8 @@ import {
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
 import { constants } from "@/settings";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -77,6 +79,8 @@ interface ReviewQueueSla {
 const DEFAULT_SLA_THRESHOLD_HOURS = 72;
 
 export default function BlogManagement() {
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "blogManagement");
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("pending_review");
@@ -277,7 +281,7 @@ export default function BlogManagement() {
     }
   };
 
-  // TODO(i18n): hard-coded Vietnamese SLA labels; move to next-intl catalog when BlogManagement is localized.
+  // SLA labels localized via blogManagement namespace (vi fallback).
   const isSlaOverdue = useCallback(
     (blog: BlogPost) => {
       if (typeof blog.slaOverdue === "boolean") return blog.slaOverdue;
@@ -287,15 +291,15 @@ export default function BlogManagement() {
     [slaThresholdHours]
   );
 
-  // TODO(i18n): hard-coded Vietnamese duration format.
+  // Duration format localized via blogManagement namespace (vi fallback).
   const formatWaitingHours = useCallback((hours: number) => {
     const rounded = Math.max(0, Math.floor(hours));
-    if (rounded < 24) return `${rounded} giờ`;
+    if (rounded < 24) return t("sla.hours", `${rounded} giờ`, { count: rounded });
     const days = Math.floor(rounded / 24);
     const remainder = rounded % 24;
-    if (remainder === 0) return `${days} ngày`;
-    return `${days} ngày ${remainder} giờ`;
-  }, []);
+    if (remainder === 0) return t("sla.days", `${days} ngày`, { count: days });
+    return t("sla.daysHours", `${days} ngày ${remainder} giờ`, { days, hours: remainder });
+  }, [t]);
 
   const overdueBlogs = useMemo(
     () => blogs.filter((b) => b.status === "pending_review" && isSlaOverdue(b)),
@@ -408,8 +412,7 @@ export default function BlogManagement() {
       render: (status: string) => getStatusTag(status),
     },
     {
-      // TODO(i18n): hard-coded Vietnamese "Chờ duyệt" / "Quá …h" labels.
-      title: "Chờ duyệt",
+      title: t("sla.waitingColumn", "Chờ duyệt"),
       dataIndex: "waitingHours",
       key: "waitingHours",
       width: 170,
@@ -430,7 +433,7 @@ export default function BlogManagement() {
               <ClockCircleOutlined className={overdue ? "text-red-500" : "text-slate-400"} />
               {formatWaitingHours(record.waitingHours)}
             </span>
-            {overdue && <Tag color="error">Quá {slaThresholdHours}h</Tag>}
+            {overdue && <Tag color="error">{t("sla.overdueTag", `Quá ${slaThresholdHours}h`, { hours: slaThresholdHours })}</Tag>}
           </Space>
         );
       },
@@ -494,20 +497,19 @@ export default function BlogManagement() {
           <Text type="secondary" className="text-sm">
             Quản lý toàn diện bài viết kỹ thuật: kiểm duyệt bài mới, ghim bài viết tiêu biểu lên trang chủ và theo dõi trạng thái xuất bản.
           </Text>
-          {/* TODO(i18n): hard-coded Vietnamese longest-waiting headline. */}
           {longestWaitingBlog && typeof longestWaitingBlog.waitingHours === "number" ? (
             <Text type="secondary" className="mt-1 block text-sm">
-              Bài chờ lâu nhất: <Text strong>{longestWaitingBlog.title}</Text> —{" "}
+              {t("sla.longestWaiting", "Bài chờ lâu nhất:")} <Text strong>{longestWaitingBlog.title}</Text> —{" "}
               {formatWaitingHours(longestWaitingBlog.waitingHours)}
               {isSlaOverdue(longestWaitingBlog) && (
                 <Tag color="error" className="ml-2">
-                  Quá {slaThresholdHours}h
+                  {t("sla.overdueTag", `Quá ${slaThresholdHours}h`, { hours: slaThresholdHours })}
                 </Tag>
               )}
             </Text>
           ) : pendingCount > 0 ? (
             <Text type="secondary" className="mt-1 block text-sm">
-              Có {pendingCount} bài đang chờ duyệt.
+              {t("sla.pendingCount", `Có ${pendingCount} bài đang chờ duyệt.`, { count: pendingCount })}
             </Text>
           ) : null}
         </div>
@@ -577,12 +579,11 @@ export default function BlogManagement() {
                 ),
               },
               {
-                // TODO(i18n): hard-coded Vietnamese "Quá hạn" tab label.
                 key: "overdue",
                 label: (
                   <Badge count={overdueCount} offset={[8, 0]} color="#DC2626">
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5 text-red-600">
-                      <ExclamationCircleOutlined /> Quá hạn ({overdueCount})
+                      <ExclamationCircleOutlined /> {t("sla.overdueTabWithCount", `Quá hạn (${overdueCount})`, { count: overdueCount })}
                     </span>
                   </Badge>
                 ),

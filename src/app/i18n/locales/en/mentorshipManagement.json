@@ -1,0 +1,68 @@
+{
+  "title": "Mentor Connections",
+  "subtitle": "Mentors open for connection (GET /api/v1/mentorship/mentors) + review queue (GET /api/v1/mentorship/requests, cross-checked via audit log).",
+  "openAuditLog": "Open audit log",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "tabs": {
+    "mentors": "Mentors",
+    "queue": "Queue",
+    "pendingBadgeTitle": "{{count}} pending requests"
+  },
+  "status": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "open": "Open for connection",
+    "unknownGen": "Unknown"
+  },
+  "mentorTable": {
+    "mentor": "Mentor",
+    "gen": "Generation",
+    "workplace": "Organization / Company",
+    "topics": "Mentoring topics",
+    "status": "Status"
+  },
+  "requestTable": {
+    "mentee": "Mentee",
+    "mentor": "Mentor",
+    "topic": "Topic",
+    "message": "Message",
+    "status": "Status",
+    "sentAt": "Sent at",
+    "actions": "Actions"
+  },
+  "approve": "Approve",
+  "approveTitle": "Approve this connection request?",
+  "approveDesc": "The mentee will be notified the mentor accepted.",
+  "decline": "Decline",
+  "declineTitle": "Decline this connection request?",
+  "declineDesc": "The mentee will be notified the request was not approved.",
+  "cancel": "Cancel",
+  "messages": {
+    "approved": "Approved connection of {{name}}",
+    "declined": "Declined connection of {{name}}",
+    "reviewFail": "Failed to review request"
+  },
+  "searchPlaceholder": "Search mentor name, company, topic...",
+  "mentorCount": "{{filtered}}/{{total}} mentors open",
+  "statusFilterLabel": "Filter by status:",
+  "filterPending": "Pending",
+  "filterPendingWithCount": "Pending ({{count}})",
+  "filterAccepted": "Accepted",
+  "filterDeclined": "Declined",
+  "filterAll": "All",
+  "queueCount": "{{count}} requests",
+  "queueTotal": "{{count}} requests",
+  "error": {
+    "mentorsTitle": "Could not load mentor list",
+    "queueTitle": "Could not load mentorship queue",
+    "desc": "Please check your connection and try again."
+  },
+  "empty": {
+    "searchNoMatch": "No mentors match the current search.",
+    "noMentors": "No mentors open for connection yet.",
+    "noRequests": "No requests match the current filter."
+  },
+  "clearSearch": "Clear search"
+}

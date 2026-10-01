@@ -1,8 +1,8 @@
 "use client";
 
-// TODO(i18n): hardcode tiếng Việt như FundManagement/InviteManagement để giữ scope;
-// full i18n (vi/en seasonManagement.json) làm sau.
 import { useMemo, useState } from "react";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 import {
   Alert,
   Button,
@@ -58,13 +58,23 @@ function formatSeasonWindow(startDate: string, endDate: string): string {
   return `${start.format("DD/MM/YYYY")} – ${end.format("DD/MM/YYYY")}`;
 }
 
-function getSeasonStatusTag(status: Season["status"]) {
-  if (status === "active") return <Tag color="success">Đang chạy</Tag>;
-  if (status === "upcoming") return <Tag color="processing">Sắp diễn ra</Tag>;
-  return <Tag color="default">Đã kết thúc</Tag>;
+function getSeasonStatusTag(
+  status: Season["status"],
+  labels: { active: string; upcoming: string; ended: string }
+) {
+  if (status === "active") return <Tag color="success">{labels.active}</Tag>;
+  if (status === "upcoming") return <Tag color="processing">{labels.upcoming}</Tag>;
+  return <Tag color="default">{labels.ended}</Tag>;
 }
 
 export default function SeasonManagement() {
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "seasonManagement");
+  const statusLabels = {
+    active: t("status.active", "Đang chạy"),
+    upcoming: t("status.upcoming", "Sắp diễn ra"),
+    ended: t("status.ended", "Đã kết thúc"),
+  };
   const [form] = Form.useForm<SeasonFormValues>();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [editingSeason, setEditingSeason] = useState<Season | null>(null);
@@ -126,11 +136,11 @@ export default function SeasonManagement() {
   const handleFinish = async (values: SeasonFormValues) => {
     const range = values.dateRange;
     if (!range || range.length !== 2 || !range[0]?.isValid() || !range[1]?.isValid()) {
-      message.error("Vui lòng chọn cửa sổ bắt đầu – kết thúc hợp lệ.");
+      message.error(t("messages.invalidRange", "Vui lòng chọn cửa sổ bắt đầu – kết thúc hợp lệ."));
       return;
     }
     if (!range[0].isBefore(range[1])) {
-      message.error("Ngày kết thúc phải sau ngày bắt đầu.");
+      message.error(t("messages.endAfterStart", "Ngày kết thúc phải sau ngày bắt đầu."));
       return;
     }
     const payload = {
@@ -147,17 +157,17 @@ export default function SeasonManagement() {
     try {
       if (editingSeason) {
         await updateSeason({ id: editingSeason._id, body: payload }).unwrap();
-        message.success("Cập nhật mùa giải thành công.");
+        message.success(t("messages.updated", "Cập nhật mùa giải thành công."));
       } else {
         await createSeason(payload).unwrap();
-        message.success("Tạo mùa giải mới thành công.");
+        message.success(t("messages.created", "Tạo mùa giải mới thành công."));
       }
       setModalOpen(false);
       setEditingSeason(null);
     } catch (err: any) {
       // 409 = mùa đã kết thúc bị khóa — giữ thông báo lâu hơn để admin đọc kịp.
       message.error(
-        err?.data?.message || "Lưu mùa giải thất bại. Vui lòng thử lại.",
+        err?.data?.message || t("messages.saveFail", "Lưu mùa giải thất bại. Vui lòng thử lại."),
         err?.status === 409 ? 6 : 3
       );
     }
@@ -172,10 +182,10 @@ export default function SeasonManagement() {
         id: record._id,
         body: { status: "ended" },
       }).unwrap();
-      message.success(`Đã kết thúc mùa "${record.name}".`);
+      message.success(t("messages.ended", `Đã kết thúc mùa "${record.name}".`, { name: record.name }));
     } catch (err: any) {
       message.error(
-        err?.data?.message || "Kết thúc mùa giải thất bại. Vui lòng thử lại.",
+        err?.data?.message || t("messages.endFail", "Kết thúc mùa giải thất bại. Vui lòng thử lại."),
         err?.status === 409 ? 6 : 3
       );
     } finally {
@@ -185,19 +195,19 @@ export default function SeasonManagement() {
 
   const columns: TableProps<Season>["columns"] = [
     {
-      title: "STT",
+      title: t("table.stt", "STT"),
       key: "stt",
       width: 60,
       render: (_, __, index) => <Text type="secondary">{index + 1}</Text>,
     },
     {
-      title: "Tên mùa",
+      title: t("table.name", "Tên mùa"),
       dataIndex: "name",
       key: "name",
       render: (name: string) => <Text strong>{name || "—"}</Text>,
     },
     {
-      title: "Cửa sổ",
+      title: t("table.window", "Cửa sổ"),
       key: "window",
       width: 220,
       render: (_, record) => (
@@ -207,14 +217,14 @@ export default function SeasonManagement() {
       ),
     },
     {
-      title: "Trạng thái",
+      title: t("table.status", "Trạng thái"),
       dataIndex: "status",
       key: "status",
       width: 140,
-      render: (status: Season["status"]) => getSeasonStatusTag(status),
+      render: (status: Season["status"]) => getSeasonStatusTag(status, statusLabels),
     },
     {
-      title: "Điểm (E/M/H)",
+      title: t("table.scoring", "Điểm (E/M/H)"),
       key: "scoring",
       width: 200,
       render: (_, record) => (
@@ -226,7 +236,7 @@ export default function SeasonManagement() {
       ),
     },
     {
-      title: "Thao tác",
+      title: t("table.actions", "Thao tác"),
       key: "action",
       width: 220,
       fixed: "right" as const,
@@ -242,13 +252,13 @@ export default function SeasonManagement() {
               disabled={locked}
               onClick={() => openEdit(record)}
             >
-              Sửa
+              {t("edit", "Sửa")}
             </Button>
             <Popconfirm
-              title="Kết thúc mùa giải?"
-              description="Mùa đã kết thúc sẽ bị khóa chỉnh sửa. Bạn có chắc chắn?"
-              okText="Kết thúc"
-              cancelText="Hủy"
+              title={t("endTitle", "Kết thúc mùa giải?")}
+              description={t("endDesc", "Mùa đã kết thúc sẽ bị khóa chỉnh sửa. Bạn có chắc chắn?")}
+              okText={t("endOk", "Kết thúc")}
+              cancelText={t("cancel", "Hủy")}
               okButtonProps={{ danger: true, loading: endingId === record._id }}
               onConfirm={() => handleEnd(record)}
             >
@@ -259,7 +269,7 @@ export default function SeasonManagement() {
                 disabled={locked}
                 loading={endingId === record._id}
               >
-                Kết thúc mùa
+                {t("endSeason", "Kết thúc mùa")}
               </Button>
             </Popconfirm>
           </Space>
@@ -287,11 +297,10 @@ export default function SeasonManagement() {
               gap: 10,
             }}
           >
-            <TrophyOutlined style={{ color: "#0066CC" }} /> Quản lý mùa giải
+            <TrophyOutlined style={{ color: "#0066CC" }} /> {t("title", "Quản lý mùa giải")}
           </Title>
           <Text type="secondary" style={{ fontSize: 13, marginTop: 4, display: "block" }}>
-            Tạo mùa giải mới, chỉnh sửa cửa sổ tính điểm và kết thúc mùa đang chạy.
-            Server tự ghi audit season.created/updated/ended.
+            {t("subtitle", "Tạo mùa giải mới, chỉnh sửa cửa sổ tính điểm và kết thúc mùa đang chạy. Server tự ghi audit season.created/updated/ended.")}
           </Text>
         </div>
         <Space size={12} wrap>
@@ -300,7 +309,7 @@ export default function SeasonManagement() {
             onClick={handleRetry}
             loading={isFetching}
           >
-            Làm mới
+            {t("refresh", "Làm mới")}
           </Button>
           <Button
             type="primary"
@@ -309,7 +318,7 @@ export default function SeasonManagement() {
             onClick={openCreate}
             style={{ backgroundColor: "#0066CC" }}
           >
-            Tạo mùa giải
+            {t("create", "Tạo mùa giải")}
           </Button>
         </Space>
       </S.Head>
@@ -320,18 +329,18 @@ export default function SeasonManagement() {
         <Alert
           type="error"
           showIcon
-          message="Không thể tải danh sách mùa giải"
-          description="Vui lòng kiểm tra kết nối và thử lại."
+          message={t("error.title", "Không thể tải danh sách mùa giải")}
+          description={t("error.desc", "Vui lòng kiểm tra kết nối và thử lại.")}
           action={
             <Button size="small" danger onClick={handleRetry} loading={isFetching}>
-              Thử lại
+              {t("retry", "Thử lại")}
             </Button>
           }
         />
       ) : seasons.length === 0 ? (
-        <Empty description="Chưa có mùa giải nào.">
+        <Empty description={t("empty", "Chưa có mùa giải nào.")}>
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-            Tạo mùa giải đầu tiên
+            {t("createFirst", "Tạo mùa giải đầu tiên")}
           </Button>
         </Empty>
       ) : (
@@ -350,14 +359,14 @@ export default function SeasonManagement() {
               onChange: (_page, size) => {
                 if (size && size !== pageSize) setPageSize(size);
               },
-              showTotal: (total) => `Tổng cộng ${total} mùa giải`,
+              showTotal: (total) => t("paginationTotal", `Tổng cộng ${total} mùa giải`, { total }),
             }}
           />
         </S.TableWrapper>
       )}
 
       <Modal
-        title={editingSeason ? "Sửa mùa giải" : "Tạo mùa giải mới"}
+        title={editingSeason ? t("modal.editTitle", "Sửa mùa giải") : t("modal.createTitle", "Tạo mùa giải mới")}
         open={modalOpen}
         onCancel={closeModal}
         footer={[]}
@@ -372,37 +381,37 @@ export default function SeasonManagement() {
           onFinish={handleFinish}
         >
           <Form.Item
-            label="Tên mùa giải"
+            label={t("modal.nameLabel", "Tên mùa giải")}
             name="name"
             rules={[
-              { required: true, message: "Vui lòng nhập tên mùa giải." },
-              { max: 120, message: "Tên mùa giải tối đa 120 ký tự." },
+              { required: true, message: t("modal.nameRequired", "Vui lòng nhập tên mùa giải.") },
+              { max: 120, message: t("modal.nameMax", "Tên mùa giải tối đa 120 ký tự.") },
             ]}
           >
-            <Input placeholder="Ví dụ: Arena Season 1 – Fall 2026" maxLength={120} />
+            <Input placeholder={t("modal.namePlaceholder", "Ví dụ: Arena Season 1 – Fall 2026")} maxLength={120} />
           </Form.Item>
 
           <Form.Item
-            label="Cửa sổ mùa giải (Bắt đầu – Kết thúc)"
+            label={t("modal.rangeLabel", "Cửa sổ mùa giải (Bắt đầu – Kết thúc)")}
             name="dateRange"
-            rules={[{ required: true, message: "Vui lòng chọn cửa sổ mùa giải." }]}
+            rules={[{ required: true, message: t("modal.rangeRequired", "Vui lòng chọn cửa sổ mùa giải.") }]}
           >
             <DatePicker.RangePicker
               style={{ width: "100%" }}
               format="DD/MM/YYYY"
-              placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+              placeholder={[t("modal.rangeStartPlaceholder", "Ngày bắt đầu"), t("modal.rangeEndPlaceholder", "Ngày kết thúc")]}
             />
           </Form.Item>
 
           <Form.Item
-            label="Trạng thái"
+            label={t("modal.statusLabel", "Trạng thái")}
             name="status"
-            rules={[{ required: true, message: "Vui lòng chọn trạng thái." }]}
+            rules={[{ required: true, message: t("modal.statusRequired", "Vui lòng chọn trạng thái.") }]}
           >
             <Select
               options={[
-                { value: "upcoming", label: "Sắp diễn ra" },
-                { value: "active", label: "Đang chạy (kích hoạt ngay)" },
+                { value: "upcoming", label: t("modal.statusUpcoming", "Sắp diễn ra") },
+                { value: "active", label: t("modal.statusActive", "Đang chạy (kích hoạt ngay)") },
               ]}
             />
           </Form.Item>
@@ -411,11 +420,11 @@ export default function SeasonManagement() {
             <Alert
               type="warning"
               showIcon
-              message="Kích hoạt sẽ kết thúc mùa đang chạy"
+              message={t("modal.activateTitle", "Kích hoạt sẽ kết thúc mùa đang chạy")}
               description={
                 showActivateWarning
-                  ? `Mùa "${activeSeason?.name}" đang chạy sẽ tự động chuyển sang đã kết thúc.`
-                  : "Mùa này sẽ trở thành mùa đang chạy duy nhất."
+                  ? t("modal.activateDescCurrent", `Mùa "${activeSeason?.name}" đang chạy sẽ tự động chuyển sang đã kết thúc.`, { name: activeSeason?.name ?? "" })
+                  : t("modal.activateDescDefault", "Mùa này sẽ trở thành mùa đang chạy duy nhất.")
               }
               style={{ marginBottom: 16 }}
             />
@@ -423,25 +432,25 @@ export default function SeasonManagement() {
 
           <Space size={12} style={{ display: "flex" }}>
             <Form.Item
-              label="Điểm Easy"
+              label={t("modal.easyLabel", "Điểm Easy")}
               name="easy"
-              rules={[{ required: true, message: "Nhập điểm Easy." }]}
+              rules={[{ required: true, message: t("modal.easyRequired", "Nhập điểm Easy.") }]}
               style={{ flex: 1, marginBottom: 0 }}
             >
               <InputNumber min={0} style={{ width: "100%" }} placeholder="1" />
             </Form.Item>
             <Form.Item
-              label="Điểm Medium"
+              label={t("modal.mediumLabel", "Điểm Medium")}
               name="medium"
-              rules={[{ required: true, message: "Nhập điểm Medium." }]}
+              rules={[{ required: true, message: t("modal.mediumRequired", "Nhập điểm Medium.") }]}
               style={{ flex: 1, marginBottom: 0 }}
             >
               <InputNumber min={0} style={{ width: "100%" }} placeholder="3" />
             </Form.Item>
             <Form.Item
-              label="Điểm Hard"
+              label={t("modal.hardLabel", "Điểm Hard")}
               name="hard"
-              rules={[{ required: true, message: "Nhập điểm Hard." }]}
+              rules={[{ required: true, message: t("modal.hardRequired", "Nhập điểm Hard.") }]}
               style={{ flex: 1, marginBottom: 0 }}
             >
               <InputNumber min={0} style={{ width: "100%" }} placeholder="5" />
@@ -456,7 +465,7 @@ export default function SeasonManagement() {
             disabled={saving}
             style={{ marginTop: 24, backgroundColor: "#0066CC" }}
           >
-            {editingSeason ? "Lưu thay đổi" : "Tạo mùa giải"}
+            {editingSeason ? t("modal.saveChanges", "Lưu thay đổi") : t("modal.createSubmit", "Tạo mùa giải")}
           </Button>
         </Form>
       </Modal>

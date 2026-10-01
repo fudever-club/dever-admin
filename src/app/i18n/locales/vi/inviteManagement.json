@@ -1,0 +1,100 @@
+{
+  "title": "Quản lý thư mời",
+  "subtitle": "Tạo thư mời lẻ hoặc hàng loạt, theo dõi trạng thái và gửi lại khi cần. Token chỉ hiển thị một lần lúc tạo.",
+  "refresh": "Làm mới",
+  "retry": "Thử lại",
+  "table": {
+    "stt": "STT",
+    "email": "Email",
+    "name": "Tên",
+    "status": "Trạng thái",
+    "expiresAt": "Hết hạn lúc",
+    "invitedBy": "Người mời",
+    "actions": "Thao tác"
+  },
+  "status": {
+    "pending": "Chờ xác nhận",
+    "accepted": "Đã chấp nhận",
+    "revoked": "Đã thu hồi",
+    "expired": "Hết hạn"
+  },
+  "resend": "Gửi lại",
+  "resendAcceptedHint": "Thư mời đã được chấp nhận",
+  "resendHint": "Tạo token mới và hiển thị liên kết một lần",
+  "revoke": "Thu hồi",
+  "revokeTitle": "Thu hồi thư mời",
+  "revokeDesc": "Bạn có chắc chắn muốn thu hồi thư mời này?",
+  "confirmOk": "Đồng ý",
+  "cancel": "Huỷ bỏ",
+  "single": {
+    "title": "Tạo thư mời lẻ",
+    "emailPlaceholder": "Email *",
+    "firstnamePlaceholder": "Tên (firstname)",
+    "lastnamePlaceholder": "Họ (lastname)",
+    "emailRequired": "Vui lòng nhập email.",
+    "emailInvalid": "Email không hợp lệ.",
+    "submit": "Tạo thư mời"
+  },
+  "bulk": {
+    "title": "Tạo hàng loạt (tối đa {{max}})",
+    "hint": "Mỗi dòng một người theo dạng: email, firstname, lastname (firstname/lastname không bắt buộc).",
+    "placeholder": "an.nguyen@fpt.edu.vn, An, Nguyen\nbinh.tran@fpt.edu.vn, Binh, Tran",
+    "ariaLabel": "Danh sách thư mời hàng loạt",
+    "overLimit": "Vượt giới hạn: {{current}}/{{max}} dòng. Hãy chia nhỏ danh sách.",
+    "valid": "Hợp lệ: {{valid}}/{{total}} dòng.",
+    "errorsPrefix": "Lỗi: {{errors}}",
+    "submit": "Tạo {{count}} thư mời",
+    "empty": "Chưa có dòng hợp lệ nào. Mỗi dòng nhập theo dạng: email, firstname, lastname.",
+    "maxError": "Tối đa {{max}} thư mời mỗi lần. Hãy chia nhỏ danh sách."
+  },
+  "bulkRow": {
+    "invalidEmail": "Dòng {{row}}: email không hợp lệ."
+  },
+  "summary": {
+    "created": "Đã tạo {{count}} thư mời",
+    "skipped": "bỏ qua {{count}}",
+    "errors": "lỗi {{count}}",
+    "clientErrors": "{{count}} dòng lỗi client ({{errors}})"
+  },
+  "resultModal": {
+    "titleDefault": "Liên kết thư mời",
+    "titleNew": "Liên kết thư mời mới",
+    "titleBulk": "Liên kết thư mời hàng loạt",
+    "titleResend": "Liên kết thư mời mới (gửi lại)",
+    "ack": "Tôi đã lưu liên kết",
+    "tokenTitle": "Token chỉ hiển thị một lần",
+    "tokenDesc": "Mỗi liên kết chứa token chỉ được backend trả về đúng một lần lúc tạo. Hãy sao chép và gửi cho thành viên qua kênh an toàn; đóng cửa sổ này sẽ không xem lại được.",
+    "copyLink": "Sao chép liên kết"
+  },
+  "messages": {
+    "created": "Đã tạo thư mời.",
+    "createFail": "Không thể tạo thư mời. Vui lòng thử lại.",
+    "bulkCreateFail": "Không thể tạo thư mời hàng loạt. Vui lòng thử lại.",
+    "bulkSuccess": "Tạo thư mời hàng loạt thành công.",
+    "revoked": "Đã thu hồi thư mời.",
+    "revokeFail": "Không thể thu hồi thư mời. Vui lòng thử lại.",
+    "resent": "Đã gửi lại thư mời.",
+    "resendFail": "Không thể gửi lại thư mời. Vui lòng thử lại."
+  },
+  "copy": {
+    "success": "Đã sao chép liên kết của {{email}}",
+    "manualFail": "Không thể sao chép tự động. Hãy copy thủ công liên kết bên dưới."
+  },
+  "filter": {
+    "allStatus": "Tất cả trạng thái",
+    "all": "Tất cả",
+    "pending": "Chờ xác nhận",
+    "accepted": "Đã chấp nhận",
+    "revoked": "Đã thu hồi"
+  },
+  "error": {
+    "title": "Không thể tải danh sách thư mời",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại."
+  },
+  "empty": {
+    "filtered": "Không có thư mời nào khớp bộ lọc hiện tại.",
+    "default": "Chưa có thư mời nào."
+  },
+  "clearFilters": "Xóa bộ lọc",
+  "paginationTotal": "Tổng cộng {{total}} thư mời"
+}

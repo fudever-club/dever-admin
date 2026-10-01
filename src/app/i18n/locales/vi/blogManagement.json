@@ -1,0 +1,13 @@
+{
+  "sla": {
+    "waitingColumn": "Chờ duyệt",
+    "overdueTag": "Quá {{hours}}h",
+    "overdueTab": "Quá hạn",
+    "overdueTabWithCount": "Quá hạn ({{count}})",
+    "hours": "{{count}} giờ",
+    "days": "{{count}} ngày",
+    "daysHours": "{{days}} ngày {{hours}} giờ",
+    "longestWaiting": "Bài chờ lâu nhất:",
+    "pendingCount": "Có {{count}} bài đang chờ duyệt."
+  }
+}

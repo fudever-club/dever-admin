@@ -29,6 +29,7 @@ import {
 } from "@ant-design/icons";
 import { useLocale } from "next-intl";
 import Link from "next/link";
+import { useTranslation } from "@/app/i18n/client";
 import {
   MentorshipMentor,
   MentorshipRequestItem,
@@ -42,15 +43,6 @@ const { Title, Text } = Typography;
 
 type QueueTab = "mentors" | "requests";
 type StatusFilter = MentorshipRequestStatus | "all";
-
-const STATUS_TAG: Record<MentorshipRequestStatus, { color: string; label: string }> = {
-  pending: { color: "gold", label: "Chờ duyệt" },
-  accepted: { color: "success", label: "Đã duyệt" },
-  declined: { color: "error", label: "Đã từ chối" },
-};
-
-// TODO(i18n): hardcode tiếng Việt như InviteManagement/AuditLog để giữ scope;
-// full i18n (vi/en mentorshipManagement.json) làm sau.
 
 function getMentorName(record: MentorshipMentor): string {
   return record.name?.trim() || "—";
@@ -70,6 +62,12 @@ function getQueueMentorName(item: MentorshipRequestItem): string {
 export default function MentorshipManagement() {
   const { message } = App.useApp();
   const locale = useLocale();
+  const { t } = useTranslation(locale, "mentorshipManagement");
+  const statusTag: Record<MentorshipRequestStatus, { color: string; label: string }> = {
+    pending: { color: "gold", label: t("status.pending", "Chờ duyệt") },
+    accepted: { color: "success", label: t("status.accepted", "Đã duyệt") },
+    declined: { color: "error", label: t("status.declined", "Đã từ chối") },
+  };
   const [activeTab, setActiveTab] = useState<QueueTab>("mentors");
   const [search, setSearch] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
@@ -136,8 +134,8 @@ export default function MentorshipManagement() {
       await reviewRequest({ id: record._id, status }).unwrap();
       message.success(
         status === "accepted"
-          ? `Đã duyệt kết nối của ${getRequesterName(record)}`
-          : `Đã từ chối kết nối của ${getRequesterName(record)}`,
+          ? t("messages.approved", `Đã duyệt kết nối của ${getRequesterName(record)}`, { name: getRequesterName(record) })
+          : t("messages.declined", `Đã từ chối kết nối của ${getRequesterName(record)}`, { name: getRequesterName(record) }),
       );
       await queue.refetch();
       await pendingBadge.refetch();
@@ -146,7 +144,7 @@ export default function MentorshipManagement() {
         typeof err === "object" && err !== null && "data" in err
           ? (err as { data?: { message?: string } }).data?.message
           : undefined;
-      message.error(apiMessage || "Lỗi khi duyệt yêu cầu");
+      message.error(apiMessage || t("messages.reviewFail", "Lỗi khi duyệt yêu cầu"));
     } finally {
       setReviewingId(null);
     }
@@ -154,7 +152,7 @@ export default function MentorshipManagement() {
 
   const mentorColumns = [
     {
-      title: "Mentor",
+      title: t("mentorTable.mentor", "Mentor"),
       key: "mentor",
       width: 280,
       render: (_: unknown, record: MentorshipMentor) => (
@@ -172,14 +170,14 @@ export default function MentorshipManagement() {
       ),
     },
     {
-      title: "Thế hệ",
+      title: t("mentorTable.gen", "Thế hệ"),
       dataIndex: "graduationGen",
       key: "graduationGen",
       width: 120,
-      render: (value: string) => <Tag color="blue">{value || "Chưa rõ"}</Tag>,
+      render: (value: string) => <Tag color="blue">{value || t("status.unknownGen", "Chưa rõ")}</Tag>,
     },
     {
-      title: "Đơn vị / Công ty",
+      title: t("mentorTable.workplace", "Đơn vị / Công ty"),
       dataIndex: "workplace",
       key: "workplace",
       width: 180,
@@ -188,7 +186,7 @@ export default function MentorshipManagement() {
       ),
     },
     {
-      title: "Chủ đề cố vấn",
+      title: t("mentorTable.topics", "Chủ đề cố vấn"),
       dataIndex: "mentoringTopics",
       key: "mentoringTopics",
       render: (value: string[]) => {
@@ -207,16 +205,16 @@ export default function MentorshipManagement() {
       },
     },
     {
-      title: "Trạng thái",
+      title: t("mentorTable.status", "Trạng thái"),
       key: "status",
       width: 150,
-      render: () => <Tag color="success">Mở kết nối</Tag>,
+      render: () => <Tag color="success">{t("status.open", "Mở kết nối")}</Tag>,
     },
   ];
 
   const requestColumns = [
     {
-      title: "Mentee",
+      title: t("requestTable.mentee", "Mentee"),
       key: "mentee",
       width: 240,
       render: (_: unknown, record: MentorshipRequestItem) => {
@@ -233,7 +231,7 @@ export default function MentorshipManagement() {
       },
     },
     {
-      title: "Mentor",
+      title: t("requestTable.mentor", "Mentor"),
       key: "mentor",
       width: 240,
       render: (_: unknown, record: MentorshipRequestItem) => {
@@ -254,14 +252,14 @@ export default function MentorshipManagement() {
       },
     },
     {
-      title: "Chủ đề",
+      title: t("requestTable.topic", "Chủ đề"),
       dataIndex: "topic",
       key: "topic",
       width: 160,
       render: (value: string) => <Tag color="cyan">{value || "—"}</Tag>,
     },
     {
-      title: "Lời nhắn",
+      title: t("requestTable.message", "Lời nhắn"),
       dataIndex: "message",
       key: "message",
       render: (value: string) => (
@@ -271,17 +269,17 @@ export default function MentorshipManagement() {
       ),
     },
     {
-      title: "Trạng thái",
+      title: t("requestTable.status", "Trạng thái"),
       dataIndex: "status",
       key: "status",
       width: 140,
       render: (value: MentorshipRequestStatus) => {
-        const meta = STATUS_TAG[value] || { color: "default", label: value || "—" };
+        const meta = statusTag[value] || { color: "default", label: value || "—" };
         return <Tag color={meta.color}>{meta.label}</Tag>;
       },
     },
     {
-      title: "Ngày gửi",
+      title: t("requestTable.sentAt", "Ngày gửi"),
       dataIndex: "createdAt",
       key: "createdAt",
       width: 150,
@@ -293,7 +291,7 @@ export default function MentorshipManagement() {
         ),
     },
     {
-      title: "Thao tác",
+      title: t("requestTable.actions", "Thao tác"),
       key: "actions",
       width: 210,
       render: (_: unknown, record: MentorshipRequestItem) => {
@@ -304,10 +302,10 @@ export default function MentorshipManagement() {
         return (
           <Space size={6} wrap>
             <Popconfirm
-              title="Duyệt yêu cầu kết nối này?"
-              description="Mentee sẽ nhận thông báo mentor đã nhận lời kết nối."
-              okText="Duyệt"
-              cancelText="Hủy"
+              title={t("approveTitle", "Duyệt yêu cầu kết nối này?")}
+              description={t("approveDesc", "Mentee sẽ nhận thông báo mentor đã nhận lời kết nối.")}
+              okText={t("approve", "Duyệt")}
+              cancelText={t("cancel", "Hủy")}
               okButtonProps={{ style: { backgroundColor: "#52c41a" } }}
               onConfirm={() => handleReview(record, "accepted")}
             >
@@ -319,14 +317,14 @@ export default function MentorshipManagement() {
                 disabled={locked}
                 style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
               >
-                Duyệt
+                {t("approve", "Duyệt")}
               </Button>
             </Popconfirm>
             <Popconfirm
-              title="Từ chối yêu cầu kết nối này?"
-              description="Mentee sẽ nhận thông báo yêu cầu chưa được duyệt."
-              okText="Từ chối"
-              cancelText="Hủy"
+              title={t("declineTitle", "Từ chối yêu cầu kết nối này?")}
+              description={t("declineDesc", "Mentee sẽ nhận thông báo yêu cầu chưa được duyệt.")}
+              okText={t("decline", "Từ chối")}
+              cancelText={t("cancel", "Hủy")}
               okButtonProps={{ danger: true }}
               onConfirm={() => handleReview(record, "declined")}
             >
@@ -337,7 +335,7 @@ export default function MentorshipManagement() {
                 loading={reviewingId === record._id}
                 disabled={locked}
               >
-                Từ chối
+                {t("decline", "Từ chối")}
               </Button>
             </Popconfirm>
           </Space>
@@ -351,21 +349,20 @@ export default function MentorshipManagement() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
         <div>
           <Title level={3} style={{ margin: 0, color: "#0F172A", display: "flex", alignItems: "center", gap: 10, fontWeight: 800 }}>
-            <TeamOutlined style={{ color: "#0066CC" }} /> Kết nối mentor
+            <TeamOutlined style={{ color: "#0066CC" }} /> {t("title", "Kết nối mentor")}
           </Title>
           <Text type="secondary" style={{ fontSize: 13, marginTop: 4, display: "block" }}>
-            Danh sách mentors đang mở kết nối (GET /api/v1/mentorship/mentors) + hàng chờ duyệt
-            (GET /api/v1/mentorship/requests, đối soát qua nhật ký kiểm toán).
+            {t("subtitle", "Danh sách mentors đang mở kết nối (GET /api/v1/mentorship/mentors) + hàng chờ duyệt (GET /api/v1/mentorship/requests, đối soát qua nhật ký kiểm toán).")}
           </Text>
         </div>
         <Space size={8} wrap>
           <Link href={`/${locale}/audit-log`}>
             <Button icon={<AuditOutlined />} style={{ borderRadius: 10, fontWeight: 600, height: 38 }}>
-              Mở nhật ký kiểm toán
+              {t("openAuditLog", "Mở nhật ký kiểm toán")}
             </Button>
           </Link>
           <Button icon={<ReloadOutlined />} onClick={handleRetry} loading={isFetching || queue.isFetching} style={{ borderRadius: 10, fontWeight: 600, height: 38 }}>
-            Làm mới
+            {t("refresh", "Làm mới")}
           </Button>
         </Space>
       </div>
@@ -374,18 +371,18 @@ export default function MentorshipManagement() {
         activeKey={activeTab}
         onChange={(key) => setActiveTab(key as QueueTab)}
         items={[
-          { key: "mentors", label: "Mentors" },
+          { key: "mentors", label: t("tabs.mentors", "Mentors") },
           {
             key: "requests",
             label: (
               <Space size={6}>
-                <span>Hàng chờ</span>
+                <span>{t("tabs.queue", "Hàng chờ")}</span>
                 {pendingTotal > 0 && (
                   <Badge
                     count={pendingTotal}
                     overflowCount={99}
                     style={{ backgroundColor: "#faad14" }}
-                    title={`${pendingTotal} yêu cầu đang chờ duyệt`}
+                    title={t("tabs.pendingBadgeTitle", `${pendingTotal} yêu cầu đang chờ duyệt`, { count: pendingTotal })}
                   />
                 )}
               </Space>
@@ -399,14 +396,14 @@ export default function MentorshipManagement() {
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16, alignItems: "center" }}>
             <Input
               prefix={<SearchOutlined style={{ color: "#0066CC" }} />}
-              placeholder="Tìm tên mentor, công ty, chủ đề..."
+              placeholder={t("searchPlaceholder", "Tìm tên mentor, công ty, chủ đề...")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{ width: 300, borderRadius: 10 }}
               allowClear
             />
             <Text type="secondary" style={{ fontSize: 12 }}>
-              {filtered.length}/{mentors.length} mentors mở kết nối
+              {t("mentorCount", `${filtered.length}/${mentors.length} mentors mở kết nối`, { filtered: filtered.length, total: mentors.length })}
             </Text>
           </div>
 
@@ -416,19 +413,19 @@ export default function MentorshipManagement() {
             <Alert
               type="error"
               showIcon
-              message="Không thể tải danh sách mentors"
-              description="Vui lòng kiểm tra kết nối và thử lại."
+              message={t("error.mentorsTitle", "Không thể tải danh sách mentors")}
+              description={t("error.desc", "Vui lòng kiểm tra kết nối và thử lại.")}
               action={
                 <Button size="small" danger onClick={handleRetry} loading={isFetching}>
-                  Thử lại
+                  {t("retry", "Thử lại")}
                 </Button>
               }
             />
           ) : filtered.length === 0 ? (
-            <Empty description={search ? "Không có mentor nào khớp tìm kiếm hiện tại." : "Chưa có mentor nào mở kết nối."}>
+            <Empty description={search ? t("empty.searchNoMatch", "Không có mentor nào khớp tìm kiếm hiện tại.") : t("empty.noMentors", "Chưa có mentor nào mở kết nối.")}>
               {search && (
                 <Button type="primary" ghost onClick={handleClearSearch}>
-                  Xóa tìm kiếm
+                  {t("clearSearch", "Xóa tìm kiếm")}
                 </Button>
               )}
             </Empty>
@@ -447,7 +444,7 @@ export default function MentorshipManagement() {
       ) : (
         <Card bordered={false} style={{ borderRadius: 20, border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF" }}>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 16, alignItems: "center" }}>
-            <Text strong style={{ fontSize: 13, color: "#475569" }}>Lọc trạng thái:</Text>
+            <Text strong style={{ fontSize: 13, color: "#475569" }}>{t("statusFilterLabel", "Lọc trạng thái:")}</Text>
             <Radio.Group
               value={statusFilter}
               onChange={(e) => {
@@ -456,13 +453,13 @@ export default function MentorshipManagement() {
               }}
               buttonStyle="solid"
             >
-              <Radio.Button value="pending">Chờ duyệt{pendingTotal > 0 ? ` (${pendingTotal})` : ""}</Radio.Button>
-              <Radio.Button value="accepted">Đã duyệt</Radio.Button>
-              <Radio.Button value="declined">Đã từ chối</Radio.Button>
-              <Radio.Button value="all">Tất cả</Radio.Button>
+              <Radio.Button value="pending">{pendingTotal > 0 ? t("filterPendingWithCount", `Chờ duyệt (${pendingTotal})`, { count: pendingTotal }) : t("filterPending", "Chờ duyệt")}</Radio.Button>
+              <Radio.Button value="accepted">{t("filterAccepted", "Đã duyệt")}</Radio.Button>
+              <Radio.Button value="declined">{t("filterDeclined", "Đã từ chối")}</Radio.Button>
+              <Radio.Button value="all">{t("filterAll", "Tất cả")}</Radio.Button>
             </Radio.Group>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              {queueTotal} yêu cầu
+              {t("queueCount", `${queueTotal} yêu cầu`, { count: queueTotal })}
             </Text>
           </div>
 
@@ -472,16 +469,16 @@ export default function MentorshipManagement() {
             <Alert
               type="error"
               showIcon
-              message="Không thể tải hàng chờ mentorship"
-              description="Vui lòng kiểm tra kết nối và thử lại."
+              message={t("error.queueTitle", "Không thể tải hàng chờ mentorship")}
+              description={t("error.desc", "Vui lòng kiểm tra kết nối và thử lại.")}
               action={
                 <Button size="small" danger onClick={handleRetry} loading={queue.isFetching}>
-                  Thử lại
+                  {t("retry", "Thử lại")}
                 </Button>
               }
             />
           ) : requests.length === 0 ? (
-            <Empty description="Không có yêu cầu nào khớp bộ lọc hiện tại." />
+            <Empty description={t("empty.noRequests", "Không có yêu cầu nào khớp bộ lọc hiện tại.")} />
           ) : (
             <Table
               columns={requestColumns}
@@ -493,7 +490,7 @@ export default function MentorshipManagement() {
                 pageSize,
                 total: queueTotal,
                 showSizeChanger: false,
-                showTotal: (total) => `${total} yêu cầu`,
+                showTotal: (total) => t("queueTotal", `${total} yêu cầu`, { count: total }),
               }}
               onChange={(pagination) => {
                 setPage(pagination.current ?? 1);

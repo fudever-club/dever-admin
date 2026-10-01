@@ -1,0 +1,68 @@
+{
+  "title": "Kết nối mentor",
+  "subtitle": "Danh sách mentors đang mở kết nối (GET /api/v1/mentorship/mentors) + hàng chờ duyệt (GET /api/v1/mentorship/requests, đối soát qua nhật ký kiểm toán).",
+  "openAuditLog": "Mở nhật ký kiểm toán",
+  "refresh": "Làm mới",
+  "retry": "Thử lại",
+  "tabs": {
+    "mentors": "Mentors",
+    "queue": "Hàng chờ",
+    "pendingBadgeTitle": "{{count}} yêu cầu đang chờ duyệt"
+  },
+  "status": {
+    "pending": "Chờ duyệt",
+    "accepted": "Đã duyệt",
+    "declined": "Đã từ chối",
+    "open": "Mở kết nối",
+    "unknownGen": "Chưa rõ"
+  },
+  "mentorTable": {
+    "mentor": "Mentor",
+    "gen": "Thế hệ",
+    "workplace": "Đơn vị / Công ty",
+    "topics": "Chủ đề cố vấn",
+    "status": "Trạng thái"
+  },
+  "requestTable": {
+    "mentee": "Mentee",
+    "mentor": "Mentor",
+    "topic": "Chủ đề",
+    "message": "Lời nhắn",
+    "status": "Trạng thái",
+    "sentAt": "Ngày gửi",
+    "actions": "Thao tác"
+  },
+  "approve": "Duyệt",
+  "approveTitle": "Duyệt yêu cầu kết nối này?",
+  "approveDesc": "Mentee sẽ nhận thông báo mentor đã nhận lời kết nối.",
+  "decline": "Từ chối",
+  "declineTitle": "Từ chối yêu cầu kết nối này?",
+  "declineDesc": "Mentee sẽ nhận thông báo yêu cầu chưa được duyệt.",
+  "cancel": "Hủy",
+  "messages": {
+    "approved": "Đã duyệt kết nối của {{name}}",
+    "declined": "Đã từ chối kết nối của {{name}}",
+    "reviewFail": "Lỗi khi duyệt yêu cầu"
+  },
+  "searchPlaceholder": "Tìm tên mentor, công ty, chủ đề...",
+  "mentorCount": "{{filtered}}/{{total}} mentors mở kết nối",
+  "statusFilterLabel": "Lọc trạng thái:",
+  "filterPending": "Chờ duyệt",
+  "filterPendingWithCount": "Chờ duyệt ({{count}})",
+  "filterAccepted": "Đã duyệt",
+  "filterDeclined": "Đã từ chối",
+  "filterAll": "Tất cả",
+  "queueCount": "{{count}} yêu cầu",
+  "queueTotal": "{{count}} yêu cầu",
+  "error": {
+    "mentorsTitle": "Không thể tải danh sách mentors",
+    "queueTitle": "Không thể tải hàng chờ mentorship",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại."
+  },
+  "empty": {
+    "searchNoMatch": "Không có mentor nào khớp tìm kiếm hiện tại.",
+    "noMentors": "Chưa có mentor nào mở kết nối.",
+    "noRequests": "Không có yêu cầu nào khớp bộ lọc hiện tại."
+  },
+  "clearSearch": "Xóa tìm kiếm"
+}
