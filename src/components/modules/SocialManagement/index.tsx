@@ -170,7 +170,7 @@ function SocialManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
-          scroll={{ x: 640 }}
+          scroll={{ x: 750 }}
         />
       </S.TableWrapper>
       <Modal
@@ -181,6 +181,8 @@ function SocialManagementModule() {
         }}
         footer={[]}
         title={t("addSocial.title")}
+        width="min(520px, 95vw)"
+        centered
       >
         <Form
           form={addForm}
@@ -204,7 +206,7 @@ function SocialManagementModule() {
           >
             <Input />
           </Form.Item>
-          <Button type="primary" htmlType="submit" $width="100%">
+          <Button type="primary" htmlType="submit" $width="100%" style={{ minHeight: 44 }}>
             {t("addSocial.add")}
           </Button>
         </Form>
@@ -214,6 +216,8 @@ function SocialManagementModule() {
         onCancel={editModal.closeModal}
         footer={[]}
         title={t("editSocial.title")}
+        width="min(520px, 95vw)"
+        centered
       >
         <Form
           name="basic"
@@ -237,7 +241,7 @@ function SocialManagementModule() {
           >
             <Input />
           </Form.Item>
-          <Button type="primary" htmlType="submit" $width="100%">
+          <Button type="primary" htmlType="submit" $width="100%" style={{ minHeight: 44 }}>
             {t("editSocial.edit")}
           </Button>
         </Form>

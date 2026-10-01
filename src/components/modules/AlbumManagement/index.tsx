@@ -261,6 +261,7 @@ function AlbumManagementModule() {
         footer={null}
         title="Thêm Album Ảnh Mới"
         width="min(520px, 95vw)"
+        centered
       >
         <Form
           name="basic"
@@ -284,8 +285,8 @@ function AlbumManagementModule() {
             <Input.TextArea rows={3} placeholder="Mô tả sự kiện, địa điểm và các kỷ niệm nổi bật..." />
           </Form.Item>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-            <Button onClick={addModal.closeModal}>Hủy</Button>
-            <Button type="primary" htmlType="submit" style={{ background: "#0066CC" }}>
+            <Button onClick={addModal.closeModal} style={{ minHeight: 44 }}>Hủy</Button>
+            <Button type="primary" htmlType="submit" style={{ background: "#0066CC", minHeight: 44 }}>
               Tạo Album
             </Button>
           </div>
@@ -299,6 +300,7 @@ function AlbumManagementModule() {
         footer={null}
         title="Chỉnh Sửa Album"
         width="min(520px, 95vw)"
+        centered
       >
         <Form
           name="basic"
@@ -323,8 +325,8 @@ function AlbumManagementModule() {
             <Input.TextArea rows={3} />
           </Form.Item>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-            <Button onClick={editModal.closeModal}>Hủy</Button>
-            <Button type="primary" htmlType="submit" style={{ background: "#0066CC" }}>
+            <Button onClick={editModal.closeModal} style={{ minHeight: 44 }}>Hủy</Button>
+            <Button type="primary" htmlType="submit" style={{ background: "#0066CC", minHeight: 44 }}>
               Lưu Thay Đổi
             </Button>
           </div>

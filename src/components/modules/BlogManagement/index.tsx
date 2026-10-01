@@ -670,6 +670,7 @@ export default function BlogManagement() {
         open={reviewModalVisible}
         onCancel={() => setReviewModalVisible(false)}
         width="min(900px, 95vw)"
+        centered
         footer={null}
         className="!rounded-3xl"
       >
@@ -715,7 +716,7 @@ export default function BlogManagement() {
 
             {/* Action buttons */}
             <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-              <Button onClick={() => setReviewModalVisible(false)} className="!rounded-xl">
+              <Button onClick={() => setReviewModalVisible(false)} className="!rounded-xl" style={{ minHeight: 44 }}>
                 Đóng
               </Button>
 
@@ -725,6 +726,7 @@ export default function BlogManagement() {
                   loading={actionLoading}
                   onClick={() => handleReviewAction("rejected")}
                   className="!rounded-xl !font-semibold"
+                  style={{ minHeight: 44 }}
                 >
                   Từ chối
                 </Button>
@@ -733,6 +735,7 @@ export default function BlogManagement() {
                   loading={actionLoading}
                   onClick={() => handleReviewAction("changes_requested")}
                   className="!rounded-xl !font-bold !bg-amber-500 !text-white !border-0 hover:!bg-amber-600"
+                  style={{ minHeight: 44 }}
                 >
                   Yêu cầu chỉnh sửa
                 </Button>
@@ -743,6 +746,7 @@ export default function BlogManagement() {
                   icon={<CheckCircleOutlined />}
                   onClick={() => handleReviewAction("published")}
                   className="!rounded-xl !font-bold !bg-emerald-600 hover:!bg-emerald-700 !border-0 shadow-md"
+                  style={{ minHeight: 44 }}
                 >
                   Duyệt &amp; Xuất Bản Ngay
                 </Button>

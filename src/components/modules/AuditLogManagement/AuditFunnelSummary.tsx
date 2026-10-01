@@ -277,6 +277,7 @@ export default function AuditFunnelSummary() {
             size: "small",
             showTotal: (t) => `Tổng cộng ${t} dòng`,
           }}
+          scroll={{ x: 750 }}
           columns={[
             {
               title: "Ngày",

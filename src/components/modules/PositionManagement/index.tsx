@@ -200,7 +200,7 @@ function PositionManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
-          scroll={{ x: 640 }}
+          scroll={{ x: 750 }}
           pagination={{
             pageSize,
             showSizeChanger: true,
@@ -223,6 +223,8 @@ function PositionManagementModule() {
         }}
         footer={[]}
         title={t("addPosition.title")}
+        width="min(520px, 95vw)"
+        centered
       >
         <Form
           form={addForm}
@@ -246,7 +248,7 @@ function PositionManagementModule() {
           >
             <Input placeholder="Ví dụ: TRUONGBANKYTHUAT" />
           </Form.Item>
-          <Button type="primary" htmlType="submit" $width="100%">
+          <Button type="primary" htmlType="submit" $width="100%" style={{ minHeight: 44 }}>
             {t("addPosition.add")}
           </Button>
         </Form>
@@ -256,6 +258,8 @@ function PositionManagementModule() {
         onCancel={editModal.closeModal}
         footer={[]}
         title={t("editPosition.title")}
+        width="min(520px, 95vw)"
+        centered
       >
         <Form
           name="editPositionForm"
@@ -279,7 +283,7 @@ function PositionManagementModule() {
           >
             <Input disabled={PROTECTED_CONSTANTS.has(editForm.getFieldValue("constant"))} />
           </Form.Item>
-          <Button type="primary" htmlType="submit" $width="100%">
+          <Button type="primary" htmlType="submit" $width="100%" style={{ minHeight: 44 }}>
             {t("editPosition.edit")}
           </Button>
         </Form>

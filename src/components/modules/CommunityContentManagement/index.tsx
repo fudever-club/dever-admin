@@ -937,6 +937,7 @@ export default function CommunityContentManagement() {
         footer={null}
         destroyOnClose
         width="min(680px, 95vw)"
+        centered
       >
         <Form form={form} layout="vertical" onFinish={save}>
           {mode === "opensource" && (
@@ -1092,7 +1093,7 @@ export default function CommunityContentManagement() {
             <Button
               onClick={() => setOpen(false)}
               disabled={saving}
-              style={{ borderRadius: 8, height: 36 }}
+              style={{ borderRadius: 8, height: 44, minHeight: 44 }}
             >
               Hủy
             </Button>
@@ -1101,7 +1102,7 @@ export default function CommunityContentManagement() {
               type="primary"
               loading={saving}
               disabled={saving}
-              style={{ backgroundColor: "#0066CC", borderRadius: 8, height: 36, fontWeight: 600 }}
+              style={{ backgroundColor: "#0066CC", borderRadius: 8, height: 44, minHeight: 44, fontWeight: 600 }}
             >
               {editing ? "Cập nhật nội dung" : "Tạo mới nội dung"}
             </Button>

@@ -31,8 +31,10 @@ function OneTimeCredentialModal({
       open={credentials.length > 0}
       closable={false}
       maskClosable={false}
+      width="min(560px, 95vw)"
+      centered
       footer={[
-        <Button key="acknowledge" type="primary" onClick={onClose}>
+        <Button key="acknowledge" type="primary" onClick={onClose} style={{ minHeight: 44 }}>
           Tôi đã lưu thông tin
         </Button>,
       ]}
@@ -54,7 +56,7 @@ function OneTimeCredentialModal({
               <Typography.Text type="secondary">Mật khẩu tạm thời: </Typography.Text>
               <Typography.Text code>{credential.temporaryPassword}</Typography.Text>
             </Typography.Paragraph>
-            <Button onClick={() => copyCredential(credential)}>Sao chép thông tin</Button>
+            <Button onClick={() => copyCredential(credential)} style={{ minHeight: 44 }}>Sao chép thông tin</Button>
           </div>
         ))}
       </Space>

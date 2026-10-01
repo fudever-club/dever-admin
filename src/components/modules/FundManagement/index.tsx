@@ -917,7 +917,10 @@ export default function FundManagementModule() {
         onOk={handleReview}
         confirmLoading={submittingReview}
         okText={reviewAction === "approved" ? "Xác Nhận Duyệt" : "Gửi Từ Chối"}
-        okButtonProps={{ danger: reviewAction === "rejected", style: reviewAction === "approved" ? { backgroundColor: "#0066CC" } : {} }}
+        okButtonProps={{ danger: reviewAction === "rejected", style: reviewAction === "approved" ? { backgroundColor: "#0066CC", minHeight: 44 } : { minHeight: 44 } }}
+        cancelButtonProps={{ style: { minHeight: 44 } }}
+        width="min(560px, 95vw)"
+        centered
         style={{ borderRadius: 16 }}
       >
         {selectedPayment && (

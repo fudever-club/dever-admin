@@ -173,7 +173,7 @@ function DepartmentManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
-          scroll={{ x: 640 }}
+          scroll={{ x: 750 }}
         />
       </S.TableWrapper>
       <Modal
@@ -184,6 +184,8 @@ function DepartmentManagementModule() {
         }}
         footer={[]}
         title={t("addDepartment.title")}
+        width="min(520px, 95vw)"
+        centered
       >
         <Form
           form={addForm}
@@ -209,7 +211,7 @@ function DepartmentManagementModule() {
           >
             <Input />
           </Form.Item>
-          <Button type="primary" htmlType="submit" $width="100%">
+          <Button type="primary" htmlType="submit" $width="100%" style={{ minHeight: 44 }}>
             {t("addDepartment.add")}
           </Button>
         </Form>
@@ -219,6 +221,8 @@ function DepartmentManagementModule() {
         onCancel={editModal.closeModal}
         footer={[]}
         title={t("editDepartment.title")}
+        width="min(520px, 95vw)"
+        centered
       >
         <Form
           name="basic"
@@ -244,7 +248,7 @@ function DepartmentManagementModule() {
           >
             <Input />
           </Form.Item>
-          <Button type="primary" htmlType="submit" $width="100%">
+          <Button type="primary" htmlType="submit" $width="100%" style={{ minHeight: 44 }}>
             {t("editDepartment.edit")}
           </Button>
         </Form>

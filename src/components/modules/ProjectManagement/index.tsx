@@ -152,7 +152,7 @@ function ProjectManagementModule() {
           dataSource={result}
           loading={isFetching}
           rowKey={(record) => record._id}
-          scroll={{ x: 640 }}
+          scroll={{ x: 750 }}
           pagination={{
             pageSize: 10,
             showTotal: (total) => `Tổng cộng ${total} dự án`,

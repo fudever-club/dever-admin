@@ -455,6 +455,7 @@ export default function ResourceManagementModule() {
         }}
         footer={null}
         width="min(640px, 95vw)"
+        centered
         style={{ top: 20 }}
       >
         <Form
@@ -564,8 +565,8 @@ export default function ResourceManagementModule() {
           </Form.Item>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-            <Button onClick={() => setIsModalOpen(false)} disabled={isSaving}>Hủy</Button>
-            <Button type="primary" htmlType="submit" loading={isSaving} style={{ background: "#0066CC" }}>
+            <Button onClick={() => setIsModalOpen(false)} disabled={isSaving} style={{ minHeight: 44 }}>Hủy</Button>
+            <Button type="primary" htmlType="submit" loading={isSaving} style={{ background: "#0066CC", minHeight: 44 }}>
               {uploadMode === "file" ? "Tải lên và lưu" : "Lưu đường dẫn"}
             </Button>
           </div>

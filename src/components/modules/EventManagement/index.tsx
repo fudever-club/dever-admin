@@ -910,6 +910,7 @@ export default function EventManagementModule() {
         }}
         footer={null}
         width="min(720px, 95vw)"
+        centered
         style={{ top: 20 }}
       >
         <Form
@@ -1090,13 +1091,13 @@ export default function EventManagementModule() {
           </Form.Item>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-            <Button disabled={isSubmitting} onClick={() => setIsModalOpen(false)}>Hủy</Button>
+            <Button disabled={isSubmitting} onClick={() => setIsModalOpen(false)} style={{ minHeight: 44 }}>Hủy</Button>
             <Button
               type="primary"
               htmlType="submit"
               loading={isSubmitting}
               disabled={isUploadingImage}
-              style={{ background: "#0066CC" }}
+              style={{ background: "#0066CC", minHeight: 44 }}
             >
               {isSubmitting ? "Đang Lưu..." : "Xác nhận lưu sự kiện"}
             </Button>
@@ -1118,6 +1119,7 @@ export default function EventManagementModule() {
         }}
         footer={null}
         width="min(720px, 95vw)"
+        centered
         style={{ top: 20 }}
       >
         <Form
@@ -1297,13 +1299,13 @@ export default function EventManagementModule() {
           </Form.Item>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-            <Button disabled={isSubmitting} onClick={() => setIsEditModalOpen(false)}>Hủy</Button>
+            <Button disabled={isSubmitting} onClick={() => setIsEditModalOpen(false)} style={{ minHeight: 44 }}>Hủy</Button>
             <Button
               type="primary"
               htmlType="submit"
               loading={isSubmitting}
               disabled={isUploadingEditImage}
-              style={{ background: "#0066CC" }}
+              style={{ background: "#0066CC", minHeight: 44 }}
             >
               {isSubmitting ? "Đang Lưu..." : "Lưu thay đổi"}
             </Button>
@@ -1317,12 +1319,13 @@ export default function EventManagementModule() {
           title="Mã QR Code Điểm Danh Sự Kiện (Bàn Desk)"
           open={!!selectedQrEvent}
           onCancel={() => setSelectedQrEvent(null)}
+          centered
           footer={[
-            <Button key="close" type="primary" onClick={() => setSelectedQrEvent(null)} style={{ background: "#0066CC" }}>
+            <Button key="close" type="primary" onClick={() => setSelectedQrEvent(null)} style={{ background: "#0066CC", minHeight: 44 }}>
               Đóng
             </Button>,
           ]}
-          width="min(440px, 92vw)"
+          width="min(440px, 95vw)"
           style={{ textAlign: "center", top: 40 }}
         >
           <div style={{ padding: "16px 0" }}>

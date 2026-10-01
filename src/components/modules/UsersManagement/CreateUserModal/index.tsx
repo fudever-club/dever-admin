@@ -58,6 +58,8 @@ function CreateUserModal({
         onCancel={close}
         destroyOnClose
         maskClosable={!isLoading}
+        width="min(560px, 95vw)"
+        centered
       >
         <Alert
           className="mb-6"
@@ -118,10 +120,10 @@ function CreateUserModal({
           <Input disabled={isLoading} placeholder="Ví dụ: HE190000" />
         </Form.Item>
         <Flex justify="center" gap={16}>
-          <Button onClick={close} disabled={isLoading}>
+          <Button onClick={close} disabled={isLoading} style={{ minHeight: 44 }}>
             Huỷ
           </Button>
-          <Button type="primary" htmlType="submit" loading={isLoading} disabled={isLoading}>
+          <Button type="primary" htmlType="submit" loading={isLoading} disabled={isLoading} style={{ minHeight: 44 }}>
             Tạo tài khoản
           </Button>
         </Flex>

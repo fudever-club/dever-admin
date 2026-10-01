@@ -172,8 +172,10 @@ function InviteLinkResultModal({
       open={results.length > 0}
       closable={false}
       maskClosable={false}
+      width="min(560px, 95vw)"
+      centered
       footer={[
-        <Button key="acknowledge" type="primary" onClick={onClose}>
+        <Button key="acknowledge" type="primary" onClick={onClose} style={{ minHeight: 44 }}>
           Tôi đã lưu liên kết
         </Button>,
       ]}
@@ -203,7 +205,7 @@ function InviteLinkResultModal({
             >
               <Text code>{result.link}</Text>
             </Typography.Paragraph>
-            <Button onClick={() => copyText(result.link, result.email)}>
+            <Button onClick={() => copyText(result.link, result.email)} style={{ minHeight: 44 }}>
               Sao chép liên kết
             </Button>
           </div>
