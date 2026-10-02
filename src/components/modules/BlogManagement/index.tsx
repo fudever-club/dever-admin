@@ -131,15 +131,15 @@ export default function BlogManagement() {
         }
       } else {
         setFetchError(true);
-        message.error(data.message || "Không thể tải danh sách bài viết");
+        message.error(data.message || t("messages.loadFailed", "Không thể tải danh sách bài viết"));
       }
     } catch (err) {
       setFetchError(true);
-      message.error("Lỗi kết nối máy chủ API");
+      message.error(t("messages.apiConnectionError", "Lỗi kết nối máy chủ API"));
     } finally {
       setLoading(false);
     }
-  }, [API_SERVER]);
+  }, [API_SERVER, t]);
 
   useEffect(() => {
     fetchBlogs();
@@ -182,21 +182,21 @@ export default function BlogManagement() {
       if (res.ok && data.status === "success") {
         message.success(
           newFeatured
-            ? `Đã ghim bài viết "${record.title}" lên mục nổi bật!`
-            : `Đã bỏ ghim bài viết "${record.title}".`
+            ? t("messages.featuredPinned", `Đã ghim bài viết "${record.title}" lên mục nổi bật!`, { title: record.title })
+            : t("messages.featuredUnpinned", `Đã bỏ ghim bài viết "${record.title}".`, { title: record.title })
         );
       } else {
         // Revert on failure
         setBlogs((prev) =>
           prev.map((b) => (b._id === record._id ? { ...b, isFeatured: oldFeatured } : b))
         );
-        message.error(data.message || "Không thể cập nhật trạng thái ghim nổi bật");
+        message.error(data.message || t("messages.featuredUpdateFailed", "Không thể cập nhật trạng thái ghim nổi bật"));
       }
     } catch (err) {
       setBlogs((prev) =>
         prev.map((b) => (b._id === record._id ? { ...b, isFeatured: oldFeatured } : b))
       );
-      message.error("Lỗi kết nối máy chủ");
+      message.error(t("messages.serverConnectionError", "Lỗi kết nối máy chủ"));
     } finally {
       setTogglingFeaturedId(null);
     }
@@ -205,7 +205,7 @@ export default function BlogManagement() {
   const handleReviewAction = async (status: "published" | "changes_requested" | "rejected") => {
     if (!selectedBlog) return;
     if ((status === "changes_requested" || status === "rejected") && !reviewFeedback.trim()) {
-      message.warning("Vui lòng nhập lời nhận xét/lý do để tác giả biết cần chỉnh sửa gì.");
+      message.warning(t("messages.reviewFeedbackRequired", "Vui lòng nhập lời nhận xét/lý do để tác giả biết cần chỉnh sửa gì."));
       return;
     }
 
@@ -227,18 +227,18 @@ export default function BlogManagement() {
       if (res.ok && json.status === "success") {
         message.success(
           status === "published"
-            ? "Đã duyệt và xuất bản bài viết thành công!"
-            : "Đã phản hồi ý kiến cho tác giả bài viết."
+            ? t("messages.reviewPublished", "Đã duyệt và xuất bản bài viết thành công!")
+            : t("messages.reviewFeedbackSent", "Đã phản hồi ý kiến cho tác giả bài viết.")
         );
         setReviewModalVisible(false);
         setSelectedBlog(null);
         setReviewFeedback("");
         fetchBlogs();
       } else {
-        message.error(json.message || "Lỗi khi xử lý duyệt bài");
+        message.error(json.message || t("messages.reviewFailed", "Lỗi khi xử lý duyệt bài"));
       }
     } catch (e) {
-      message.error("Lỗi kết nối máy chủ");
+      message.error(t("messages.serverConnectionError", "Lỗi kết nối máy chủ"));
     } finally {
       setActionLoading(false);
     }
@@ -254,13 +254,13 @@ export default function BlogManagement() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
-        message.success("Đã xóa bài viết.");
+        message.success(t("messages.deleteSuccess", "Đã xóa bài viết."));
         fetchBlogs();
       } else {
-        message.error("Không thể xóa bài viết");
+        message.error(t("messages.deleteFailed", "Không thể xóa bài viết"));
       }
     } catch (e) {
-      message.error("Lỗi kết nối");
+      message.error(t("messages.connectionError", "Lỗi kết nối"));
     } finally {
       setDeletingId(null);
     }
@@ -269,15 +269,15 @@ export default function BlogManagement() {
   const getStatusTag = (status: string) => {
     switch (status) {
       case "published":
-        return <Tag color="success">Đã xuất bản</Tag>;
+        return <Tag color="success">{t("status.published", "Đã xuất bản")}</Tag>;
       case "pending_review":
-        return <Tag color="processing">Chờ duyệt</Tag>;
+        return <Tag color="processing">{t("status.pending_review", "Chờ duyệt")}</Tag>;
       case "changes_requested":
-        return <Tag color="warning">Yêu cầu sửa</Tag>;
+        return <Tag color="warning">{t("status.changes_requested", "Yêu cầu sửa")}</Tag>;
       case "rejected":
-        return <Tag color="error">Từ chối</Tag>;
+        return <Tag color="error">{t("status.rejected", "Từ chối")}</Tag>;
       default:
-        return <Tag color="default">Bản nháp</Tag>;
+        return <Tag color="default">{t("status.draft", "Bản nháp")}</Tag>;
     }
   };
 
@@ -339,7 +339,7 @@ export default function BlogManagement() {
 
   const columns = [
     {
-      title: "Tiêu đề bài viết",
+      title: t("table.title", "Tiêu đề bài viết"),
       dataIndex: "title",
       key: "title",
       render: (title: string, record: BlogPost) => (
@@ -347,7 +347,7 @@ export default function BlogManagement() {
           <div className="flex items-center gap-1.5">
             {record.isFeatured && (
               <Tag color="gold" className="!mr-1 font-bold text-[10px] inline-flex items-center gap-1">
-                <StarFilled /> NỔI BẬT
+                <StarFilled /> {t("featured.tag", "NỔI BẬT")}
               </Tag>
             )}
             <Text strong className="text-[#0066CC] hover:underline cursor-pointer">
@@ -359,7 +359,7 @@ export default function BlogManagement() {
       ),
     },
     {
-      title: "Ghim nổi bật",
+      title: t("table.featured", "Ghim nổi bật"),
       dataIndex: "isFeatured",
       key: "isFeatured",
       width: 120,
@@ -368,8 +368,8 @@ export default function BlogManagement() {
         <Tooltip
           title={
             isFeatured
-              ? "Đang được ghim trên mục nổi bật Landing Page (Bấm để bỏ ghim)"
-              : "Bấm để ghim bài viết này lên mục nổi bật Landing Page"
+              ? t("featured.tooltipPinned", "Đang được ghim trên mục nổi bật Landing Page (Bấm để bỏ ghim)")
+              : t("featured.tooltipUnpinned", "Bấm để ghim bài viết này lên mục nổi bật Landing Page")
           }
         >
           <Switch
@@ -377,7 +377,7 @@ export default function BlogManagement() {
             loading={togglingFeaturedId === record._id}
             disabled={togglingFeaturedId !== null && togglingFeaturedId !== record._id}
             onChange={() => handleToggleFeatured(record)}
-            aria-label={isFeatured ? "Bỏ ghim khỏi nổi bật" : "Ghim lên nổi bật"}
+            aria-label={isFeatured ? t("featured.unpinAria", "Bỏ ghim khỏi nổi bật") : t("featured.pinAria", "Ghim lên nổi bật")}
             checkedChildren={<StarFilled className="text-amber-300" />}
             unCheckedChildren={<StarOutlined />}
             className={isFeatured ? "!bg-amber-500" : ""}
@@ -386,26 +386,26 @@ export default function BlogManagement() {
       ),
     },
     {
-      title: "Tác giả",
+      title: t("table.author", "Tác giả"),
       dataIndex: "author",
       key: "author",
       width: 170,
       render: (author: any) => (
         <Space size="small">
           <UserOutlined className="text-blue-500" />
-          <span className="font-semibold">{author?.name || "DEVER Member"}</span>
+          <span className="font-semibold">{author?.name || t("table.authorFallback", "DEVER Member")}</span>
         </Space>
       ),
     },
     {
-      title: "Chuyên mục",
+      title: t("table.category", "Chuyên mục"),
       dataIndex: "category",
       key: "category",
       width: 150,
       render: (cat: string) => <Tag color="geekblue">{cat}</Tag>,
     },
     {
-      title: "Trạng thái",
+      title: t("table.status", "Trạng thái"),
       dataIndex: "status",
       key: "status",
       width: 130,
@@ -439,7 +439,7 @@ export default function BlogManagement() {
       },
     },
     {
-      title: "Ngày cập nhật",
+      title: t("table.updatedAt", "Ngày cập nhật"),
       dataIndex: "updatedAt",
       key: "updatedAt",
       width: 140,
@@ -448,7 +448,7 @@ export default function BlogManagement() {
       render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
     },
     {
-      title: "Thao tác",
+      title: t("table.actions", "Thao tác"),
       key: "actions",
       width: 170,
       render: (_: any, record: BlogPost) => (
@@ -464,13 +464,13 @@ export default function BlogManagement() {
             }}
             className="!bg-[#0066CC] !rounded-lg !font-semibold"
           >
-            {record.status === "pending_review" ? "Duyệt bài" : "Chi tiết"}
+            {record.status === "pending_review" ? t("actions.review", "Duyệt bài") : t("actions.detail", "Chi tiết")}
           </Button>
           <Popconfirm
-            title="Xác nhận xóa bài viết này?"
+            title={t("delete.confirmTitle", "Xác nhận xóa bài viết này?")}
             onConfirm={() => handleDeleteBlog(record._id)}
-            okText="Xóa"
-            cancelText="Hủy"
+            okText={t("delete.confirmOk", "Xóa")}
+            cancelText={t("delete.cancel", "Hủy")}
             okButtonProps={{ danger: true, loading: deletingId === record._id }}
           >
             <Button size="small" danger icon={<DeleteOutlined />} className="!rounded-lg" />
@@ -492,11 +492,10 @@ export default function BlogManagement() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <Title level={3} className="!mb-1 text-slate-900 font-black">
-            Quản Lý &amp; Kiểm Duyệt Tech Blog
+            {t("title", "Quản Lý & Kiểm Duyệt Tech Blog")}
           </Title>
           <Text type="secondary" className="text-sm">
-            Quản lý toàn diện bài viết kỹ thuật: kiểm duyệt bài mới, ghim bài viết tiêu biểu lên trang chủ và theo dõi trạng thái xuất bản.
-          </Text>
+            {t("subtitle", "Quản lý toàn diện bài viết kỹ thuật: kiểm duyệt bài mới, ghim bài viết tiêu biểu lên trang chủ và theo dõi trạng thái xuất bản.")}
           {longestWaitingBlog && typeof longestWaitingBlog.waitingHours === "number" ? (
             <Text type="secondary" className="mt-1 block text-sm">
               {t("sla.longestWaiting", "Bài chờ lâu nhất:")} <Text strong>{longestWaitingBlog.title}</Text> —{" "}
@@ -512,6 +511,7 @@ export default function BlogManagement() {
               {t("sla.pendingCount", `Có ${pendingCount} bài đang chờ duyệt.`, { count: pendingCount })}
             </Text>
           ) : null}
+          </Text>
         </div>
         <Button
           icon={<ReloadOutlined />}
@@ -519,7 +519,7 @@ export default function BlogManagement() {
           loading={loading}
           className="!rounded-xl !font-bold self-start sm:self-auto"
         >
-          Làm mới
+          {t("refresh", "Làm mới")}
         </Button>
       </div>
 
@@ -527,14 +527,14 @@ export default function BlogManagement() {
       <Row gutter={[16, 16]}>
         <Col xs={12} sm={6}>
           <Card className="!rounded-2xl !border-slate-200 shadow-2xs hover:border-blue-300 transition-all">
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng bài viết</div>
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("metrics.total", "Tổng bài viết")}</div>
             <div className="text-2xl font-black text-slate-900 mt-1">{totalCount}</div>
           </Card>
         </Col>
         <Col xs={12} sm={6}>
           <Card className="!rounded-2xl !border-amber-200 bg-amber-50/40 shadow-2xs">
             <div className="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1">
-              <ClockCircleOutlined /> Chờ duyệt
+              <ClockCircleOutlined /> {t("metrics.pending", "Chờ duyệt")}
             </div>
             <div className="text-2xl font-black text-amber-900 mt-1">{pendingCount}</div>
           </Card>
@@ -542,7 +542,7 @@ export default function BlogManagement() {
         <Col xs={12} sm={6}>
           <Card className="!rounded-2xl !border-emerald-200 bg-emerald-50/40 shadow-2xs">
             <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
-              <CheckCircleOutlined /> Đã xuất bản
+              <CheckCircleOutlined /> {t("metrics.published", "Đã xuất bản")}
             </div>
             <div className="text-2xl font-black text-emerald-900 mt-1">{publishedCount}</div>
           </Card>
@@ -550,7 +550,7 @@ export default function BlogManagement() {
         <Col xs={12} sm={6}>
           <Card className="!rounded-2xl !border-blue-200 bg-blue-50/40 shadow-2xs">
             <div className="text-xs font-bold text-[#0066CC] uppercase tracking-wider flex items-center gap-1">
-              <StarFilled className="text-amber-500" /> Ghim nổi bật
+              <StarFilled className="text-amber-500" /> {t("metrics.featured", "Ghim nổi bật")}
             </div>
             <div className="text-2xl font-black text-[#004C99] mt-1">{featuredCount}</div>
           </Card>
@@ -566,14 +566,14 @@ export default function BlogManagement() {
             items={[
               {
                 key: "all",
-                label: <span className="font-bold">Tất cả ({blogs.length})</span>,
+                label: <span className="font-bold">{t("tabs.allWithCount", `Tất cả (${blogs.length})`, { count: blogs.length })}</span>,
               },
               {
                 key: "pending_review",
                 label: (
                   <Badge count={pendingCount} offset={[8, 0]}>
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5">
-                      <ClockCircleOutlined style={{ color: "#D97706" }} /> Chờ duyệt
+                      <ClockCircleOutlined style={{ color: "#D97706" }} /> {t("tabs.pending", "Chờ duyệt")}
                     </span>
                   </Badge>
                 ),
@@ -593,7 +593,7 @@ export default function BlogManagement() {
                 label: (
                   <Badge count={publishedCount} offset={[8, 0]} color="#10B981">
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5 text-emerald-700">
-                      <CheckCircleOutlined /> Đã xuất bản
+                      <CheckCircleOutlined /> {t("tabs.published", "Đã xuất bản")}
                     </span>
                   </Badge>
                 ),
@@ -603,7 +603,7 @@ export default function BlogManagement() {
                 label: (
                   <Badge count={featuredCount} offset={[8, 0]} color="#F59E0B">
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5 text-amber-600">
-                      <StarFilled /> Nổi bật
+                      <StarFilled /> {t("tabs.featured", "Nổi bật")}
                     </span>
                   </Badge>
                 ),
@@ -613,7 +613,7 @@ export default function BlogManagement() {
                 label: (
                   <Badge count={blogs.filter((b) => b.status === "changes_requested").length} offset={[8, 0]}>
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5">
-                      <ExclamationCircleOutlined style={{ color: "#EA580C" }} /> Cần chỉnh sửa
+                      <ExclamationCircleOutlined style={{ color: "#EA580C" }} /> {t("tabs.changesRequested", "Cần chỉnh sửa")}
                     </span>
                   </Badge>
                 ),
@@ -622,7 +622,7 @@ export default function BlogManagement() {
                 key: "draft",
                 label: (
                   <span className="font-bold inline-flex items-center gap-1.5">
-                    <FileTextOutlined style={{ color: "#64748B" }} /> Bản nháp ({blogs.filter((b) => b.status === "draft").length})
+                    <FileTextOutlined style={{ color: "#64748B" }} /> {t("tabs.draftWithCount", `Bản nháp (${blogs.filter((b) => b.status === "draft").length})`, { count: blogs.filter((b) => b.status === "draft").length })}
                   </span>
                 ),
               },
@@ -634,11 +634,11 @@ export default function BlogManagement() {
           <Alert
             type="error"
             showIcon
-            message="Không thể tải danh sách bài viết"
-            description="Vui lòng kiểm tra kết nối và thử lại."
+            message={t("error.title", "Không thể tải danh sách bài viết")}
+            description={t("error.desc", "Vui lòng kiểm tra kết nối và thử lại.")}
             action={
               <Button size="small" danger onClick={fetchBlogs}>
-                Thử lại
+                {t("error.retry", "Thử lại")}
               </Button>
             }
             style={{ marginBottom: 16 }}
@@ -653,11 +653,11 @@ export default function BlogManagement() {
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: (total) => `Tổng cộng ${total} bài viết`,
+            showTotal: (total) => t("table.totalWithCount", `Tổng cộng ${total} bài viết`, { total }),
           }}
           scroll={{ x: 880 }}
           className="dever-admin-table"
-          locale={{ emptyText: <Empty description="Chưa có bài viết nào" /> }}
+          locale={{ emptyText: <Empty description={t("table.empty", "Chưa có bài viết nào")} /> }}
         />
       </Card>
 
@@ -665,7 +665,7 @@ export default function BlogManagement() {
       <Modal
         title={
           <div className="flex items-center gap-2 text-lg font-black text-[#0066CC]">
-            <FileTextOutlined /> Đánh Giá Bài Viết &amp; Phản Hồi Tác Giả
+            <FileTextOutlined /> {t("modal.title", "Đánh Giá Bài Viết & Phản Hồi Tác Giả")}
           </div>
         }
         open={reviewModalVisible}
@@ -686,31 +686,31 @@ export default function BlogManagement() {
               <h2 className="text-xl font-black text-slate-900">{selectedBlog.title}</h2>
               <p className="text-xs text-slate-600 font-medium">{selectedBlog.excerpt}</p>
               <div className="flex items-center gap-4 text-xs text-slate-500 pt-2 border-t border-blue-100">
-                <span><strong>Tác giả:</strong> {selectedBlog.author?.name} ({selectedBlog.author?.role})</span>
-                <span><strong>Thời lượng:</strong> {selectedBlog.readTime || "5 phút"}</span>
+                <span><strong>{t("modal.authorLabel", "Tác giả:")}</strong> {selectedBlog.author?.name} ({selectedBlog.author?.role})</span>
+                <span><strong>{t("modal.durationLabel", "Thời lượng:")}</strong> {selectedBlog.readTime || t("modal.defaultReadTime", "5 phút")}</span>
               </div>
             </div>
 
             {/* Markdown Content Preview */}
             <div>
               <Text strong className="text-slate-800 block mb-2 text-xs uppercase tracking-wider">
-                Nội dung bài viết (Markdown Preview):
+                {t("modal.contentLabel", "Nội dung bài viết (Markdown Preview):")}
               </Text>
               <div className="p-5 rounded-2xl border border-slate-200 bg-white max-h-[300px] overflow-y-auto font-mono text-xs leading-relaxed whitespace-pre-wrap text-slate-800">
-                {selectedBlog.content || "Bài viết chưa có nội dung."}
+                {selectedBlog.content || t("modal.emptyContent", "Bài viết chưa có nội dung.")}
               </div>
             </div>
 
             {/* Feedback / Review Notes Input */}
             <div>
               <Text strong className="text-slate-800 block mb-2 text-xs uppercase tracking-wider">
-                Lời nhắn góp ý / Lý do yêu cầu sửa đổi (Review Notes):
+                {t("modal.feedbackLabel", "Lời nhắn góp ý / Lý do yêu cầu sửa đổi (Review Notes):")}
               </Text>
               <TextArea
                 rows={3}
                 value={reviewFeedback}
                 onChange={(e) => setReviewFeedback(e.target.value)}
-                placeholder="Nhập nhận xét cụ thể để tác giả chỉnh sửa (ví dụ: 'Bài viết tốt nhưng cần bổ sung thêm giải thích phần code xử lý JWT...')"
+                placeholder={t("modal.feedbackPlaceholder", "Nhập nhận xét cụ thể để tác giả chỉnh sửa (ví dụ: 'Bài viết tốt nhưng cần bổ sung thêm giải thích phần code xử lý JWT...')")}
                 className="!rounded-xl text-sm"
               />
             </div>
@@ -718,7 +718,7 @@ export default function BlogManagement() {
             {/* Action buttons */}
             <div className="flex items-center justify-between pt-4 border-t border-slate-100">
               <Button onClick={() => setReviewModalVisible(false)} className="!rounded-xl" style={{ minHeight: 44 }}>
-                Đóng
+                {t("modal.close", "Đóng")}
               </Button>
 
               <Space>
@@ -729,7 +729,7 @@ export default function BlogManagement() {
                   className="!rounded-xl !font-semibold"
                   style={{ minHeight: 44 }}
                 >
-                  Từ chối
+                  {t("modal.reject", "Từ chối")}
                 </Button>
 
                 <Button
@@ -738,7 +738,7 @@ export default function BlogManagement() {
                   className="!rounded-xl !font-bold !bg-amber-500 !text-white !border-0 hover:!bg-amber-600"
                   style={{ minHeight: 44 }}
                 >
-                  Yêu cầu chỉnh sửa
+                  {t("modal.requestChanges", "Yêu cầu chỉnh sửa")}
                 </Button>
 
                 <Button
@@ -749,7 +749,7 @@ export default function BlogManagement() {
                   className="!rounded-xl !font-bold !bg-emerald-600 hover:!bg-emerald-700 !border-0 shadow-md"
                   style={{ minHeight: 44 }}
                 >
-                  Duyệt &amp; Xuất Bản Ngay
+                  {t("modal.approvePublish", "Duyệt & Xuất Bản Ngay")}
                 </Button>
               </Space>
             </div>

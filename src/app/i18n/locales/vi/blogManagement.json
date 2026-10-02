@@ -9,5 +9,92 @@
     "daysHours": "{{days}} ngày {{hours}} giờ",
     "longestWaiting": "Bài chờ lâu nhất:",
     "pendingCount": "Có {{count}} bài đang chờ duyệt."
+  },
+  "title": "Quản Lý & Kiểm Duyệt Tech Blog",
+  "subtitle": "Quản lý toàn diện bài viết kỹ thuật: kiểm duyệt bài mới, ghim bài viết tiêu biểu lên trang chủ và theo dõi trạng thái xuất bản.",
+  "refresh": "Làm mới",
+  "metrics": {
+    "total": "Tổng bài viết",
+    "pending": "Chờ duyệt",
+    "published": "Đã xuất bản",
+    "featured": "Ghim nổi bật"
+  },
+  "tabs": {
+    "allWithCount": "Tất cả ({{count}})",
+    "pending": "Chờ duyệt",
+    "published": "Đã xuất bản",
+    "featured": "Nổi bật",
+    "changesRequested": "Cần chỉnh sửa",
+    "draft": "Bản nháp",
+    "draftWithCount": "Bản nháp ({{count}})"
+  },
+  "table": {
+    "title": "Tiêu đề bài viết",
+    "featured": "Ghim nổi bật",
+    "author": "Tác giả",
+    "category": "Chuyên mục",
+    "status": "Trạng thái",
+    "updatedAt": "Ngày cập nhật",
+    "actions": "Thao tác",
+    "totalWithCount": "Tổng cộng {{total}} bài viết",
+    "empty": "Chưa có bài viết nào",
+    "authorFallback": "DEVER Member"
+  },
+  "featured": {
+    "tag": "NỔI BẬT",
+    "tooltipPinned": "Đang được ghim trên mục nổi bật Landing Page (Bấm để bỏ ghim)",
+    "tooltipUnpinned": "Bấm để ghim bài viết này lên mục nổi bật Landing Page",
+    "pinAria": "Ghim lên nổi bật",
+    "unpinAria": "Bỏ ghim khỏi nổi bật"
+  },
+  "status": {
+    "published": "Đã xuất bản",
+    "pending_review": "Chờ duyệt",
+    "changes_requested": "Yêu cầu sửa",
+    "rejected": "Từ chối",
+    "draft": "Bản nháp"
+  },
+  "actions": {
+    "review": "Duyệt bài",
+    "detail": "Chi tiết"
+  },
+  "delete": {
+    "confirmTitle": "Xác nhận xóa bài viết này?",
+    "confirmOk": "Xóa",
+    "cancel": "Hủy"
+  },
+  "error": {
+    "title": "Không thể tải danh sách bài viết",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại.",
+    "retry": "Thử lại"
+  },
+  "modal": {
+    "title": "Đánh Giá Bài Viết & Phản Hồi Tác Giả",
+    "authorLabel": "Tác giả:",
+    "durationLabel": "Thời lượng:",
+    "defaultReadTime": "5 phút",
+    "contentLabel": "Nội dung bài viết (Markdown Preview):",
+    "emptyContent": "Bài viết chưa có nội dung.",
+    "feedbackLabel": "Lời nhắn góp ý / Lý do yêu cầu sửa đổi (Review Notes):",
+    "feedbackPlaceholder": "Nhập nhận xét cụ thể để tác giả chỉnh sửa (ví dụ: 'Bài viết tốt nhưng cần bổ sung thêm giải thích phần code xử lý JWT...')",
+    "close": "Đóng",
+    "reject": "Từ chối",
+    "requestChanges": "Yêu cầu chỉnh sửa",
+    "approvePublish": "Duyệt & Xuất Bản Ngay"
+  },
+  "messages": {
+    "loadFailed": "Không thể tải danh sách bài viết",
+    "apiConnectionError": "Lỗi kết nối máy chủ API",
+    "serverConnectionError": "Lỗi kết nối máy chủ",
+    "connectionError": "Lỗi kết nối",
+    "featuredPinned": "Đã ghim bài viết \"{{title}}\" lên mục nổi bật!",
+    "featuredUnpinned": "Đã bỏ ghim bài viết \"{{title}}\".",
+    "featuredUpdateFailed": "Không thể cập nhật trạng thái ghim nổi bật",
+    "reviewFeedbackRequired": "Vui lòng nhập lời nhận xét/lý do để tác giả biết cần chỉnh sửa gì.",
+    "reviewPublished": "Đã duyệt và xuất bản bài viết thành công!",
+    "reviewFeedbackSent": "Đã phản hồi ý kiến cho tác giả bài viết.",
+    "reviewFailed": "Lỗi khi xử lý duyệt bài",
+    "deleteSuccess": "Đã xóa bài viết.",
+    "deleteFailed": "Không thể xóa bài viết"
   }
 }

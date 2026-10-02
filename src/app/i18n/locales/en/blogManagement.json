@@ -9,5 +9,92 @@
     "daysHours": "{{days}}d {{hours}}h",
     "longestWaiting": "Longest-waiting post:",
     "pendingCount": "{{count}} posts pending review."
+  },
+  "title": "Tech Blog Management & Review",
+  "subtitle": "Manage technical articles end-to-end: review new posts, pin featured posts to the homepage and track publishing status.",
+  "refresh": "Refresh",
+  "metrics": {
+    "total": "Total posts",
+    "pending": "Pending review",
+    "published": "Published",
+    "featured": "Featured"
+  },
+  "tabs": {
+    "allWithCount": "All ({{count}})",
+    "pending": "Pending review",
+    "published": "Published",
+    "featured": "Featured",
+    "changesRequested": "Needs edits",
+    "draft": "Drafts",
+    "draftWithCount": "Drafts ({{count}})"
+  },
+  "table": {
+    "title": "Post title",
+    "featured": "Featured",
+    "author": "Author",
+    "category": "Category",
+    "status": "Status",
+    "updatedAt": "Updated at",
+    "actions": "Actions",
+    "totalWithCount": "{{total}} posts in total",
+    "empty": "No posts yet",
+    "authorFallback": "DEVER Member"
+  },
+  "featured": {
+    "tag": "FEATURED",
+    "tooltipPinned": "Pinned to the Landing Page featured section (Click to unpin)",
+    "tooltipUnpinned": "Click to pin this post to the Landing Page featured section",
+    "pinAria": "Pin to featured",
+    "unpinAria": "Unpin from featured"
+  },
+  "status": {
+    "published": "Published",
+    "pending_review": "Pending review",
+    "changes_requested": "Needs edits",
+    "rejected": "Rejected",
+    "draft": "Draft"
+  },
+  "actions": {
+    "review": "Review",
+    "detail": "Details"
+  },
+  "delete": {
+    "confirmTitle": "Delete this post?",
+    "confirmOk": "Delete",
+    "cancel": "Cancel"
+  },
+  "error": {
+    "title": "Could not load post list",
+    "desc": "Please check your connection and try again.",
+    "retry": "Retry"
+  },
+  "modal": {
+    "title": "Review Post & Author Feedback",
+    "authorLabel": "Author:",
+    "durationLabel": "Duration:",
+    "defaultReadTime": "5 min",
+    "contentLabel": "Post content (Markdown preview):",
+    "emptyContent": "This post has no content yet.",
+    "feedbackLabel": "Feedback / Reason for requested changes (Review notes):",
+    "feedbackPlaceholder": "Enter specific feedback for the author (e.g. 'Good post, but please expand the JWT code explanation...')",
+    "close": "Close",
+    "reject": "Reject",
+    "requestChanges": "Request edits",
+    "approvePublish": "Approve & Publish Now"
+  },
+  "messages": {
+    "loadFailed": "Could not load post list",
+    "apiConnectionError": "API server connection error",
+    "serverConnectionError": "Server connection error",
+    "connectionError": "Connection error",
+    "featuredPinned": "Pinned \"{{title}}\" to featured!",
+    "featuredUnpinned": "Unpinned \"{{title}}\".",
+    "featuredUpdateFailed": "Could not update featured status",
+    "reviewFeedbackRequired": "Please enter feedback/reason so the author knows what to fix.",
+    "reviewPublished": "Post approved and published successfully!",
+    "reviewFeedbackSent": "Feedback sent to the post author.",
+    "reviewFailed": "Failed to review post",
+    "deleteSuccess": "Post deleted.",
+    "deleteFailed": "Could not delete post"
   }
 }
