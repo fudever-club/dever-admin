@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 
-export default function ContentManagementAliasPage({
-  params: { locale },
+export default async function ContentManagementAliasPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   // Canonical route is /[locale]/community-content — keep this alias as a
   // redirect so bookmarks survive without forking the UI into two URLs.
   redirect(`/${locale}/community-content`);

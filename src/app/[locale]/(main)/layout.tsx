@@ -6,13 +6,14 @@ import MainLayout from "@/components/core/layouts/MainLayout";
 
 import { constants } from "@/settings";
 
-export default function RootMainLayout({
+export default async function RootMainLayout({
   children,
-  params: { locale },
+  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
   const token = getCookie(constants.ACCESS_TOKEN, { cookies });
 
   if (!token) {

@@ -5,8 +5,9 @@ export const metadata: Metadata = {
   title: "FU-DEVER | Đăng nhập",
 };
 
-function SignUpPage({ params }: { params: { locale: string } }) {
-  redirect(`/${params.locale}/sign-in`);
+async function SignUpPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  redirect(`/${locale}/sign-in`);
 }
 
 export default SignUpPage;

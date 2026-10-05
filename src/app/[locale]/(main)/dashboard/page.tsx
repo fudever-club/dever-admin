@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 
-export default function DashboardPage({
-  params: { locale },
+export default async function DashboardPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   redirect(`/${locale}/user-management`);
 }

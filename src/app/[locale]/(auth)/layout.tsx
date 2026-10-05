@@ -6,13 +6,14 @@ import AuthLayout from "@/components/core/layouts/AuthLayout";
 
 import { constants } from "@/settings";
 
-export default function RootAuthLayout({
+export default async function RootAuthLayout({
   children,
-  params: { locale },
+  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
   const token = getCookie(constants.ACCESS_TOKEN, { cookies });
 
   if (token) {

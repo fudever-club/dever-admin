@@ -22,12 +22,14 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }>) {
+  // Awaited for Next 15+ async params; resolves immediately on Next 14.
+  const { locale } = await params;
   return (
-    <html lang={params?.locale}>
+    <html lang={locale}>
       <head>
         <style>{`@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }`}</style>
         <script
