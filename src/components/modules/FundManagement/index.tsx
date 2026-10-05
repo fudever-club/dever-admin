@@ -48,6 +48,7 @@ import {
   CopyOutlined,
   CheckOutlined,
   PictureOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
 import { constants } from "@/settings";
@@ -217,6 +218,33 @@ export default function FundManagementModule() {
     fetchPayments();
     fetchCampaigns();
   }, [fetchPayments, fetchCampaigns]);
+
+  // CSV export for treasurer reconciliation (server logs fund.exported audit).
+  const [exporting, setExporting] = useState(false);
+  const handleExportCsv = useCallback(async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const token = webStorageClient.getToken();
+      const params = selectedStatus !== "all" ? `?status=${selectedStatus}` : "";
+      const res = await fetch(`${apiServer}/api/v1/funds/admin/payments/export${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`export failed: ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "fund-payments.csv";
+      anchor.click();
+      URL.revokeObjectURL(url);
+      message.success("Đã xuất file CSV đối soát.");
+    } catch {
+      message.error("Xuất file thất bại, thử lại sau.");
+    } finally {
+      setExporting(false);
+    }
+  }, [apiServer, exporting, selectedStatus]);
 
   // KPI must not render 0đ when the fetch failed; show Skeleton/unavailable instead.
   const hasFundError = paymentsError || campaignsError;
@@ -758,6 +786,15 @@ export default function FundManagementModule() {
                       onChange={(e) => setSearchQuery(e.target.value)}
                       style={{ width: 320 }}
                     />
+                    <Button
+                      icon={<DownloadOutlined />}
+                      onClick={handleExportCsv}
+                      loading={exporting}
+                      disabled={exporting}
+                      style={{ minHeight: 44 }}
+                    >
+                      Xuất CSV
+                    </Button>
                   </div>
 
                   {/* Table */}
