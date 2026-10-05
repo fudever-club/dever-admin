@@ -1,6 +1,6 @@
 {
   "sla": {
-    "waitingColumn": "Waiting",
+    "waitingColumn": "Pending review",
     "overdueTag": "Over {{hours}}h",
     "overdueTab": "Overdue",
     "overdueTabWithCount": "Overdue ({{count}})",
@@ -42,7 +42,7 @@
   },
   "featured": {
     "tag": "FEATURED",
-    "tooltipPinned": "Pinned to the Landing Page featured section (Click to unpin)",
+    "tooltipPinned": "Pinned to the Landing Page featured section (click to unpin)",
     "tooltipUnpinned": "Click to pin this post to the Landing Page featured section",
     "pinAria": "Pin to featured",
     "unpinAria": "Unpin from featured"
@@ -76,7 +76,7 @@
     "contentLabel": "Post content (Markdown preview):",
     "emptyContent": "This post has no content yet.",
     "feedbackLabel": "Feedback / Reason for requested changes (Review notes):",
-    "feedbackPlaceholder": "Enter specific feedback for the author (e.g. 'Good post, but please expand the JWT code explanation...')",
+    "feedbackPlaceholder": "Enter specific feedback for the author (e.g., 'Good post, but please expand the JWT code explanation...')",
     "close": "Close",
     "reject": "Reject",
     "requestChanges": "Request edits",
@@ -87,14 +87,14 @@
     "apiConnectionError": "API server connection error",
     "serverConnectionError": "Server connection error",
     "connectionError": "Connection error",
-    "featuredPinned": "Pinned \"{{title}}\" to featured!",
-    "featuredUnpinned": "Unpinned \"{{title}}\".",
-    "featuredUpdateFailed": "Could not update featured status",
-    "reviewFeedbackRequired": "Please enter feedback/reason so the author knows what to fix.",
+    "featuredPinned": "Pinned \"{{title}}\" to the featured section!",
+    "featuredUnpinned": "Unpinned \"{{title}}\" from the featured section.",
+    "featuredUpdateFailed": "Could not update the featured status",
+    "reviewFeedbackRequired": "Please enter feedback or a reason so the author knows what to fix.",
     "reviewPublished": "Post approved and published successfully!",
     "reviewFeedbackSent": "Feedback sent to the post author.",
-    "reviewFailed": "Failed to review post",
+    "reviewFailed": "Failed to review the post",
     "deleteSuccess": "Post deleted.",
-    "deleteFailed": "Could not delete post"
+    "deleteFailed": "Could not delete the post"
   }
 }

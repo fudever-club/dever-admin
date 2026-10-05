@@ -13,7 +13,7 @@
     "actions": "Actions"
   },
   "status": {
-    "pending": "Pending",
+    "pending": "Pending confirmation",
     "accepted": "Accepted",
     "revoked": "Revoked",
     "expired": "Expired"
@@ -31,13 +31,13 @@
     "emailPlaceholder": "Email *",
     "firstnamePlaceholder": "First name",
     "lastnamePlaceholder": "Last name",
-    "emailRequired": "Please enter an email.",
-    "emailInvalid": "Invalid email.",
+    "emailRequired": "Please enter an email address.",
+    "emailInvalid": "Please enter a valid email address.",
     "submit": "Create invite"
   },
   "bulk": {
     "title": "Bulk create (max {{max}})",
-    "hint": "One person per line as: email, firstname, lastname (firstname/lastname optional).",
+    "hint": "One person per line: email, firstname, lastname (firstname and lastname are optional).",
     "placeholder": "an.nguyen@fpt.edu.vn, An, Nguyen\nbinh.tran@fpt.edu.vn, Binh, Tran",
     "ariaLabel": "Bulk invite list",
     "overLimit": "Over limit: {{current}}/{{max}} lines. Please split the list.",
@@ -45,10 +45,10 @@
     "errorsPrefix": "Errors: {{errors}}",
     "submit": "Create {{count}} invites",
     "empty": "No valid rows yet. Each line format: email, firstname, lastname.",
-    "maxError": "Max {{max}} invites per batch. Please split the list."
+    "maxError": "Maximum {{max}} invites per batch. Please split the list."
   },
   "bulkRow": {
-    "invalidEmail": "Line {{row}}: invalid email."
+    "invalidEmail": "Line {{row}}: Invalid email address."
   },
   "summary": {
     "created": "Created {{count}} invites",
@@ -63,7 +63,7 @@
     "titleResend": "New invite link (resent)",
     "ack": "I have saved the links",
     "tokenTitle": "Token is shown only once",
-    "tokenDesc": "Each link contains a token returned by the backend only once at creation. Copy and send it via a safe channel; closing this dialog loses access.",
+    "tokenDesc": "Each link contains a token that the backend returns only once at creation. Copy and share it through a secure channel; you will not be able to view it again after closing this dialog.",
     "copyLink": "Copy link"
   },
   "messages": {
@@ -77,13 +77,13 @@
     "resendFail": "Could not resend invite. Please try again."
   },
   "copy": {
-    "success": "Copied link of {{email}}",
-    "manualFail": "Auto-copy failed. Please copy the link below manually."
+    "success": "Copied link for {{email}}",
+    "manualFail": "Automatic copy failed. Please copy the link below manually."
   },
   "filter": {
     "allStatus": "All statuses",
     "all": "All",
-    "pending": "Pending",
+    "pending": "Pending confirmation",
     "accepted": "Accepted",
     "revoked": "Revoked"
   },

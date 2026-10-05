@@ -1,6 +1,6 @@
 {
   "title": "Audit Log",
-  "subtitle": "Browse admin activity history (read-only, server pagination).",
+  "subtitle": "Browse admin activity history (read-only, with server-side pagination).",
   "refresh": "Refresh",
   "retry": "Retry",
   "search": "Search",
@@ -18,8 +18,8 @@
     "allActions": "All actions",
     "allTargets": "All targets",
     "all": "All",
-    "targetIdPlaceholder": "Search by targetId...",
-    "actorIdPlaceholder": "Search by actorId..."
+    "targetIdPlaceholder": "Search by target ID...",
+    "actorIdPlaceholder": "Search by actor ID..."
   },
   "actions": {
     "user.role_granted": "Grant admin role",
@@ -32,12 +32,12 @@
     "user.invited": "Invite member",
     "user.accepted": "Accept invite",
     "user.invite_revoked": "Revoke invite",
-    "fund.payment_approved": "Approve fund",
-    "fund.payment_rejected": "Reject fund",
+    "fund.payment_approved": "Approve fund payment",
+    "fund.payment_rejected": "Reject fund payment",
     "blog.reviewed": "Review blog",
-    "opensource.approved": "Approve open-source",
-    "opensource.rejected": "Reject open-source",
-    "opensource.deleted": "Delete open-source"
+    "opensource.approved": "Approve open source",
+    "opensource.rejected": "Reject open source",
+    "opensource.deleted": "Delete open source"
   },
   "targetTypes": {
     "user": "Member",
@@ -61,8 +61,8 @@
   "paginationTotal": "{{total}} records in total",
   "funnel": {
     "title": "Audit funnel",
-    "subtitle": "Total operations by group in the period (numbers + table, no charts).",
-    "periodLabel": "Select statistics period",
+    "subtitle": "Total operations by group for the selected period (totals and table, no charts).",
+    "periodLabel": "Select a statistics period",
     "refreshLabel": "Refresh audit funnel",
     "days7": "Last 7 days",
     "days30": "Last 30 days",
@@ -77,7 +77,7 @@
     "loadError": "Could not load audit funnel",
     "loadErrorDesc": "Please check your connection and try again.",
     "partialTitle": "Part of the funnel data is unavailable",
-    "partialDesc": "Valid parts are still shown; refresh to fetch full data.",
+    "partialDesc": "Valid entries are still shown; refresh to load the full data.",
     "empty": "No activity in the last {{days}} days.",
     "tableDate": "Date",
     "tableAction": "Action",
