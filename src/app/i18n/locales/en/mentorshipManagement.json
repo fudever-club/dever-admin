@@ -54,6 +54,7 @@
   "filterAll": "All",
   "queueCount": "{{count}} requests",
   "queueTotal": "{{count}} requests",
+  "mentorPaginationTotal": "{{total}} mentors in total",
   "error": {
     "mentorsTitle": "Could not load mentor list",
     "queueTitle": "Could not load mentorship queue",

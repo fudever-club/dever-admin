@@ -435,7 +435,12 @@ export default function MentorshipManagement() {
               dataSource={filtered}
               rowKey={(record) => record._id}
               loading={isFetching}
-              pagination={{ pageSize: 10 }}
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                pageSizeOptions: ["10", "20", "50"],
+                showTotal: (total) => t("mentorPaginationTotal", `Tổng cộng ${total} mentors`, { total }),
+              }}
               scroll={{ x: 900 }}
               style={{ borderRadius: 12, overflow: "hidden" }}
             />

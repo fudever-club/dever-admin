@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@/app/i18n/client";
 import {
@@ -80,6 +80,16 @@ export default function SeasonManagement() {
   const [editingSeason, setEditingSeason] = useState<Season | null>(null);
   const [endingId, setEndingId] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(typeof window !== "undefined" && window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const watchedStatus = Form.useWatch("status", form);
 
@@ -239,7 +249,7 @@ export default function SeasonManagement() {
       title: t("table.actions", "Thao tác"),
       key: "action",
       width: 220,
-      fixed: "right" as const,
+      fixed: isMobile ? undefined : ("right" as const),
       render: (_, record) => {
         // Locks pattern (như Blog deletingId / Fund submittingReview):
         // mùa ended bị khóa; chặn cả chuột lẫn bàn phím bằng native disabled.

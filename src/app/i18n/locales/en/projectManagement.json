@@ -1,5 +1,6 @@
 {
   "title": "Project Management",
+  "paginationTotal": "{{total}} projects in total",
   "deleteProject": {
     "title": "Delete project",
     "description": "Are you sure to delete this project?",

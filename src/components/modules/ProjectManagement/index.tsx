@@ -155,7 +155,9 @@ function ProjectManagementModule() {
           scroll={{ x: 750 }}
           pagination={{
             pageSize: 10,
-            showTotal: (total) => `Tổng cộng ${total} dự án`,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50"],
+            showTotal: (total) => t("paginationTotal", `Tổng cộng ${total} dự án`, { total }),
           }}
         />
       </S.TableWrapper>

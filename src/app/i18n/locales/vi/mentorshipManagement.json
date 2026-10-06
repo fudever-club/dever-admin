@@ -54,6 +54,7 @@
   "filterAll": "Tất cả",
   "queueCount": "{{count}} yêu cầu",
   "queueTotal": "{{count}} yêu cầu",
+  "mentorPaginationTotal": "Tổng cộng {{total}} mentors",
   "error": {
     "mentorsTitle": "Không thể tải danh sách mentors",
     "queueTitle": "Không thể tải hàng chờ mentorship",

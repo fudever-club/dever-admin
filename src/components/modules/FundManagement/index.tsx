@@ -54,6 +54,8 @@ import webStorageClient from "@/utils/webStorageClient";
 import { constants } from "@/settings";
 import { compressImage } from "@/utils/imageCompressor";
 import dayjs from "dayjs";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -122,6 +124,8 @@ interface FundPayment {
 }
 
 export default function FundManagementModule() {
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "fundManagement");
   const [activeTab, setActiveTab] = useState<string>("payments");
   const [loading, setLoading] = useState<boolean>(false);
   const [payments, setPayments] = useState<FundPayment[]>([]);
@@ -416,7 +420,7 @@ export default function FundManagementModule() {
 
   const paymentColumns = [
     {
-      title: "Thành viên",
+      title: t("table.member", "Thành viên"),
       key: "user",
       render: (_: any, record: FundPayment) => {
         const fullName = [record.userId?.firstname, record.userId?.lastname].filter(Boolean).join(" ") || "Thành viên";
@@ -455,7 +459,7 @@ export default function FundManagementModule() {
       },
     },
     {
-      title: "Kỳ thu quỹ",
+      title: t("table.campaign", "Kỳ thu quỹ"),
       key: "campaign",
       render: (_: any, record: FundPayment) => (
         <div>
@@ -465,7 +469,7 @@ export default function FundManagementModule() {
       ),
     },
     {
-      title: "Số tiền",
+      title: t("table.amount", "Số tiền"),
       dataIndex: "amount",
       key: "amount",
       render: (amount: number) => (
@@ -475,7 +479,7 @@ export default function FundManagementModule() {
       ),
     },
     {
-      title: "Biên lai / Bill",
+      title: t("table.receipt", "Biên lai / Bill"),
       key: "proof",
       render: (_: any, record: FundPayment) => (
         <Button
@@ -491,13 +495,13 @@ export default function FundManagementModule() {
       ),
     },
     {
-      title: "Mã giao dịch",
+      title: t("table.transactionCode", "Mã giao dịch"),
       dataIndex: "transactionCode",
       key: "transactionCode",
       render: (code: string) => <Text code style={{ fontSize: 11 }}>{code || "N/A"}</Text>,
     },
     {
-      title: "Trạng thái",
+      title: t("table.status", "Trạng thái"),
       dataIndex: "status",
       key: "status",
       render: (status: string) => {
@@ -511,7 +515,7 @@ export default function FundManagementModule() {
       },
     },
     {
-      title: "Thời gian nộp",
+      title: t("table.submittedAt", "Thời gian nộp"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) => (
@@ -521,7 +525,7 @@ export default function FundManagementModule() {
       ),
     },
     {
-      title: "Hành động",
+      title: t("table.actions", "Hành động"),
       key: "actions",
       render: (_: any, record: FundPayment) => {
         // Concurrency lock + status guard (same as Event deletingId/updatingStatusId):
@@ -574,10 +578,10 @@ export default function FundManagementModule() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
         <div>
           <Title level={3} style={{ margin: 0, color: "#0F172A", display: "flex", alignItems: "center", gap: 10, fontWeight: 800 }}>
-            <WalletOutlined style={{ color: "#0066CC" }} /> Quản Lý Quỹ Câu Lạc Bộ (Club Fund)
+            <WalletOutlined style={{ color: "#0066CC" }} /> {t("title", "Quản Lý Quỹ Câu Lạc Bộ (Club Fund)")}
           </Title>
           <Text type="secondary" style={{ fontSize: 13, marginTop: 4, display: "block" }}>
-            Theo dõi, duyệt biên lai chuyển khoản thành viên và cấu hình chiến dịch thu quỹ cùng mã QR thủ quỹ.
+            {t("subtitle", "Theo dõi, duyệt biên lai chuyển khoản thành viên và cấu hình chiến dịch thu quỹ cùng mã QR thủ quỹ.")}
           </Text>
         </div>
         <Space size={12}>
@@ -590,7 +594,7 @@ export default function FundManagementModule() {
             loading={loading}
             style={{ borderRadius: 10, fontWeight: 600, height: 38 }}
           >
-            Làm mới
+            {t("refresh", "Làm mới")}
           </Button>
           <Button
             type="primary"
@@ -625,11 +629,11 @@ export default function FundManagementModule() {
         <Alert
           type="error"
           showIcon
-          message="Không thể tải dữ liệu quỹ"
-          description="Số liệu bên dưới có thể không đầy đủ. Vui lòng kiểm tra kết nối và thử lại."
+          message={t("error.title", "Không thể tải dữ liệu quỹ")}
+          description={t("error.desc", "Số liệu bên dưới có thể không đầy đủ. Vui lòng kiểm tra kết nối và thử lại.")}
           action={
             <Button size="small" danger onClick={retryFundFetch}>
-              Thử lại
+              {t("retry", "Thử lại")}
             </Button>
           }
           style={{ marginBottom: 16 }}
@@ -802,11 +806,11 @@ export default function FundManagementModule() {
                     <Alert
                       type="error"
                       showIcon
-                      message="Không thể tải danh sách nộp quỹ"
-                      description="Vui lòng kiểm tra kết nối và thử lại."
+                      message={t("error.title", "Không thể tải danh sách nộp quỹ")}
+                      description={t("error.desc", "Vui lòng kiểm tra kết nối và thử lại.")}
                       action={
                         <Button size="small" danger onClick={retryFundFetch}>
-                          Thử lại
+                          {t("retry", "Thử lại")}
                         </Button>
                       }
                       style={{ marginBottom: 12 }}
@@ -817,7 +821,7 @@ export default function FundManagementModule() {
                     dataSource={filteredPayments}
                     rowKey="_id"
                     loading={loading}
-                    pagination={{ pageSize: 8, showTotal: (total) => `Tổng cộng ${total} lượt nộp` }}
+                    pagination={{ pageSize: 8, showSizeChanger: true, pageSizeOptions: ["8", "16", "32"], showTotal: (total) => t("paginationTotal", `Tổng cộng ${total} lượt nộp`, { total }) }}
                     scroll={{ x: 1000 }}
                     style={{ borderRadius: 12, overflow: "hidden" }}
                   />
@@ -837,11 +841,11 @@ export default function FundManagementModule() {
                     <Alert
                       type="error"
                       showIcon
-                      message="Không thể tải danh sách kỳ thu quỹ"
-                      description="Vui lòng kiểm tra kết nối và thử lại."
+                      message={t("error.title", "Không thể tải danh sách kỳ thu quỹ")}
+                      description={t("error.desc", "Vui lòng kiểm tra kết nối và thử lại.")}
                       action={
                         <Button size="small" danger onClick={retryFundFetch}>
-                          Thử lại
+                          {t("retry", "Thử lại")}
                         </Button>
                       }
                       style={{ marginBottom: 12 }}
@@ -1035,13 +1039,13 @@ export default function FundManagementModule() {
           onFinish={handleCampaignSubmit}
           style={{ paddingTop: 10 }}
         >
-          <Form.Item name="title" label="Tiêu đề kỳ thu quỹ" rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}>
+          <Form.Item name="title" label="Tiêu đề kỳ thu quỹ" rules={[{ required: true, message: t("validation.titleRequired", "Vui lòng nhập tiêu đề") }]}>
             <Input placeholder="Ví dụ: Quỹ CLB FU-DEVER Kỳ Fall 2026" style={{ borderRadius: 8 }} />
           </Form.Item>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="amount" label="Số tiền mỗi thành viên (VNĐ)" rules={[{ required: true, message: "Nhập số tiền" }]}>
+              <Form.Item name="amount" label="Số tiền mỗi thành viên (VNĐ)" rules={[{ required: true, message: t("validation.amountRequired", "Nhập số tiền") }]}>
                 <InputNumber
                   style={{ width: "100%", borderRadius: 8 }}
                   formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1050,24 +1054,24 @@ export default function FundManagementModule() {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="semester" label="Kỳ học" rules={[{ required: true, message: "Nhập kỳ học" }]}>
+              <Form.Item name="semester" label="Kỳ học" rules={[{ required: true, message: t("validation.semesterRequired", "Nhập kỳ học") }]}>
                 <Input placeholder="Fall 2026" style={{ borderRadius: 8 }} />
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item name="dateRange" label="Thời gian thu quỹ (Bắt đầu - Deadline)" rules={[{ required: true, message: "Chọn thời gian" }]}>
+          <Form.Item name="dateRange" label="Thời gian thu quỹ (Bắt đầu - Deadline)" rules={[{ required: true, message: t("validation.dateRangeRequired", "Chọn thời gian") }]}>
             <DatePicker.RangePicker style={{ width: "100%", borderRadius: 8 }} format="DD/MM/YYYY" />
           </Form.Item>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="bankName" label="Tên Ngân Hàng" rules={[{ required: true, message: "Nhập tên ngân hàng" }]}>
+              <Form.Item name="bankName" label="Tên Ngân Hàng" rules={[{ required: true, message: t("validation.bankNameRequired", "Nhập tên ngân hàng") }]}>
                 <Input placeholder="TPBank / MBBank..." style={{ borderRadius: 8 }} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="bankCode" label="Mã Ngân Hàng (VietQR Code)" rules={[{ required: true, message: "Nhập mã ngân hàng" }]}>
+              <Form.Item name="bankCode" label="Mã Ngân Hàng (VietQR Code)" rules={[{ required: true, message: t("validation.bankCodeRequired", "Nhập mã ngân hàng") }]}>
                 <Input placeholder="TPB, MB, VCB..." style={{ borderRadius: 8 }} />
               </Form.Item>
             </Col>
@@ -1075,12 +1079,12 @@ export default function FundManagementModule() {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="accountNumber" label="Số Tài Khoản Nhận Quỹ" rules={[{ required: true, message: "Nhập số tài khoản" }]}>
+              <Form.Item name="accountNumber" label="Số Tài Khoản Nhận Quỹ" rules={[{ required: true, message: t("validation.accountNumberRequired", "Nhập số tài khoản") }]}>
                 <Input placeholder="05371798501" style={{ borderRadius: 8 }} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="accountHolder" label="Tên Chủ Tài Khoản (Thủ Quỹ)" rules={[{ required: true, message: "Nhập tên chủ tài khoản" }]}>
+              <Form.Item name="accountHolder" label="Tên Chủ Tài Khoản (Thủ Quỹ)" rules={[{ required: true, message: t("validation.accountHolderRequired", "Nhập tên chủ tài khoản") }]}>
                 <Input placeholder="DANG QUANG NHAT" style={{ borderRadius: 8 }} />
               </Form.Item>
             </Col>

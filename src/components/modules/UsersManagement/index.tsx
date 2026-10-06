@@ -250,7 +250,7 @@ function UsersManagementModule() {
 
   const modal = useModal();
 
-  const { result, total, isFetching, refetch } = useGetAllUsersQuery(
+  const { result, total, isFetching, isError, refetch } = useGetAllUsersQuery(
     {
       page: page,
       limit: limit,
@@ -264,11 +264,12 @@ function UsersManagementModule() {
       }),
     },
     {
-      selectFromResult: ({ data, isFetching }) => {
+      selectFromResult: ({ data, isFetching, isError }) => {
         return {
           result: data?.data?.users ?? [],
           total: data?.total ?? 0,
           isFetching,
+          isError,
         };
       },
     }
@@ -925,6 +926,20 @@ function UsersManagementModule() {
         </Col>
       </Row>
       <S.TableWrapper>
+        {isError && !isFetching && (
+          <Alert
+            type="error"
+            showIcon
+            message="Không thể tải danh sách thành viên"
+            description="Số liệu và danh sách bên dưới có thể không đầy đủ. Vui lòng kiểm tra kết nối và thử lại."
+            action={
+              <Button size="small" danger onClick={() => refetch()}>
+                Thử lại
+              </Button>
+            }
+            style={{ marginBottom: 16 }}
+          />
+        )}
         <Table
           columns={columns}
           dataSource={result}
@@ -942,6 +957,11 @@ function UsersManagementModule() {
             onShowSizeChange={onShowSizeChange}
             defaultCurrent={page}
             total={total}
+            showTotal={
+              isError
+                ? undefined
+                : (totalCount) => `Tổng cộng ${totalCount} thành viên`
+            }
             onChange={(page) =>
               router.push(createQueryString("page", `${page}`))
             }

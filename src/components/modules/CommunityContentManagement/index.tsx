@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 import {
   App,
   AutoComplete,
@@ -102,6 +103,8 @@ const COMPANY_SUGGESTIONS = [
 
 export default function CommunityContentManagement() {
   const { message } = App.useApp();
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "communityContent");
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("opensource");
   const [editing, setEditing] = useState<any | null>(null);
@@ -400,7 +403,7 @@ export default function CommunityContentManagement() {
     if (mode === "project") {
       return [
         {
-          title: "Dự Án Lab",
+          title: t("table.labProject", "Dự Án Lab"),
           dataIndex: "title",
           render: (value: string, row: any) => (
             <Space direction="vertical" size={0}>
@@ -414,12 +417,12 @@ export default function CommunityContentManagement() {
           ),
         },
         {
-          title: "Nhóm",
+          title: t("table.team", "Nhóm"),
           dataIndex: "category",
           render: (value: string) => <Tag color="blue">{value}</Tag>,
         },
         {
-          title: "Vị trí tuyển",
+          title: t("table.onlineStatus", "Vị trí tuyển"),
           dataIndex: "roles",
           render: (roles: string[]) => (
             <Space wrap size={[0, 4]}>
@@ -432,7 +435,7 @@ export default function CommunityContentManagement() {
           ),
         },
         {
-          title: "Trạng thái",
+          title: t("table.status", "Trạng thái"),
           dataIndex: "status",
           render: (value: string) => (
             <Tag color={value === "open" ? "success" : value === "paused" ? "warning" : "default"}>
@@ -444,7 +447,7 @@ export default function CommunityContentManagement() {
     } else if (mode === "opensource") {
       return [
         {
-          title: "Dự Án Open Source",
+          title: t("table.opensourceProject", "Dự Án Open Source"),
           dataIndex: "title",
           render: (value: string, row: any) => (
             <Space direction="vertical" size={0}>
@@ -458,12 +461,12 @@ export default function CommunityContentManagement() {
           ),
         },
         {
-          title: "Tác giả",
+          title: t("table.author", "Tác giả"),
           dataIndex: "author",
           render: (value: string) => <Typography.Text strong>{value}</Typography.Text>,
         },
         {
-          title: "Số sao GitHub",
+          title: t("table.stars", "Số sao GitHub"),
           dataIndex: "stars",
           width: 120,
           render: (value: number) => (
@@ -473,12 +476,12 @@ export default function CommunityContentManagement() {
           ),
         },
         {
-          title: "Phân loại",
+          title: t("table.category", "Phân loại"),
           dataIndex: "category",
           render: (value: string) => <Tag color="cyan">{value || "Open Source"}</Tag>,
         },
         {
-          title: "Links",
+          title: t("table.links", "Links"),
           render: (_: unknown, row: any) => (
             <Space>
               {row.githubUrl && (
@@ -495,7 +498,7 @@ export default function CommunityContentManagement() {
           ),
         },
         {
-          title: "Trạng thái",
+          title: t("table.status", "Trạng thái"),
           dataIndex: "isPublished",
           width: 170,
           render: (value: boolean) => (
@@ -514,7 +517,7 @@ export default function CommunityContentManagement() {
     } else {
       return [
         {
-          title: "Cựu thành viên",
+          title: t("table.alumnus", "Cựu thành viên"),
           dataIndex: "name",
           render: (value: string, row: any) => (
             <Space size={12}>
@@ -529,19 +532,19 @@ export default function CommunityContentManagement() {
           ),
         },
         {
-          title: "Thế hệ",
+          title: t("table.generation", "Thế hệ"),
           dataIndex: "graduationGen",
                       render: (gen: string) => <Tag color="blue">{gen || "Chưa rõ"}</Tag>,
         },
         {
-          title: "Đơn vị / Công ty",
+          title: t("table.workplace", "Đơn vị / Công ty"),
           dataIndex: "workplace",
           render: (workplace: string) => (
             <Tag color="cyan" style={{ fontWeight: 600 }}>{workplace || "FPT Software"}</Tag>
           ),
         },
         {
-          title: "Mentoring OJT",
+          title: t("table.mentoring", "Mentoring OJT"),
           dataIndex: "isMentor",
           render: (isMentor: boolean, record: any) => (
             <Switch
@@ -556,7 +559,7 @@ export default function CommunityContentManagement() {
           ),
         },
         {
-          title: "Hiển thị Landing",
+          title: t("table.landingVisible", "Hiển thị Landing"),
           dataIndex: "isPublished",
           render: (isPublished: boolean, record: any) => (
             <Switch
@@ -572,10 +575,10 @@ export default function CommunityContentManagement() {
         },
       ];
     }
-  }, [mode, togglingAlumniId, handleToggleAlumniMentor, handleToggleAlumniPublish]);
+  }, [mode, t, togglingAlumniId, handleToggleAlumniMentor, handleToggleAlumniPublish]);
 
   const actionColumn = {
-    title: "Thao tác",
+    title: t("table.actions", "Thao tác"),
     width: 220,
     render: (_: unknown, record: any) => {
       const isPending = mode === "opensource" && !record.isPublished;
@@ -659,10 +662,10 @@ export default function CommunityContentManagement() {
       <Space direction="vertical" size={20} style={{ width: "100%" }}>
         <div>
           <Typography.Title level={2} style={{ color: "#0066CC", marginBottom: 4 }}>
-            Nội dung cộng đồng &amp; Mạng lưới Alumni
+            {t("title", "Nội dung cộng đồng & Mạng lưới Alumni")}
           </Typography.Title>
           <Typography.Text type="secondary">
-            Quản trị các dự án Open Source, Project Lab nghiên cứu và mạng lưới cựu thành viên hiển thị trên Landing Page.
+            {t("subtitle", "Quản trị các dự án Open Source, Project Lab nghiên cứu và mạng lưới cựu thành viên hiển thị trên Landing Page.")}
           </Typography.Text>
         </div>
 
@@ -678,7 +681,7 @@ export default function CommunityContentManagement() {
               key: "opensource",
               label: (
                 <Space size={6}>
-                  <span>Dự Án Cá Nhân &amp; Open Source</span>
+                  <span>{t("tabs.opensource", "Dự Án Cá Nhân & Open Source")}</span>
                   {pendingOpenSourceCount > 0 && (
                     <Badge
                       count={pendingOpenSourceCount}
@@ -689,8 +692,8 @@ export default function CommunityContentManagement() {
                 </Space>
               ),
             },
-            { key: "project", label: "Project Lab" },
-            { key: "alumni", label: "Mạng Lưới Cựu Thành Viên (Alumni)" },
+            { key: "project", label: t("tabs.project", "Project Lab") },
+            { key: "alumni", label: t("tabs.alumni", "Mạng Lưới Cựu Thành Viên (Alumni)") },
           ]}
         />
 
@@ -919,7 +922,12 @@ export default function CommunityContentManagement() {
             }
             columns={[...columns, actionColumn]}
             dataSource={rows}
-            pagination={{ pageSize: 10 }}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50"],
+              showTotal: (total) => t("paginationTotal", `Tổng cộng ${total} mục`, { total }),
+            }}
             scroll={{ x: 880 }}
           />
         )}
@@ -942,10 +950,10 @@ export default function CommunityContentManagement() {
         <Form form={form} layout="vertical" onFinish={save}>
           {mode === "opensource" && (
             <>
-              <Form.Item name="title" label="Tên dự án" rules={[{ required: true, message: "Vui lòng nhập tên dự án" }]}>
+              <Form.Item name="title" label="Tên dự án" rules={[{ required: true, message: t("validation.titleRequired", "Vui lòng nhập tên dự án") }]}>
                 <Input placeholder="ví dụ: dever-cli, fptu-timetable..." />
               </Form.Item>
-              <Form.Item name="description" label="Mô tả dự án" rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}>
+              <Form.Item name="description" label="Mô tả dự án" rules={[{ required: true, message: t("validation.descriptionRequired", "Vui lòng nhập mô tả") }]}>
                 <Input.TextArea rows={3} placeholder="Công cụ CLI giúp setup dự án nhanh cho thành viên CLB..." />
               </Form.Item>
               <Space style={{ width: "100%" }} size={16}>
@@ -1043,12 +1051,12 @@ export default function CommunityContentManagement() {
                 </div>
               )}
 
-              <Form.Item name="name" label="Họ tên cựu thành viên" rules={[{ required: true, message: "Vui lòng nhập họ tên" }]}>
+              <Form.Item name="name" label="Họ tên cựu thành viên" rules={[{ required: true, message: t("validation.nameRequired", "Vui lòng nhập họ tên") }]}>
                 <Input placeholder="Nguyễn Hải Đăng, Trần Minh Quang..." />
               </Form.Item>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <Form.Item name="graduationGen" label="Thế hệ (Gen)" rules={[{ required: true, message: "Chọn Gen" }]}>
+                <Form.Item name="graduationGen" label="Thế hệ (Gen)" rules={[{ required: true, message: t("validation.genRequired", "Chọn Gen") }]}>
                   <Select options={GEN_CHOICES} />
                 </Form.Item>
                 <Form.Item name="workplace" label="Đơn vị / Công ty (Tự điền bất kỳ)">

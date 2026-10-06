@@ -48,6 +48,7 @@ function MajorManagementModule() {
   const { t } = useTranslation(params?.locale as string, "majorManagement");
 
   const [MajorId, setMajorID] = useState<string>("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [deleteMajor] = useDeleteMajorMutation();
   const [createMajor] = useCreateMajorMutation();
@@ -56,6 +57,8 @@ function MajorManagementModule() {
   const result = majorData?.data ?? [];
 
   const handleDelete = async (id: string) => {
+    if (!id || deletingId) return;
+    setDeletingId(id);
     try {
       await deleteMajor(id).unwrap();
       message.success("Xóa chuyên ngành thành công");
@@ -63,6 +66,8 @@ function MajorManagementModule() {
     } catch (error: any) {
       // 409 = still referenced by members — keep the message visible longer.
       message.error(error?.data?.message || "Xóa chuyên ngành thất bại", error?.status === 409 ? 6 : 3);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -135,6 +140,7 @@ function MajorManagementModule() {
               description={t("deleteMajor.description")}
               okText={t("deleteMajor.okText")}
               cancelText={t("deleteMajor.cancelText")}
+              okButtonProps={{ danger: true, loading: deletingId === record?._id }}
               onConfirm={() => handleDelete(record?._id)}
             >
               <Button
@@ -142,6 +148,7 @@ function MajorManagementModule() {
                 shape="circle"
                 danger
                 icon={<DeleteOutlined />}
+                loading={deletingId === record?._id}
               />
             </Popconfirm>
           </Flex>
@@ -194,7 +201,7 @@ function MajorManagementModule() {
           <Form.Item
             label={t("addMajor.name")}
             name="name"
-            rules={[{ required: true, message: "Please input your Major!" }]}
+            rules={[{ required: true, message: t("validation.nameRequired") }]}
           >
             <Input />
           </Form.Item>
@@ -202,7 +209,7 @@ function MajorManagementModule() {
           <Form.Item
             label={t("addMajor.value")}
             name="constant"
-            rules={[{ required: true, message: "Please input your constant!" }]}
+            rules={[{ required: true, message: t("validation.constantRequired") }]}
           >
             <Input />
           </Form.Item>
@@ -229,7 +236,7 @@ function MajorManagementModule() {
           <Form.Item
             label={t("editMajor.name")}
             name="name"
-            rules={[{ required: true, message: "Please input your Major!" }]}
+            rules={[{ required: true, message: t("validation.nameRequired") }]}
           >
             <Input />
           </Form.Item>
@@ -237,7 +244,7 @@ function MajorManagementModule() {
           <Form.Item
             label={t("editMajor.value")}
             name="constant"
-            rules={[{ required: true, message: "Please input your constant!" }]}
+            rules={[{ required: true, message: t("validation.constantRequired") }]}
           >
             <Input />
           </Form.Item>

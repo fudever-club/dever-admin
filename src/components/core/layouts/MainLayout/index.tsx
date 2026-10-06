@@ -146,7 +146,7 @@ const MainLayout = ({
                     gap={12}
                     onClick={() => {
                       setMobileOpen(false);
-                      router?.push(`/${localActive}/user-management`);
+                      router?.push(`/${localActive}/dashboard`);
                     }}
                     style={{ cursor: "pointer", flex: 1 }}
                   >
@@ -195,7 +195,7 @@ const MainLayout = ({
 
             <Menu
               mode="inline"
-              selectedKeys={[pathname?.split("/")[2] || "user-management"]}
+              selectedKeys={[pathname?.split("/")[2] || "dashboard"]}
               items={sideBarMenuFormat}
               onClick={(e) => handleMenuClick(e?.key)}
             />

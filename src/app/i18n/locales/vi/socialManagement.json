@@ -22,5 +22,9 @@
     "cancelText": "Hủy",
     "okText": "Xác nhận",
     "delete": "Xóa"
+  },
+  "validation": {
+    "nameRequired": "Vui lòng nhập tên mạng xã hội!",
+    "constantRequired": "Vui lòng nhập mã constant!"
   }
 }

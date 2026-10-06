@@ -23,5 +23,9 @@
     "cancelText": "Hủy",
     "okText" : "Xác nhận",
     "delete": "Xóa"
+  },
+  "validation": {
+    "nameRequired": "Vui lòng nhập tên ban!",
+    "constantRequired": "Vui lòng nhập mã constant!"
   }
 }

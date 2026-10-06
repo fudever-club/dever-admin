@@ -53,6 +53,7 @@ function PositionManagementModule() {
 
   const [PositionId, setPositionID] = useState<string>("");
   const [pageSize, setPageSize] = useState<number>(25);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [deletePosition] = useDeletePositionMutation();
   const [createPosition] = useCreatePositionMutation();
@@ -61,6 +62,8 @@ function PositionManagementModule() {
   const result = positionData?.data ?? [];
 
   const handleDelete = async (id: string) => {
+    if (!id || deletingId) return;
+    setDeletingId(id);
     try {
       await deletePosition(id).unwrap();
       message.success("Xóa chức vụ thành công");
@@ -68,6 +71,8 @@ function PositionManagementModule() {
     } catch (error: any) {
       // 409 = still referenced by members or protected — keep the message visible longer.
       message.error(error?.data?.message || "Xóa chức vụ thất bại", error?.status === 409 ? 6 : 3);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -161,6 +166,7 @@ function PositionManagementModule() {
                 description={t("deletePosition.description")}
                 okText={t("deletePosition.okText")}
                 cancelText={t("deletePosition.cancelText")}
+                okButtonProps={{ danger: true, loading: deletingId === record?._id }}
                 onConfirm={() => handleDelete(record?._id)}
               >
                 <Button
@@ -168,6 +174,7 @@ function PositionManagementModule() {
                   shape="circle"
                   danger
                   icon={<DeleteOutlined />}
+                  loading={deletingId === record?._id}
                 />
               </Popconfirm>
             )}
@@ -236,7 +243,7 @@ function PositionManagementModule() {
           <Form.Item
             label={t("addPosition.name")}
             name="name"
-            rules={[{ required: true, message: "Vui lòng nhập tên chức vụ!" }]}
+            rules={[{ required: true, message: t("validation.nameRequired") }]}
           >
             <Input placeholder="Ví dụ: Trưởng Ban Kỹ Thuật" />
           </Form.Item>
@@ -244,7 +251,7 @@ function PositionManagementModule() {
           <Form.Item
             label={t("addPosition.value")}
             name="constant"
-            rules={[{ required: true, message: "Vui lòng nhập mã định danh constant!" }]}
+            rules={[{ required: true, message: t("validation.constantRequired") }]}
           >
             <Input placeholder="Ví dụ: TRUONGBANKYTHUAT" />
           </Form.Item>
@@ -271,7 +278,7 @@ function PositionManagementModule() {
           <Form.Item
             label={t("editPosition.name")}
             name="name"
-            rules={[{ required: true, message: "Vui lòng nhập tên chức vụ!" }]}
+            rules={[{ required: true, message: t("validation.nameRequired") }]}
           >
             <Input />
           </Form.Item>
@@ -279,7 +286,7 @@ function PositionManagementModule() {
           <Form.Item
             label={t("editPosition.value")}
             name="constant"
-            rules={[{ required: true, message: "Vui lòng nhập mã constant!" }]}
+            rules={[{ required: true, message: t("validation.constantRequired") }]}
           >
             <Input disabled={PROTECTED_CONSTANTS.has(editForm.getFieldValue("constant"))} />
           </Form.Item>

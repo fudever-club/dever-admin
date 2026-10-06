@@ -51,6 +51,7 @@ function DepartmentManagementModule() {
   );
 
   const [departmentId, setDepartmentID] = useState<string>("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [deleteDepartment] = useDeleteDepartmentMutation();
   const [createDepartment] = useCreateDepartmentMutation();
@@ -59,6 +60,8 @@ function DepartmentManagementModule() {
   const result = deptData?.data ?? [];
 
   const handleDelete = async (id: string) => {
+    if (!id || deletingId) return;
+    setDeletingId(id);
     try {
       await deleteDepartment(id).unwrap();
       message.success("Xóa ban chuyên môn thành công");
@@ -66,6 +69,8 @@ function DepartmentManagementModule() {
     } catch (error: any) {
       // 409 = still referenced by members — keep the message visible longer.
       message.error(error?.data?.message || "Xóa ban thất bại", error?.status === 409 ? 6 : 3);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -138,6 +143,7 @@ function DepartmentManagementModule() {
               description={t("deleteDepartment.description")}
               okText={t("deleteDepartment.okText")}
               cancelText={t("deleteDepartment.cancelText")}
+              okButtonProps={{ danger: true, loading: deletingId === record?._id }}
               onConfirm={() => handleDelete(record?._id)}
             >
               <Button
@@ -145,6 +151,7 @@ function DepartmentManagementModule() {
                 shape="circle"
                 danger
                 icon={<DeleteOutlined />}
+                loading={deletingId === record?._id}
               />
             </Popconfirm>
           </Flex>
@@ -198,7 +205,7 @@ function DepartmentManagementModule() {
             label={t("addDepartment.name")}
             name="name"
             rules={[
-              { required: true, message: "Please input your department!" },
+              { required: true, message: t("validation.nameRequired") },
             ]}
           >
             <Input />
@@ -207,7 +214,7 @@ function DepartmentManagementModule() {
           <Form.Item
             label={t("addDepartment.value")}
             name="constant"
-            rules={[{ required: true, message: "Please input your constant!" }]}
+            rules={[{ required: true, message: t("validation.constantRequired") }]}
           >
             <Input />
           </Form.Item>
@@ -235,7 +242,7 @@ function DepartmentManagementModule() {
             label={t("editDepartment.name")}
             name="name"
             rules={[
-              { required: true, message: "Please input your department!" },
+              { required: true, message: t("validation.nameRequired") },
             ]}
           >
             <Input />
@@ -244,7 +251,7 @@ function DepartmentManagementModule() {
           <Form.Item
             label={t("editDepartment.value")}
             name="constant"
-            rules={[{ required: true, message: "Please input your constant!" }]}
+            rules={[{ required: true, message: t("validation.constantRequired") }]}
           >
             <Input />
           </Form.Item>

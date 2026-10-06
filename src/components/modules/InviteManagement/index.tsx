@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Button,
@@ -249,7 +249,17 @@ export default function InviteManagement() {
   const [resultSummary, setResultSummary] = useState<string | undefined>(undefined);
   const [revokingId, setRevokingId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const [singleForm] = Form.useForm();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(typeof window !== "undefined" && window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const validPaging =
     Number.isSafeInteger(page) && page >= 1 && Number.isSafeInteger(limit) && limit >= 1;
@@ -491,7 +501,7 @@ export default function InviteManagement() {
       title: t("table.actions", "Thao tác"),
       key: "action",
       width: 180,
-      fixed: "right" as const,
+      fixed: isMobile ? undefined : ("right" as const),
       render: (_: unknown, record: InviteEntry) => (
         <Space size={8} wrap>
           <Tooltip

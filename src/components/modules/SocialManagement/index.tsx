@@ -48,6 +48,7 @@ function SocialManagementModule() {
   const { t } = useTranslation(params?.locale as string, "socialManagement");
 
   const [SocialId, setSocialID] = useState<string>("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [deleteSocial] = useDeleteSocialMutation();
   const [createSocial] = useCreateSocialMutation();
@@ -56,6 +57,8 @@ function SocialManagementModule() {
   const result = socialData?.data ?? [];
 
   const handleDelete = async (id: string) => {
+    if (!id || deletingId) return;
+    setDeletingId(id);
     try {
       await deleteSocial(id).unwrap();
       message.success("Xóa mạng xã hội thành công");
@@ -63,6 +66,8 @@ function SocialManagementModule() {
     } catch (error: any) {
       // 409 = still referenced by members — keep the message visible longer.
       message.error(error?.data?.message || "Xóa mạng xã hội thất bại", error?.status === 409 ? 6 : 3);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -135,6 +140,7 @@ function SocialManagementModule() {
               description={t("deleteSocial.description")}
               okText={t("deleteSocial.okText")}
               cancelText={t("deleteSocial.cancelText")}
+              okButtonProps={{ danger: true, loading: deletingId === record?._id }}
               onConfirm={() => handleDelete(record?._id)}
             >
               <Button
@@ -142,6 +148,7 @@ function SocialManagementModule() {
                 shape="circle"
                 danger
                 icon={<DeleteOutlined />}
+                loading={deletingId === record?._id}
               />
             </Popconfirm>
           </Flex>
@@ -194,7 +201,7 @@ function SocialManagementModule() {
           <Form.Item
             label={t("addSocial.name")}
             name="name"
-            rules={[{ required: true, message: "Please input your Social!" }]}
+            rules={[{ required: true, message: t("validation.nameRequired") }]}
           >
             <Input />
           </Form.Item>
@@ -202,7 +209,7 @@ function SocialManagementModule() {
           <Form.Item
             label={t("addSocial.value")}
             name="constant"
-            rules={[{ required: true, message: "Please input your constant!" }]}
+            rules={[{ required: true, message: t("validation.constantRequired") }]}
           >
             <Input />
           </Form.Item>
@@ -229,7 +236,7 @@ function SocialManagementModule() {
           <Form.Item
             label={t("editSocial.name")}
             name="name"
-            rules={[{ required: true, message: "Please input your Social!" }]}
+            rules={[{ required: true, message: t("validation.nameRequired") }]}
           >
             <Input />
           </Form.Item>
@@ -237,7 +244,7 @@ function SocialManagementModule() {
           <Form.Item
             label={t("editSocial.value")}
             name="constant"
-            rules={[{ required: true, message: "Please input your constant!" }]}
+            rules={[{ required: true, message: t("validation.constantRequired") }]}
           >
             <Input />
           </Form.Item>

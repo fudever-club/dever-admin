@@ -23,5 +23,9 @@
     "cancelText": "Cancel",
     "okText": "Ok",
     "delete": "Delete"
+  },
+  "validation": {
+    "nameRequired": "Please enter the position name!",
+    "constantRequired": "Please enter the constant code!"
   }
 }

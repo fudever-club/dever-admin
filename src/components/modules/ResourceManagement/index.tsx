@@ -35,6 +35,8 @@ import {
 } from "@ant-design/icons";
 import webStorageClient from "@/utils/webStorageClient";
 import { constants } from "@/settings";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -54,6 +56,8 @@ interface ResourceData {
 }
 
 export default function ResourceManagementModule() {
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "resourceManagement");
   const [resources, setResources] = useState<ResourceData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -251,7 +255,7 @@ export default function ResourceManagementModule() {
 
   const columns = [
     {
-      title: "Tên tài liệu / Slide",
+      title: t("table.name", "Tên tài liệu / Slide"),
       dataIndex: "title",
       key: "title",
       width: 280,
@@ -266,14 +270,14 @@ export default function ResourceManagementModule() {
               </Paragraph>
             )}
             <Text type="secondary" style={{ fontSize: 11, color: "#64748B", display: "block" }}>
-              Tác giả: {record.author || "FU-DEVER"}
+              {record.author || t("table.authorFallback", "FU-DEVER")}
             </Text>
           </div>
         </div>
       ),
     },
     {
-      title: "Loại tài liệu",
+      title: t("table.type", "Loại tài liệu"),
       dataIndex: "type",
       key: "type",
       width: 140,
@@ -290,7 +294,7 @@ export default function ResourceManagementModule() {
       },
     },
     {
-      title: "Chủ đề",
+      title: t("table.category", "Chủ đề"),
       dataIndex: "category",
       key: "category",
       width: 160,
@@ -301,7 +305,7 @@ export default function ResourceManagementModule() {
       ),
     },
     {
-      title: "Dung lượng / Nguồn",
+      title: t("table.size", "Dung lượng / Nguồn"),
       dataIndex: "size",
       key: "size",
       width: 140,
@@ -312,7 +316,7 @@ export default function ResourceManagementModule() {
       ),
     },
     {
-      title: "Đường dẫn File",
+      title: t("table.fileUrl", "Đường dẫn File"),
       dataIndex: "fileUrl",
       key: "fileUrl",
       width: 130,
@@ -323,14 +327,14 @@ export default function ResourceManagementModule() {
           rel="noreferrer noopener"
           style={{ color: "#0066CC", fontWeight: 600, fontSize: 12 }}
         >
-          <LinkOutlined /> Xem File ↗
+          <LinkOutlined /> {t("table.viewFile", "Xem File")} ↗
         </a>
       ),
     },
     {
       title: (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-          <StarFilled style={{ color: "#F59E0B" }} /> Tiêu Điểm
+          <StarFilled style={{ color: "#F59E0B" }} /> {t("table.featured", "Tiêu Điểm")}
         </span>
       ),
       dataIndex: "isFeatured",
@@ -350,16 +354,16 @@ export default function ResourceManagementModule() {
       ),
     },
     {
-      title: "Thao tác",
+      title: t("table.actions", "Thao tác"),
       key: "action",
       width: 90,
       render: (_: any, record: ResourceData) => (
         <Popconfirm
-          title="Xóa tài liệu"
-          description={`Bạn có chắc chắn muốn xóa "${record.title}"?`}
+          title={t("delete.title", "Xóa tài liệu")}
+          description={t("delete.description", `Bạn có chắc chắn muốn xóa "${record.title}"?`, { title: record.title })}
           onConfirm={() => handleDelete(record._id)}
-          okText="Xóa"
-          cancelText="Hủy"
+          okText={t("delete.okText", "Xóa")}
+          cancelText={t("delete.cancelText", "Hủy")}
           okButtonProps={{ danger: true, loading: deletingId === record._id }}
         >
           <Button
@@ -367,9 +371,9 @@ export default function ResourceManagementModule() {
             type="text"
             icon={<DeleteOutlined />}
             loading={deletingId === record._id}
-            aria-label={`Xóa tài liệu ${record.title}`}
+            aria-label={t("delete.title", `Xóa tài liệu ${record.title}`)}
           >
-            Xóa
+            {t("delete.okText", "Xóa")}
           </Button>
         </Popconfirm>
       ),
@@ -391,10 +395,10 @@ export default function ResourceManagementModule() {
       >
         <div>
           <Title level={4} style={{ margin: 0, color: "#0066CC", fontSize: "18px", fontWeight: 700 }}>
-            <FolderOpenOutlined aria-hidden="true" /> Quản Lý Tài Liệu & Slide Workshop
+            <FolderOpenOutlined aria-hidden="true" /> {t("title", "Quản Lý Tài Liệu & Slide Workshop")}
           </Title>
           <Text type="secondary" style={{ fontSize: "13px" }}>
-            Đăng tải tài liệu, Ebook, Slide bài giảng, tự động đồng bộ lên Landing Page.
+            {t("subtitle", "Đăng tải tài liệu, Ebook, Slide bài giảng, tự động đồng bộ lên Landing Page.")}
           </Text>
         </div>
         <Space>
@@ -404,7 +408,7 @@ export default function ResourceManagementModule() {
             loading={loading}
             style={{ borderRadius: 8 }}
           >
-            Làm mới
+            {t("refresh", "Làm mới")}
           </Button>
           <Button
             type="primary"
@@ -423,7 +427,7 @@ export default function ResourceManagementModule() {
               boxShadow: "0 2px 4px rgba(0,102,204,0.15)",
             }}
           >
-            Tải Lên Tài Liệu Mới
+            {t("uploadNew", "Tải Lên Tài Liệu Mới")}
           </Button>
         </Space>
       </div>
@@ -440,7 +444,12 @@ export default function ResourceManagementModule() {
           dataSource={resources}
           columns={columns}
           loading={loading}
-          pagination={{ pageSize: 8 }}
+          pagination={{
+            pageSize: 8,
+            showSizeChanger: true,
+            pageSizeOptions: ["8", "16", "32"],
+            showTotal: (total) => t("paginationTotal", `Tổng cộng ${total} tài liệu`, { total }),
+          }}
           scroll={{ x: 880 }}
         />
       </Card>
@@ -471,7 +480,7 @@ export default function ResourceManagementModule() {
           <Form.Item
             label="Tên bài giảng / Tài liệu"
             name="title"
-            rules={[{ required: true, message: "Vui lòng nhập tên tài liệu!" }]}
+            rules={[{ required: true, message: t("validation.titleRequired", "Vui lòng nhập tên tài liệu!") }]}
           >
             <Input placeholder="Ví dụ: Slide Workshop Clean Architecture 2026..." />
           </Form.Item>
@@ -544,8 +553,8 @@ export default function ResourceManagementModule() {
               label="Đường dẫn tài liệu"
               name="fileUrl"
               rules={[
-                { required: true, message: "Vui lòng dán link tài liệu." },
-                { type: "url", message: "Link phải bắt đầu bằng http:// hoặc https://" },
+                { required: true, message: t("validation.fileUrlRequired", "Vui lòng dán link tài liệu.") },
+                { type: "url", message: t("validation.urlInvalid", "Link phải bắt đầu bằng http:// hoặc https://") },
               ]}
               extra="Hỗ trợ Google Docs, Google Drive, GitHub, OneDrive và mọi link HTTP(S) công khai."
             >

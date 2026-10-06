@@ -1,5 +1,6 @@
 {
   "title": "Quản lý dự án",
+  "paginationTotal": "Tổng cộng {{total}} dự án",
   "deleteProject": {
     "title": "Xóa dự án",
     "description": "Bạn có chắc chắn muốn xoá dự án này?",

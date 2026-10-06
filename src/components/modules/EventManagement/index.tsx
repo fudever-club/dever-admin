@@ -44,6 +44,8 @@ import {
 import webStorageClient from "@/utils/webStorageClient";
 import { constants } from "@/settings";
 import { compressImage } from "@/utils/imageCompressor";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/app/i18n/client";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -135,10 +137,11 @@ interface EventAdminData {
 }
 
 export default function EventManagementModule() {
+  const params = useParams();
+  const { t } = useTranslation(params?.locale as string, "eventManagement");
   const [events, setEvents] = useState<EventAdminData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -504,48 +507,51 @@ export default function EventManagementModule() {
       ? events
       : events.filter((e) => e.status === filterStatus);
 
+  // Honest counts on fetch failure (ExecutiveAnalytics pattern):
+  // fetchError → "—" instead of misleading 0; Alert + retry is rendered above the table.
+  const isCountUnavailable = fetchError && !loading;
   const filterTabs = [
     {
       key: "all",
       label: "Tất cả",
       icon: <AppstoreOutlined />,
-      count: events.length,
+      count: isCountUnavailable ? "—" : events.length,
     },
     {
       key: "Đang mở đăng ký",
       label: "Đang mở đăng ký",
       icon: <CheckCircleOutlined style={{ color: "#0066CC" }} />,
-      count: events.filter((e) => e.status === "Đang mở đăng ký").length,
+      count: isCountUnavailable ? "—" : events.filter((e) => e.status === "Đang mở đăng ký").length,
     },
     {
       key: "Đang diễn ra",
       label: "Đang diễn ra",
       icon: <PlayCircleOutlined style={{ color: "#E11D48" }} />,
-      count: events.filter((e) => e.status === "Đang diễn ra").length,
+      count: isCountUnavailable ? "—" : events.filter((e) => e.status === "Đang diễn ra").length,
     },
     {
       key: "Sắp diễn ra",
       label: "Sắp diễn ra",
       icon: <ClockCircleOutlined style={{ color: "#D97706" }} />,
-      count: events.filter((e) => e.status === "Sắp diễn ra").length,
+      count: isCountUnavailable ? "—" : events.filter((e) => e.status === "Sắp diễn ra").length,
     },
     {
       key: "Đã kết thúc",
       label: "Đã kết thúc",
       icon: <HistoryOutlined style={{ color: "#64748B" }} />,
-      count: events.filter((e) => e.status === "Đã kết thúc").length,
+      count: isCountUnavailable ? "—" : events.filter((e) => e.status === "Đã kết thúc").length,
     },
     {
       key: "Tạm hoãn",
       label: "Tạm hoãn",
       icon: <PauseCircleOutlined style={{ color: "#7C3AED" }} />,
-      count: events.filter((e) => e.status === "Tạm hoãn").length,
+      count: isCountUnavailable ? "—" : events.filter((e) => e.status === "Tạm hoãn").length,
     },
   ];
 
   const columns = [
     {
-      title: "Ảnh Bìa",
+      title: t("table.cover", "Ảnh Bìa"),
       dataIndex: "coverImage",
       key: "coverImage",
       width: 85,
@@ -561,7 +567,7 @@ export default function EventManagementModule() {
       ),
     },
     {
-      title: "Tên Sự kiện & Mô tả",
+      title: t("table.name", "Tên Sự kiện & Mô tả"),
       dataIndex: "title",
       key: "title",
       width: 260,
@@ -605,7 +611,7 @@ export default function EventManagementModule() {
     {
       title: (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-          <StarFilled style={{ color: "#F59E0B" }} /> Nổi Bật (Hero)
+          <StarFilled style={{ color: "#F59E0B" }} /> {t("table.featured", "Nổi Bật (Hero)")}
         </span>
       ),
       dataIndex: "isFeatured",
@@ -625,7 +631,7 @@ export default function EventManagementModule() {
       ),
     },
     {
-      title: "Trạng thái",
+      title: t("table.status", "Trạng thái"),
       dataIndex: "status",
       key: "status",
       width: 165,
@@ -679,7 +685,7 @@ export default function EventManagementModule() {
       },
     },
     {
-      title: "Link Đăng Ký",
+      title: t("table.registerLink", "Link Đăng Ký"),
       dataIndex: "registerUrl",
       key: "registerUrl",
       width: 140,
@@ -693,7 +699,7 @@ export default function EventManagementModule() {
         ),
     },
     {
-      title: "Mã QR Check-in",
+      title: t("table.qrCheckin", "Mã QR Check-in"),
       key: "qr",
       width: 150,
       render: (_: any, record: EventAdminData) =>
@@ -711,7 +717,7 @@ export default function EventManagementModule() {
         ),
     },
     {
-      title: "Thao tác",
+      title: t("table.actions", "Thao tác"),
       key: "action",
       width: 130,
       render: (_: any, record: EventAdminData) => (
@@ -726,11 +732,11 @@ export default function EventManagementModule() {
             Sửa
           </Button>
           <Popconfirm
-            title="Xác nhận xóa sự kiện"
-            description="Bạn có chắc chắn muốn xóa sự kiện này không? Hành động này không thể hoàn tác."
+            title={t("delete.title", "Xác nhận xóa sự kiện")}
+            description={t("delete.description", "Bạn có chắc chắn muốn xóa sự kiện này không? Hành động này không thể hoàn tác.")}
             onConfirm={() => handleDelete(record._id)}
-            okText="Xóa"
-            cancelText="Hủy"
+            okText={t("delete.okText", "Xóa")}
+            cancelText={t("delete.cancelText", "Hủy")}
             okButtonProps={{ danger: true, loading: deletingId === record._id }}
           >
             <Button
@@ -763,10 +769,10 @@ export default function EventManagementModule() {
       >
         <div>
           <Title level={4} style={{ margin: 0, color: "#0066CC", fontSize: "18px", fontWeight: 700 }}>
-            <CalendarOutlined aria-hidden="true" /> Quản Lý Sự Kiện & Workshop
+            <CalendarOutlined aria-hidden="true" /> {t("title", "Quản Lý Sự Kiện & Workshop")}
           </Title>
           <Text type="secondary" style={{ fontSize: "13px" }}>
-            Linh hoạt ghim sự kiện nổi bật lên Hero Banner, lọc trạng thái và tạo mã QR check-in bàn desk.
+            {t("subtitle", "Linh hoạt ghim sự kiện nổi bật lên Hero Banner, lọc trạng thái và tạo mã QR check-in bàn desk.")}
           </Text>
         </div>
         <Space>
@@ -776,7 +782,7 @@ export default function EventManagementModule() {
             loading={loading}
             style={{ borderRadius: 8 }}
           >
-            Làm mới
+            {t("refresh", "Làm mới")}
           </Button>
           <Button
             type="primary"
@@ -799,7 +805,7 @@ export default function EventManagementModule() {
               boxShadow: "0 2px 4px rgba(0,102,204,0.15)",
             }}
           >
-            Tạo Sự Kiện Mới
+            {t("addEvent", "Tạo Sự Kiện Mới")}
           </Button>
         </Space>
       </div>
@@ -873,11 +879,11 @@ export default function EventManagementModule() {
           <Alert
             type="error"
             showIcon
-            message="Không thể tải danh sách sự kiện"
-            description="Vui lòng kiểm tra kết nối và thử lại."
+            message={t("error.title", "Không thể tải danh sách sự kiện")}
+            description={t("error.desc", "Vui lòng kiểm tra kết nối và thử lại.")}
             action={
               <Button size="small" danger onClick={fetchEvents}>
-                Thử lại
+                {t("retry", "Thử lại")}
               </Button>
             }
             style={{ marginBottom: 12 }}
@@ -891,7 +897,7 @@ export default function EventManagementModule() {
           pagination={{
             pageSize: 5,
             showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} sự kiện`,
+            showTotal: (total) => t("paginationTotal", `${total} sự kiện`, { total }),
           }}
           scroll={{ x: 920 }}
         />
@@ -919,18 +925,18 @@ export default function EventManagementModule() {
           onFinish={handleAddEvent}
           initialValues={{ status: "Đang mở đăng ký", isFeatured: false }}
         >
-          <Form.Item label="Tiêu đề Sự kiện / Workshop" name="title" rules={[{ required: true, message: "Vui lòng nhập tiêu đề sự kiện!" }]}>
+          <Form.Item label="Tiêu đề Sự kiện / Workshop" name="title" rules={[{ required: true, message: t("validation.titleRequired", "Vui lòng nhập tiêu đề sự kiện!") }]}>
             <Input placeholder="Ví dụ: Workshop Tối Ưu Hóa Code Web 2026..." />
           </Form.Item>
 
           <Row gutter={[12, 12]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Ngày diễn ra" name="date" rules={[{ required: true, message: "Nhập ngày diễn ra!" }]}>
+              <Form.Item label="Ngày diễn ra" name="date" rules={[{ required: true, message: t("validation.dateRequired", "Nhập ngày diễn ra!") }]}>
                 <Input placeholder="Ví dụ: 15/08/2026" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Khung giờ" name="time" rules={[{ required: true, message: "Nhập khung giờ!" }]}>
+              <Form.Item label="Khung giờ" name="time" rules={[{ required: true, message: t("validation.timeRequired", "Nhập khung giờ!") }]}>
                 <Input placeholder="Ví dụ: 14:00 - 17:00" />
               </Form.Item>
             </Col>
@@ -938,7 +944,7 @@ export default function EventManagementModule() {
 
           <Row gutter={[12, 12]}>
             <Col xs={24} sm={14}>
-              <Form.Item label="Địa điểm tổ chức" name="location" rules={[{ required: true, message: "Vui lòng nhập địa điểm!" }]}>
+              <Form.Item label="Địa điểm tổ chức" name="location" rules={[{ required: true, message: t("validation.locationRequired", "Vui lòng nhập địa điểm!") }]}>
                 <Input placeholder="Ví dụ: Hội trường Beta, FPTU Da Nang..." />
               </Form.Item>
             </Col>
@@ -1050,7 +1056,7 @@ export default function EventManagementModule() {
           <Form.Item
             label="Mô Tả Chi Tiết Sự Kiện (Description & Agenda)"
             name="description"
-            rules={[{ required: true, message: "Vui lòng nhập mô tả sự kiện!" }]}
+            rules={[{ required: true, message: t("validation.descriptionRequired", "Vui lòng nhập mô tả sự kiện!") }]}
           >
             <TextArea
               rows={4}
@@ -1127,18 +1133,18 @@ export default function EventManagementModule() {
           layout="vertical"
           onFinish={handleUpdateEvent}
         >
-          <Form.Item label="Tiêu đề Sự kiện / Workshop" name="title" rules={[{ required: true, message: "Vui lòng nhập tiêu đề sự kiện!" }]}>
+          <Form.Item label="Tiêu đề Sự kiện / Workshop" name="title" rules={[{ required: true, message: t("validation.titleRequired", "Vui lòng nhập tiêu đề sự kiện!") }]}>
             <Input placeholder="Ví dụ: Workshop Tối Ưu Hóa Code Web 2026..." />
           </Form.Item>
 
           <Row gutter={[12, 12]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Ngày diễn ra" name="date" rules={[{ required: true, message: "Nhập ngày diễn ra!" }]}>
+              <Form.Item label="Ngày diễn ra" name="date" rules={[{ required: true, message: t("validation.dateRequired", "Nhập ngày diễn ra!") }]}>
                 <Input placeholder="Ví dụ: 15/08/2026" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Khung giờ" name="time" rules={[{ required: true, message: "Nhập khung giờ!" }]}>
+              <Form.Item label="Khung giờ" name="time" rules={[{ required: true, message: t("validation.timeRequired", "Nhập khung giờ!") }]}>
                 <Input placeholder="Ví dụ: 14:00 - 17:00" />
               </Form.Item>
             </Col>
@@ -1146,7 +1152,7 @@ export default function EventManagementModule() {
 
           <Row gutter={[12, 12]}>
             <Col xs={24} sm={14}>
-              <Form.Item label="Địa điểm tổ chức" name="location" rules={[{ required: true, message: "Vui lòng nhập địa điểm!" }]}>
+              <Form.Item label="Địa điểm tổ chức" name="location" rules={[{ required: true, message: t("validation.locationRequired", "Vui lòng nhập địa điểm!") }]}>
                 <Input placeholder="Ví dụ: Hội trường Beta, FPTU Da Nang..." />
               </Form.Item>
             </Col>
@@ -1258,7 +1264,7 @@ export default function EventManagementModule() {
           <Form.Item
             label="Mô Tả Chi Tiết Sự Kiện (Description & Agenda)"
             name="description"
-            rules={[{ required: true, message: "Vui lòng nhập mô tả sự kiện!" }]}
+            rules={[{ required: true, message: t("validation.descriptionRequired", "Vui lòng nhập mô tả sự kiện!") }]}
           >
             <TextArea
               rows={4}

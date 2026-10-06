@@ -480,11 +480,13 @@ export default function BlogManagement() {
     },
   ];
 
-  // Quick Metric Counts
+  // Quick Metric Counts (honest on fetch failure: Alert + "—" instead of misleading 0,
+  // same pattern as ExecutiveAnalytics unavailable + AuditFunnel partial warning).
   const totalCount = blogs.length;
   const pendingCount = blogs.filter((b) => b.status === "pending_review").length;
   const publishedCount = blogs.filter((b) => b.status === "published").length;
   const featuredCount = blogs.filter((b) => b.isFeatured).length;
+  const metricDisplay = (value: number) => (fetchError && !loading ? "—" : value);
 
   return (
     <div className="p-6 space-y-6">
@@ -523,12 +525,12 @@ export default function BlogManagement() {
         </Button>
       </div>
 
-      {/* Metric Cards Row */}
+      {/* Metric Cards Row (fetchError → "—", never misleading 0) */}
       <Row gutter={[16, 16]}>
         <Col xs={12} sm={6}>
           <Card className="!rounded-2xl !border-slate-200 shadow-2xs hover:border-blue-300 transition-all">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("metrics.total", "Tổng bài viết")}</div>
-            <div className="text-2xl font-black text-slate-900 mt-1">{totalCount}</div>
+            <div className="text-2xl font-black text-slate-900 mt-1">{metricDisplay(totalCount)}</div>
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -536,7 +538,7 @@ export default function BlogManagement() {
             <div className="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1">
               <ClockCircleOutlined /> {t("metrics.pending", "Chờ duyệt")}
             </div>
-            <div className="text-2xl font-black text-amber-900 mt-1">{pendingCount}</div>
+            <div className="text-2xl font-black text-amber-900 mt-1">{metricDisplay(pendingCount)}</div>
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -544,7 +546,7 @@ export default function BlogManagement() {
             <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
               <CheckCircleOutlined /> {t("metrics.published", "Đã xuất bản")}
             </div>
-            <div className="text-2xl font-black text-emerald-900 mt-1">{publishedCount}</div>
+            <div className="text-2xl font-black text-emerald-900 mt-1">{metricDisplay(publishedCount)}</div>
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -552,7 +554,7 @@ export default function BlogManagement() {
             <div className="text-xs font-bold text-[#0066CC] uppercase tracking-wider flex items-center gap-1">
               <StarFilled className="text-amber-500" /> {t("metrics.featured", "Ghim nổi bật")}
             </div>
-            <div className="text-2xl font-black text-[#004C99] mt-1">{featuredCount}</div>
+            <div className="text-2xl font-black text-[#004C99] mt-1">{metricDisplay(featuredCount)}</div>
           </Card>
         </Col>
       </Row>
@@ -566,14 +568,14 @@ export default function BlogManagement() {
             items={[
               {
                 key: "all",
-                label: <span className="font-bold">{t("tabs.allWithCount", `Tất cả (${blogs.length})`, { count: blogs.length })}</span>,
+                label: <span className="font-bold">{fetchError && !loading ? t("tabs.allWithCount", "Tất cả (—)", { count: "—" as unknown as number }) : t("tabs.allWithCount", `Tất cả (${blogs.length})`, { count: blogs.length })}</span>,
               },
               {
                 key: "pending_review",
                 label: (
-                  <Badge count={pendingCount} offset={[8, 0]}>
+                  <Badge count={fetchError && !loading ? 0 : pendingCount} showZero={!fetchError} offset={[8, 0]}>
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5">
-                      <ClockCircleOutlined style={{ color: "#D97706" }} /> {t("tabs.pending", "Chờ duyệt")}
+                      <ClockCircleOutlined style={{ color: "#D97706" }} /> {t("tabs.pending", "Chờ duyệt")}{fetchError && !loading ? " (—)" : ""}
                     </span>
                   </Badge>
                 ),
@@ -581,9 +583,9 @@ export default function BlogManagement() {
               {
                 key: "overdue",
                 label: (
-                  <Badge count={overdueCount} offset={[8, 0]} color="#DC2626">
+                  <Badge count={fetchError && !loading ? 0 : overdueCount} showZero={!fetchError} offset={[8, 0]} color="#DC2626">
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5 text-red-600">
-                      <ExclamationCircleOutlined /> {t("sla.overdueTabWithCount", `Quá hạn (${overdueCount})`, { count: overdueCount })}
+                      <ExclamationCircleOutlined /> {fetchError && !loading ? t("sla.overdueTabWithCount", "Quá hạn (—)", { count: "—" as unknown as number }) : t("sla.overdueTabWithCount", `Quá hạn (${overdueCount})`, { count: overdueCount })}
                     </span>
                   </Badge>
                 ),
@@ -591,7 +593,7 @@ export default function BlogManagement() {
               {
                 key: "published",
                 label: (
-                  <Badge count={publishedCount} offset={[8, 0]} color="#10B981">
+                  <Badge count={fetchError && !loading ? 0 : publishedCount} showZero={!fetchError} offset={[8, 0]} color="#10B981">
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5 text-emerald-700">
                       <CheckCircleOutlined /> {t("tabs.published", "Đã xuất bản")}
                     </span>
@@ -601,7 +603,7 @@ export default function BlogManagement() {
               {
                 key: "featured",
                 label: (
-                  <Badge count={featuredCount} offset={[8, 0]} color="#F59E0B">
+                  <Badge count={fetchError && !loading ? 0 : featuredCount} showZero={!fetchError} offset={[8, 0]} color="#F59E0B">
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5 text-amber-600">
                       <StarFilled /> {t("tabs.featured", "Nổi bật")}
                     </span>
@@ -611,7 +613,7 @@ export default function BlogManagement() {
               {
                 key: "changes_requested",
                 label: (
-                  <Badge count={blogs.filter((b) => b.status === "changes_requested").length} offset={[8, 0]}>
+                  <Badge count={fetchError && !loading ? 0 : blogs.filter((b) => b.status === "changes_requested").length} showZero={!fetchError} offset={[8, 0]}>
                     <span className="font-bold pr-2 inline-flex items-center gap-1.5">
                       <ExclamationCircleOutlined style={{ color: "#EA580C" }} /> {t("tabs.changesRequested", "Cần chỉnh sửa")}
                     </span>
@@ -622,7 +624,7 @@ export default function BlogManagement() {
                 key: "draft",
                 label: (
                   <span className="font-bold inline-flex items-center gap-1.5">
-                    <FileTextOutlined style={{ color: "#64748B" }} /> {t("tabs.draftWithCount", `Bản nháp (${blogs.filter((b) => b.status === "draft").length})`, { count: blogs.filter((b) => b.status === "draft").length })}
+                    <FileTextOutlined style={{ color: "#64748B" }} /> {fetchError && !loading ? t("tabs.draftWithCount", "Bản nháp (—)", { count: "—" as unknown as number }) : t("tabs.draftWithCount", `Bản nháp (${blogs.filter((b) => b.status === "draft").length})`, { count: blogs.filter((b) => b.status === "draft").length })}
                   </span>
                 ),
               },
