@@ -1,6 +1,6 @@
 {
   "title": "Mentor Connections",
-  "subtitle": "Browse mentors open for connection (GET /api/v1/mentorship/mentors) and the review queue (GET /api/v1/mentorship/requests, cross-checked via the audit log).",
+  "subtitle": "Browse mentors open for connection and the review queue — cross-checked via the audit log.",
   "openAuditLog": "Open audit log",
   "refresh": "Refresh",
   "retry": "Retry",

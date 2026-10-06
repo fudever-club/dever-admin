@@ -352,7 +352,7 @@ export default function MentorshipManagement() {
             <TeamOutlined style={{ color: "#0066CC" }} /> {t("title", "Kết nối mentor")}
           </Title>
           <Text type="secondary" style={{ fontSize: 13, marginTop: 4, display: "block" }}>
-            {t("subtitle", "Danh sách mentors đang mở kết nối (GET /api/v1/mentorship/mentors) + hàng chờ duyệt (GET /api/v1/mentorship/requests, đối soát qua nhật ký kiểm toán).")}
+            {t("subtitle", "Danh sách mentors đang mở kết nối và hàng chờ duyệt — đối soát qua nhật ký kiểm toán.")}
           </Text>
         </div>
         <Space size={8} wrap>
