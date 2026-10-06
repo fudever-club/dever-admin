@@ -1,10 +1,11 @@
-import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
-export default async function DashboardPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  redirect(`/${locale}/user-management`);
+export const metadata: Metadata = {
+  title: "FU-DEVER | Bảng điều khiển",
+};
+
+import DashboardModule from "@/components/modules/Dashboard";
+
+export default function DashboardPage() {
+  return <DashboardModule />;
 }
