@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  NEXT_PUBLIC_API_SERVER: https://dever-backend-production.up.railway.app
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: node node_modules/typescript/bin/tsc --noEmit --incremental false
+      - run: npm run build
+      - run: node --test tests/admin-regressions.test.cjs tests/sign-in-regressions.test.cjs
