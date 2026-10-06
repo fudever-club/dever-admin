@@ -1,0 +1,54 @@
+{
+  "title": "Club Album Management",
+  "subtitle": "Create and manage photo collections of DEVER events, workshops and outdoor activities.",
+  "addAlbum": "Add New Album",
+  "table": {
+    "name": "Album Name",
+    "description": "Description",
+    "imageCount": "Photos",
+    "actions": "Actions",
+    "empty": "No albums yet",
+    "emptyDescription": "No description"
+  },
+  "imageUnit": "{{count}} photos",
+  "delete": {
+    "title": "Delete album",
+    "description": "Are you sure you want to delete this album?",
+    "okText": "Delete",
+    "cancelText": "Cancel"
+  },
+  "addModal": {
+    "title": "Add New Photo Album",
+    "nameLabel": "Album Name",
+    "namePlaceholder": "E.g.: AI & Web Fullstack Workshop 2026...",
+    "descriptionLabel": "Short description",
+    "descriptionPlaceholder": "Describe the event, venue and highlights...",
+    "cancel": "Cancel",
+    "submit": "Create Album"
+  },
+  "editModal": {
+    "title": "Edit Album",
+    "nameLabel": "Album Name",
+    "descriptionLabel": "Description",
+    "cancel": "Cancel",
+    "submit": "Save Changes"
+  },
+  "validation": {
+    "nameRequired": "Please enter the album name!",
+    "descriptionRequired": "Please enter a short description!"
+  },
+  "messages": {
+    "createSuccess": "Added successfully",
+    "createFailed": "Failed to add album, please try again",
+    "updateSuccess": "Updated successfully",
+    "updateFailed": "Failed to update album, please try again",
+    "deleteSuccess": "Deleted successfully",
+    "deleteFailed": "Failed to delete album, please try again"
+  },
+  "paginationTotal": "{{total}} albums in total",
+  "aria": {
+    "view": "View album details",
+    "edit": "Edit album info",
+    "delete": "Delete album"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "title": "Club Fund Management",
+  "subtitle": "Track fund payments, review transfer proofs and manage collection campaigns.",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "tabs": {
+    "payments": "Payments",
+    "campaigns": "Campaigns"
+  },
+  "table": {
+    "member": "Member",
+    "campaign": "Campaign",
+    "amount": "Amount",
+    "receipt": "Receipt / Bill",
+    "transactionCode": "Transaction code",
+    "status": "Status",
+    "submittedAt": "Submitted at",
+    "actions": "Actions",
+    "empty": "No payments yet"
+  },
+  "paginationTotal": "{{total}} payments in total",
+  "error": {
+    "title": "Failed to load fund data",
+    "desc": "Please check your connection and try again."
+  },
+  "validation": {
+    "titleRequired": "Please enter a title",
+    "amountRequired": "Enter the amount",
+    "semesterRequired": "Enter the semester",
+    "dateRangeRequired": "Select a time range",
+    "bankNameRequired": "Enter the bank name",
+    "bankCodeRequired": "Enter the bank code",
+    "accountNumberRequired": "Enter the account number",
+    "accountHolderRequired": "Enter the account holder name"
+  }
+}

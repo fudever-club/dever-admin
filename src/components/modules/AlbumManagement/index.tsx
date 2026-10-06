@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  Empty,
   Flex,
   Form,
   Input,
@@ -53,10 +54,11 @@ function AlbumManagementModule() {
   const addModal = useModal();
   const editModal = useModal();
 
-  const { t } = useTranslation(params?.locale as string, "majorManagement");
+  const { t } = useTranslation(params?.locale as string, "albumManagement");
 
   const [MajorId, setMajorID] = useState<string>("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pageSize, setPageSize] = useState<number>(8);
 
   const [deleteAlbum] = useDeleteAlbumMutation();
   const [createAlbum] = useCreateAlbumMutation();
@@ -77,10 +79,10 @@ function AlbumManagementModule() {
     setDeletingId(id);
     try {
       await deleteAlbum(id).unwrap();
-      message.success("Xóa thành công");
+      message.success(t("messages.deleteSuccess", "Xóa thành công"));
       refetch();
     } catch (error: any) {
-      message.error(error?.data?.message || "Xóa album thất bại, vui lòng thử lại");
+      message.error(error?.data?.message || t("messages.deleteFailed", "Xóa album thất bại, vui lòng thử lại"));
     } finally {
       setDeletingId(null);
     }
@@ -89,11 +91,11 @@ function AlbumManagementModule() {
   const handleAdd = async (values: any) => {
     try {
       await createAlbum(values).unwrap();
-      message.success("Thêm thành công");
+      message.success(t("messages.createSuccess", "Thêm thành công"));
       refetch();
       addModal.closeModal();
     } catch (error: any) {
-      message.error(error?.data?.message || "Thêm album thất bại, vui lòng thử lại");
+      message.error(error?.data?.message || t("messages.createFailed", "Thêm album thất bại, vui lòng thử lại"));
     }
   };
 
@@ -103,17 +105,17 @@ function AlbumManagementModule() {
         params: { id: MajorId },
         body: values,
       }).unwrap();
-      message.success("Sửa thành công");
+      message.success(t("messages.updateSuccess", "Sửa thành công"));
       refetch();
       editModal.closeModal();
     } catch (error: any) {
-      message.error(error?.data?.message || "Sửa album thất bại, vui lòng thử lại");
+      message.error(error?.data?.message || t("messages.updateFailed", "Sửa album thất bại, vui lòng thử lại"));
     }
   };
 
   const columns: TableProps<DataType>["columns"] = [
     {
-      title: "Tên Album",
+      title: t("table.name", "Tên Album"),
       dataIndex: "name",
       key: "name",
       width: 220,
@@ -124,27 +126,27 @@ function AlbumManagementModule() {
       ),
     },
     {
-      title: "Mô tả",
+      title: t("table.description", "Mô tả"),
       dataIndex: "description",
       key: "description",
       render: (desc: string) => (
         <Typography.Paragraph ellipsis={{ rows: 2 }} type="secondary" style={{ fontSize: 12, margin: 0, wordBreak: "break-word" }}>
-          {desc || "Chưa có mô tả"}
+          {desc || t("table.emptyDescription", "Chưa có mô tả")}
         </Typography.Paragraph>
       ),
     },
     {
-      title: "Số lượng ảnh",
+      title: t("table.imageCount", "Số lượng ảnh"),
       key: "numberImage",
       width: 140,
       render: (_, record) => (
         <span style={{ fontWeight: 600, color: "#0066CC", fontSize: 12 }}>
-          {record?.imageList?.length || 0} ảnh
+          {t("imageUnit", `${record?.imageList?.length || 0} ảnh`, { count: record?.imageList?.length || 0 })}
         </span>
       ),
     },
     {
-      title: "Thao tác",
+      title: t("table.actions", "Thao tác"),
       key: "action",
       width: 150,
       render: (_, record) => {
@@ -154,7 +156,7 @@ function AlbumManagementModule() {
               type="default"
               shape="circle"
               icon={<EyeOutlined />}
-              aria-label="Xem chi tiết album"
+              aria-label={t("aria.view", "Xem chi tiết album")}
               onClick={() => {
                 router.push(`/${params?.locale || "vi"}/album-management/${record?.slug}`);
               }}
@@ -163,7 +165,7 @@ function AlbumManagementModule() {
               type="default"
               shape="circle"
               icon={<EditOutlined />}
-              aria-label="Sửa thông tin album"
+              aria-label={t("aria.edit", "Sửa thông tin album")}
               onClick={() => {
                 setMajorID(record?._id);
                 editModal.openModal();
@@ -174,10 +176,10 @@ function AlbumManagementModule() {
               }}
             />
             <Popconfirm
-              title="Xoá album"
-              description="Bạn có chắc chắn muốn xoá album này không?"
-              okText="Xoá"
-              cancelText="Hủy"
+              title={t("delete.title", "Xoá album")}
+              description={t("delete.description", "Bạn có chắc chắn muốn xoá album này không?")}
+              okText={t("delete.okText", "Xoá")}
+              cancelText={t("delete.cancelText", "Hủy")}
               okButtonProps={{ danger: true, loading: deletingId === record?._id }}
               onConfirm={() => handleDelete(record?._id)}
             >
@@ -186,7 +188,7 @@ function AlbumManagementModule() {
                 shape="circle"
                 danger
                 icon={<DeleteOutlined />}
-                aria-label="Xóa album"
+                aria-label={t("aria.delete", "Xóa album")}
               />
             </Popconfirm>
           </Flex>
@@ -209,10 +211,10 @@ function AlbumManagementModule() {
       >
         <div>
           <Typography.Title level={4} style={{ margin: 0, color: "#0066CC", fontSize: "18px", fontWeight: 700 }}>
-            Quản Lý Album Hình Ảnh CLB
+            {t("title", "Quản Lý Album Hình Ảnh CLB")}
           </Typography.Title>
           <Typography.Text type="secondary" style={{ fontSize: "13px" }}>
-            Tạo và quản lý các bộ sưu tập ảnh sự kiện, workshop, hoạt động ngoại khóa của DEVER.
+            {t("subtitle", "Tạo và quản lý các bộ sưu tập ảnh sự kiện, workshop, hoạt động ngoại khóa của DEVER.")}
           </Typography.Text>
         </div>
         <Button
@@ -231,7 +233,7 @@ function AlbumManagementModule() {
             boxShadow: "0 2px 4px rgba(0,102,204,0.15)",
           }}
         >
-          Thêm Album Mới
+          {t("addAlbum", "Thêm Album Mới")}
         </Button>
       </div>
 
@@ -250,7 +252,19 @@ function AlbumManagementModule() {
           loading={isFetching}
           rowKey={(record) => record._id}
           scroll={{ x: 750 }}
-          pagination={{ pageSize: 8 }}
+          pagination={{
+            pageSize,
+            showSizeChanger: true,
+            pageSizeOptions: ["8", "16", "32"],
+            onShowSizeChange: (_current, size) => setPageSize(size),
+            onChange: (_page, size) => {
+              if (size && size !== pageSize) {
+                setPageSize(size);
+              }
+            },
+            showTotal: (total) => t("paginationTotal", `Tổng cộng ${total} album`, { total }),
+          }}
+          locale={{ emptyText: <Empty description={t("table.empty", "Chưa có album nào")} /> }}
         />
       </div>
 

@@ -1,0 +1,36 @@
+{
+  "title": "Quản Lý Quỹ CLB",
+  "subtitle": "Theo dõi các lượt nộp quỹ, duyệt minh chứng chuyển khoản và quản lý các kỳ thu quỹ.",
+  "refresh": "Làm mới",
+  "retry": "Thử lại",
+  "tabs": {
+    "payments": "Lượt nộp",
+    "campaigns": "Kỳ thu quỹ"
+  },
+  "table": {
+    "member": "Thành viên",
+    "campaign": "Kỳ thu quỹ",
+    "amount": "Số tiền",
+    "receipt": "Biên lai / Bill",
+    "transactionCode": "Mã giao dịch",
+    "status": "Trạng thái",
+    "submittedAt": "Thời gian nộp",
+    "actions": "Hành động",
+    "empty": "Chưa có lượt nộp nào"
+  },
+  "paginationTotal": "Tổng cộng {{total}} lượt nộp",
+  "error": {
+    "title": "Không thể tải dữ liệu quỹ",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại."
+  },
+  "validation": {
+    "titleRequired": "Vui lòng nhập tiêu đề",
+    "amountRequired": "Nhập số tiền",
+    "semesterRequired": "Nhập kỳ học",
+    "dateRangeRequired": "Chọn thời gian",
+    "bankNameRequired": "Nhập tên ngân hàng",
+    "bankCodeRequired": "Nhập mã ngân hàng",
+    "accountNumberRequired": "Nhập số tài khoản",
+    "accountHolderRequired": "Nhập tên chủ tài khoản"
+  }
+}

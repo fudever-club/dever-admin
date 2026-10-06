@@ -1,0 +1,46 @@
+{
+  "title": "Community Content & Alumni",
+  "subtitle": "Moderate open-source projects, manage Project Lab and the alumni network.",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "tabs": {
+    "project": "Project Lab",
+    "opensource": "Open Source",
+    "alumni": "Alumni Network"
+  },
+  "table": {
+    "labProject": "Lab Project",
+    "team": "Team",
+    "onlineStatus": "Online status",
+    "status": "Status",
+    "opensourceProject": "Open Source Project",
+    "author": "Author",
+    "stars": "GitHub stars",
+    "category": "Category",
+    "links": "Links",
+    "alumnus": "Alumnus",
+    "generation": "Generation",
+    "workplace": "Workplace / Company",
+    "mentoring": "OJT Mentoring",
+    "landingVisible": "Landing visibility",
+    "actions": "Actions",
+    "empty": "No data yet"
+  },
+  "paginationTotal": "{{total}} items in total",
+  "error": {
+    "title": "Failed to load community content",
+    "desc": "Please check your connection and try again."
+  },
+  "filter": {
+    "all": "All",
+    "pending": "Pending",
+    "published": "Published",
+    "allGenerations": "All Generations (Alumni)"
+  },
+  "validation": {
+    "titleRequired": "Please enter the project name",
+    "descriptionRequired": "Please enter a description",
+    "nameRequired": "Please enter the full name",
+    "genRequired": "Select a generation"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "title": "Resources & Slides Management",
+  "subtitle": "Upload documents, ebooks and lecture slides, auto-synced to the Landing Page.",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "uploadNew": "Upload New Resource",
+  "table": {
+    "name": "Resource / Slide name",
+    "type": "Resource type",
+    "category": "Topic",
+    "size": "Size / Source",
+    "fileUrl": "File link",
+    "featured": "Spotlight",
+    "actions": "Actions",
+    "empty": "No resources yet",
+    "authorFallback": "FU-DEVER",
+    "viewFile": "View File"
+  },
+  "paginationTotal": "{{total}} resources in total",
+  "error": {
+    "title": "Failed to load resources",
+    "desc": "Please check your connection and try again."
+  },
+  "delete": {
+    "title": "Delete resource",
+    "okText": "Delete",
+    "cancelText": "Cancel"
+  },
+  "validation": {
+    "titleRequired": "Please enter the resource name!",
+    "fileUrlRequired": "Please paste the resource link.",
+    "urlInvalid": "Link must start with http:// or https://"
+  }
+}

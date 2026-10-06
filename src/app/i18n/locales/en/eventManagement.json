@@ -1,0 +1,33 @@
+{
+  "title": "Events & Workshops Management",
+  "subtitle": "Create events, manage registrations, QR check-in and pin featured events to the Landing Page.",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "addEvent": "Create event",
+  "table": {
+    "cover": "Cover",
+    "name": "Event Name & Description",
+    "status": "Status",
+    "registerLink": "Registration Link",
+    "qrCheckin": "Check-in QR",
+    "actions": "Actions",
+    "empty": "No events yet"
+  },
+  "paginationTotal": "{{total}} events",
+  "error": {
+    "title": "Failed to load events",
+    "desc": "Please check your connection and try again."
+  },
+  "filter": {
+    "all": "All",
+    "label": "Filter by status:"
+  },
+  "validation": {
+    "titleRequired": "Please enter the event title!",
+    "dateRequired": "Enter the date!",
+    "timeRequired": "Enter the time!",
+    "locationRequired": "Please enter the venue!",
+    "descriptionRequired": "Please enter the event description!",
+    "urlInvalid": "Link must start with http:// or https://"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "title": "Nội Dung Cộng Đồng & Alumni",
+  "subtitle": "Kiểm duyệt dự án Open Source, quản lý Project Lab và mạng lưới cựu thành viên.",
+  "refresh": "Làm mới",
+  "retry": "Thử lại",
+  "tabs": {
+    "project": "Project Lab",
+    "opensource": "Mã Nguồn Mở",
+    "alumni": "Mạng Lưới Cựu Thành Viên (Alumni)"
+  },
+  "table": {
+    "labProject": "Dự Án Lab",
+    "team": "Nhóm",
+    "onlineStatus": "Vị trí tuyến",
+    "status": "Trạng thái",
+    "opensourceProject": "Dự Án Open Source",
+    "author": "Tác giả",
+    "stars": "Số sao GitHub",
+    "category": "Phân loại",
+    "links": "Links",
+    "alumnus": "Cựu thành viên",
+    "generation": "Thế hệ",
+    "workplace": "Đơn vị / Công ty",
+    "mentoring": "Mentoring OJT",
+    "landingVisible": "Hiển thị Landing",
+    "actions": "Thao tác",
+    "empty": "Chưa có dữ liệu nào"
+  },
+  "paginationTotal": "Tổng cộng {{total}} mục",
+  "error": {
+    "title": "Không thể tải nội dung cộng đồng",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại."
+  },
+  "filter": {
+    "all": "Tất cả",
+    "pending": "Chờ duyệt",
+    "published": "Đã xuất bản",
+    "allGenerations": "Tất Cả Thế Hệ (Alumni)"
+  },
+  "validation": {
+    "titleRequired": "Vui lòng nhập tên dự án",
+    "descriptionRequired": "Vui lòng nhập mô tả",
+    "nameRequired": "Vui lòng nhập họ tên",
+    "genRequired": "Chọn Gen"
+  }
+}

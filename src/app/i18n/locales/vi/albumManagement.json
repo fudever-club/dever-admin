@@ -1,0 +1,54 @@
+{
+  "title": "Quản Lý Album Hình Ảnh CLB",
+  "subtitle": "Tạo và quản lý các bộ sưu tập ảnh sự kiện, workshop, hoạt động ngoại khóa của DEVER.",
+  "addAlbum": "Thêm Album Mới",
+  "table": {
+    "name": "Tên Album",
+    "description": "Mô tả",
+    "imageCount": "Số lượng ảnh",
+    "actions": "Thao tác",
+    "empty": "Chưa có album nào",
+    "emptyDescription": "Chưa có mô tả"
+  },
+  "imageUnit": "{{count}} ảnh",
+  "delete": {
+    "title": "Xóa album",
+    "description": "Bạn có chắc chắn muốn xóa album này không?",
+    "okText": "Xóa",
+    "cancelText": "Hủy"
+  },
+  "addModal": {
+    "title": "Thêm Album Ảnh Mới",
+    "nameLabel": "Tên Album",
+    "namePlaceholder": "Ví dụ: Workshop AI & Web Fullstack 2026...",
+    "descriptionLabel": "Mô tả tóm tắt",
+    "descriptionPlaceholder": "Mô tả sự kiện, địa điểm và các kỷ niệm nổi bật...",
+    "cancel": "Hủy",
+    "submit": "Tạo Album"
+  },
+  "editModal": {
+    "title": "Chỉnh Sửa Album",
+    "nameLabel": "Tên Album",
+    "descriptionLabel": "Mô tả",
+    "cancel": "Hủy",
+    "submit": "Lưu Thay Đổi"
+  },
+  "validation": {
+    "nameRequired": "Vui lòng nhập tên album!",
+    "descriptionRequired": "Vui lòng nhập mô tả tóm tắt!"
+  },
+  "messages": {
+    "createSuccess": "Thêm thành công",
+    "createFailed": "Thêm album thất bại, vui lòng thử lại",
+    "updateSuccess": "Sửa thành công",
+    "updateFailed": "Sửa album thất bại, vui lòng thử lại",
+    "deleteSuccess": "Xóa thành công",
+    "deleteFailed": "Xóa album thất bại, vui lòng thử lại"
+  },
+  "paginationTotal": "Tổng cộng {{total}} album",
+  "aria": {
+    "view": "Xem chi tiết album",
+    "edit": "Sửa thông tin album",
+    "delete": "Xóa album"
+  }
+}

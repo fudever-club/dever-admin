@@ -1,0 +1,33 @@
+{
+  "title": "Quản Lý Sự Kiện & Workshop",
+  "subtitle": "Tạo sự kiện, quản lý đăng ký, điểm danh QR và ghim sự kiện nổi bật lên Landing Page.",
+  "refresh": "Làm mới",
+  "retry": "Thử lại",
+  "addEvent": "Tạo sự kiện",
+  "table": {
+    "cover": "Ảnh Bìa",
+    "name": "Tên Sự kiện & Mô tả",
+    "status": "Trạng thái",
+    "registerLink": "Link Đăng Ký",
+    "qrCheckin": "Mã QR Check-in",
+    "actions": "Thao tác",
+    "empty": "Chưa có sự kiện nào"
+  },
+  "paginationTotal": "{{total}} sự kiện",
+  "error": {
+    "title": "Không thể tải danh sách sự kiện",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại."
+  },
+  "filter": {
+    "all": "Tất cả",
+    "label": "Lọc trạng thái:"
+  },
+  "validation": {
+    "titleRequired": "Vui lòng nhập tiêu đề sự kiện!",
+    "dateRequired": "Nhập ngày diễn ra!",
+    "timeRequired": "Nhập khung giờ!",
+    "locationRequired": "Vui lòng nhập địa điểm!",
+    "descriptionRequired": "Vui lòng nhập mô tả sự kiện!",
+    "urlInvalid": "Link phải bắt đầu bằng http:// hoặc https://"
+  }
+}

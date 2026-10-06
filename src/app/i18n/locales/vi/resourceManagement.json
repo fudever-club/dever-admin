@@ -1,0 +1,34 @@
+{
+  "title": "Quản Lý Tài Liệu & Slide Workshop",
+  "subtitle": "Đăng tải tài liệu, Ebook, Slide bài giảng, tự động đồng bộ lên Landing Page.",
+  "refresh": "Làm mới",
+  "retry": "Thử lại",
+  "uploadNew": "Tải Lên Tài Liệu Mới",
+  "table": {
+    "name": "Tên tài liệu / Slide",
+    "type": "Loại tài liệu",
+    "category": "Chủ đề",
+    "size": "Dung lượng / Nguồn",
+    "fileUrl": "Đường dẫn File",
+    "featured": "Tiêu Điểm",
+    "actions": "Thao tác",
+    "empty": "Chưa có tài liệu nào",
+    "authorFallback": "FU-DEVER",
+    "viewFile": "Xem File"
+  },
+  "paginationTotal": "Tổng cộng {{total}} tài liệu",
+  "error": {
+    "title": "Không thể tải danh sách tài liệu",
+    "desc": "Vui lòng kiểm tra kết nối và thử lại."
+  },
+  "delete": {
+    "title": "Xóa tài liệu",
+    "okText": "Xóa",
+    "cancelText": "Hủy"
+  },
+  "validation": {
+    "titleRequired": "Vui lòng nhập tên tài liệu!",
+    "fileUrlRequired": "Vui lòng dán link tài liệu.",
+    "urlInvalid": "Link phải bắt đầu bằng http:// hoặc https://"
+  }
+}
