@@ -33,6 +33,7 @@ import dayjs, { Dayjs } from "dayjs";
 
 import {
   Season,
+  SeasonBracket,
   useCreateSeasonMutation,
   useListSeasonsQuery,
   useUpdateSeasonMutation,
@@ -46,6 +47,8 @@ interface SeasonFormValues {
   name: string;
   dateRange: [Dayjs, Dayjs];
   status: "upcoming" | "active";
+  bracket: SeasonBracket;
+  newbieGenCutoff?: number | null;
   easy: number;
   medium: number;
   hard: number;
@@ -67,6 +70,15 @@ function getSeasonStatusTag(
   return <Tag color="default">{labels.ended}</Tag>;
 }
 
+function getSeasonBracketTag(
+  bracket: Season["bracket"],
+  labels: { open: string; newbie: string; pro: string }
+) {
+  if (bracket === "newbie") return <Tag color="green">{labels.newbie}</Tag>;
+  if (bracket === "pro") return <Tag color="purple">{labels.pro}</Tag>;
+  return <Tag color="blue">{labels.open}</Tag>;
+}
+
 export default function SeasonManagement() {
   const params = useParams();
   const { t } = useTranslation(params?.locale as string, "seasonManagement");
@@ -74,6 +86,11 @@ export default function SeasonManagement() {
     active: t("status.active", "Đang chạy"),
     upcoming: t("status.upcoming", "Sắp diễn ra"),
     ended: t("status.ended", "Đã kết thúc"),
+  };
+  const bracketLabels = {
+    open: t("bracket.open", "Mở"),
+    newbie: t("bracket.newbie", "Gà-mới"),
+    pro: t("bracket.pro", "Pro"),
   };
   const [form] = Form.useForm<SeasonFormValues>();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -92,6 +109,7 @@ export default function SeasonManagement() {
   }, []);
 
   const watchedStatus = Form.useWatch("status", form);
+  const watchedBracket = Form.useWatch("bracket", form);
 
   const { data, error, isLoading, isFetching, refetch } =
     useListSeasonsQuery();
@@ -119,7 +137,7 @@ export default function SeasonManagement() {
   const openCreate = () => {
     setEditingSeason(null);
     form.resetFields();
-    form.setFieldsValue({ status: "upcoming", easy: 1, medium: 3, hard: 5 });
+    form.setFieldsValue({ status: "upcoming", bracket: "open", newbieGenCutoff: undefined, easy: 1, medium: 3, hard: 5 });
     setModalOpen(true);
   };
 
@@ -130,6 +148,8 @@ export default function SeasonManagement() {
       name: record.name,
       dateRange: [dayjs(record.startDate), dayjs(record.endDate)],
       status: record.status === "active" ? "active" : "upcoming",
+      bracket: record.bracket ?? "open",
+      newbieGenCutoff: record.newbieGenCutoff ?? undefined,
       easy: record.scoring?.easy ?? 1,
       medium: record.scoring?.medium ?? 3,
       hard: record.scoring?.hard ?? 5,
@@ -153,11 +173,19 @@ export default function SeasonManagement() {
       message.error(t("messages.endAfterStart", "Ngày kết thúc phải sau ngày bắt đầu."));
       return;
     }
+    const bracket: SeasonBracket = values.bracket ?? "open";
+    const cutoffRaw = values.newbieGenCutoff;
+    if (bracket !== "open" && !(typeof cutoffRaw === "number" && Number.isInteger(cutoffRaw) && cutoffRaw >= 1)) {
+      message.error(t("messages.cutoffRequired", "Vui lòng nhập ngưỡng Gen (>= 1) cho hạng Gà-mới/Pro."));
+      return;
+    }
     const payload = {
       name: values.name.trim(),
       startDate: range[0].toISOString(),
       endDate: range[1].toISOString(),
       status: values.status,
+      bracket,
+      newbieGenCutoff: bracket === "open" ? null : Number(cutoffRaw),
       scoring: {
         easy: Number(values.easy),
         medium: Number(values.medium),
@@ -232,6 +260,25 @@ export default function SeasonManagement() {
       key: "status",
       width: 140,
       render: (status: Season["status"]) => getSeasonStatusTag(status, statusLabels),
+    },
+    {
+      title: t("table.bracket", "Hạng"),
+      dataIndex: "bracket",
+      key: "bracket",
+      width: 120,
+      render: (bracket: Season["bracket"]) => getSeasonBracketTag(bracket ?? "open", bracketLabels),
+    },
+    {
+      title: t("table.cutoff", "Ngưỡng"),
+      dataIndex: "newbieGenCutoff",
+      key: "newbieGenCutoff",
+      width: 100,
+      render: (cutoff: Season["newbieGenCutoff"], record) =>
+        (record.bracket ?? "open") === "open" || cutoff === null || cutoff === undefined ? (
+          <Text type="secondary">—</Text>
+        ) : (
+          <Text style={{ fontSize: 13 }}>Gen {cutoff}</Text>
+        ),
     },
     {
       title: t("table.scoring", "Điểm (E/M/H)"),
@@ -360,7 +407,7 @@ export default function SeasonManagement() {
             dataSource={seasons}
             rowKey={(record) => record._id}
             loading={isFetching}
-            scroll={{ x: 880 }}
+            scroll={{ x: 1040 }}
             pagination={{
               pageSize,
               showSizeChanger: true,
@@ -387,7 +434,7 @@ export default function SeasonManagement() {
           name="seasonForm"
           layout="vertical"
           autoComplete="off"
-          initialValues={{ status: "upcoming", easy: 1, medium: 3, hard: 5 }}
+          initialValues={{ status: "upcoming", bracket: "open", easy: 1, medium: 3, hard: 5 }}
           onFinish={handleFinish}
         >
           <Form.Item
@@ -425,6 +472,35 @@ export default function SeasonManagement() {
               ]}
             />
           </Form.Item>
+
+          <Form.Item
+            label={t("modal.bracketLabel", "Hạng mùa giải")}
+            name="bracket"
+            rules={[{ required: true, message: t("modal.bracketRequired", "Vui lòng chọn hạng mùa giải.") }]}
+          >
+            <Select
+              options={[
+                { value: "open", label: t("modal.bracketOpen", "Mở (tất cả Gen)") },
+                { value: "newbie", label: t("modal.bracketNewbie", "Gà-mới (Gen mới)") },
+                { value: "pro", label: t("modal.bracketPro", "Pro (Gen kỳ cựu)") },
+              ]}
+            />
+          </Form.Item>
+
+          {(watchedBracket === "newbie" || watchedBracket === "pro") && (
+            <Form.Item
+              label={t("modal.cutoffLabel", "Ngưỡng Gen phân hạng")}
+              name="newbieGenCutoff"
+              rules={[
+                { required: true, message: t("modal.cutoffRequired", "Vui lòng nhập ngưỡng Gen.") },
+                { type: "number", min: 1, message: t("modal.cutoffMin", "Ngưỡng Gen phải >= 1.") },
+              ]}
+              extra={t("modal.cutoffHint", "Gen >= ngưỡng thuộc hạng Gà-mới; Gen < ngưỡng thuộc hạng Pro.")}
+              preserve={false}
+            >
+              <InputNumber min={1} step={1} precision={0} style={{ width: "100%" }} placeholder="Ví dụ: 7" />
+            </Form.Item>
+          )}
 
           {watchedStatus === "active" && (
             <Alert

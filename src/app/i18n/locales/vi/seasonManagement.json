@@ -10,6 +10,8 @@
     "name": "Tên mùa",
     "window": "Cửa sổ",
     "status": "Trạng thái",
+    "bracket": "Hạng",
+    "cutoff": "Ngưỡng",
     "scoring": "Điểm (E/M/H)",
     "actions": "Thao tác"
   },
@@ -17,6 +19,11 @@
     "active": "Đang chạy",
     "upcoming": "Sắp diễn ra",
     "ended": "Đã kết thúc"
+  },
+  "bracket": {
+    "open": "Mở",
+    "newbie": "Gà-mới",
+    "pro": "Pro"
   },
   "edit": "Sửa",
   "endSeason": "Kết thúc mùa",
@@ -39,6 +46,15 @@
     "statusRequired": "Vui lòng chọn trạng thái.",
     "statusUpcoming": "Sắp diễn ra",
     "statusActive": "Đang chạy (kích hoạt ngay)",
+    "bracketLabel": "Hạng mùa giải",
+    "bracketRequired": "Vui lòng chọn hạng mùa giải.",
+    "bracketOpen": "Mở (tất cả Gen)",
+    "bracketNewbie": "Gà-mới (Gen mới)",
+    "bracketPro": "Pro (Gen kỳ cựu)",
+    "cutoffLabel": "Ngưỡng Gen phân hạng",
+    "cutoffRequired": "Vui lòng nhập ngưỡng Gen.",
+    "cutoffMin": "Ngưỡng Gen phải >= 1.",
+    "cutoffHint": "Gen >= ngưỡng thuộc hạng Gà-mới; Gen < ngưỡng thuộc hạng Pro.",
     "easyLabel": "Điểm Easy",
     "easyRequired": "Nhập điểm Easy.",
     "mediumLabel": "Điểm Medium",
@@ -54,6 +70,7 @@
   "messages": {
     "invalidRange": "Vui lòng chọn cửa sổ bắt đầu – kết thúc hợp lệ.",
     "endAfterStart": "Ngày kết thúc phải sau ngày bắt đầu.",
+    "cutoffRequired": "Vui lòng nhập ngưỡng Gen (>= 1) cho hạng Gà-mới/Pro.",
     "updated": "Cập nhật mùa giải thành công.",
     "created": "Tạo mùa giải mới thành công.",
     "saveFail": "Lưu mùa giải thất bại. Vui lòng thử lại.",

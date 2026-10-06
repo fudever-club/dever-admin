@@ -5,6 +5,8 @@ import { baseApi } from "../base";
 
 export type SeasonStatus = "upcoming" | "active" | "ended";
 
+export type SeasonBracket = "open" | "newbie" | "pro";
+
 export interface SeasonScoring {
   easy: number;
   medium: number;
@@ -18,6 +20,8 @@ export interface Season {
   endDate: string;
   status: SeasonStatus;
   scoring: SeasonScoring;
+  bracket: SeasonBracket;
+  newbieGenCutoff: number | null;
 }
 
 export interface ListSeasonsResponse {
@@ -32,6 +36,8 @@ export interface CreateSeasonPayload {
   endDate: string;
   status?: "upcoming" | "active";
   scoring?: Partial<SeasonScoring>;
+  bracket?: SeasonBracket;
+  newbieGenCutoff?: number | null;
 }
 
 export interface UpdateSeasonPayload {
@@ -42,6 +48,8 @@ export interface UpdateSeasonPayload {
     endDate?: string;
     status?: SeasonStatus;
     scoring?: Partial<SeasonScoring>;
+    bracket?: SeasonBracket;
+    newbieGenCutoff?: number | null;
   };
 }
 

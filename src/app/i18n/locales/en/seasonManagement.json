@@ -10,6 +10,8 @@
     "name": "Season name",
     "window": "Season window",
     "status": "Status",
+    "bracket": "Bracket",
+    "cutoff": "Cutoff",
     "scoring": "Scores (E/M/H)",
     "actions": "Actions"
   },
@@ -17,6 +19,11 @@
     "active": "Running",
     "upcoming": "Upcoming",
     "ended": "Ended"
+  },
+  "bracket": {
+    "open": "Open",
+    "newbie": "Newbie",
+    "pro": "Pro"
   },
   "edit": "Edit",
   "endSeason": "End season",
@@ -39,6 +46,15 @@
     "statusRequired": "Please select a status.",
     "statusUpcoming": "Upcoming",
     "statusActive": "Running (activate now)",
+    "bracketLabel": "Season bracket",
+    "bracketRequired": "Please select a season bracket.",
+    "bracketOpen": "Open (all Gens)",
+    "bracketNewbie": "Newbie (new Gens)",
+    "bracketPro": "Pro (veteran Gens)",
+    "cutoffLabel": "Gen cutoff",
+    "cutoffRequired": "Please enter the Gen cutoff.",
+    "cutoffMin": "Gen cutoff must be >= 1.",
+    "cutoffHint": "Gen >= cutoff plays Newbie; Gen < cutoff plays Pro.",
     "easyLabel": "Easy score",
     "easyRequired": "Please enter the Easy score.",
     "mediumLabel": "Medium score",
@@ -54,6 +70,7 @@
   "messages": {
     "invalidRange": "Please select a valid start – end window.",
     "endAfterStart": "The end date must be after the start date.",
+    "cutoffRequired": "Please enter a Gen cutoff (>= 1) for Newbie/Pro brackets.",
     "updated": "Season updated successfully.",
     "created": "New season created successfully.",
     "saveFail": "Could not save season. Please try again.",
