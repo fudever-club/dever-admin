@@ -115,7 +115,18 @@ const reset = css`
     display: block;
   }
   body {
-    line-height: 1;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.25;
+  }
+
+  p {
+    line-height: 1.6;
   }
 
   blockquote,

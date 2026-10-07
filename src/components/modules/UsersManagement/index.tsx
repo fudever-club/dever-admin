@@ -787,9 +787,9 @@ function UsersManagementModule() {
       </S.Head>
       <S.FilterWrapper>
         <div className="item">
-          <Typography.Title level={5}>{t("search")}</Typography.Title>
+          <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", display: "block", marginBottom: 6 }}>{t("search")}</span>
           <Input
-            placeholder="Search..."
+            placeholder={t("search")}
             prefix={<SearchOutlined />}
             onChange={handleSearch}
             defaultValue={search}
@@ -836,7 +836,7 @@ function UsersManagementModule() {
       )}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={8} lg={5}>
-          <Typography.Title level={5}>Chức vụ</Typography.Title>
+          <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", display: "block", marginBottom: 6 }}>Chức vụ</span>
           <Select
             placeholder="Chọn vị trí"
             allowClear
@@ -846,7 +846,7 @@ function UsersManagementModule() {
           />
         </Col>
         <Col xs={24} sm={12} md={8} lg={5}>
-          <Typography.Title level={5}>Ban hoạt động</Typography.Title>
+          <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", display: "block", marginBottom: 6 }}>Ban hoạt động</span>
           <Select
             placeholder="Chọn ban hoạt động"
             allowClear
@@ -857,7 +857,7 @@ function UsersManagementModule() {
           />
         </Col>
         <Col xs={24} sm={12} md={8} lg={5}>
-          <Typography.Title level={5}>Chuyên ngành</Typography.Title>
+          <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", display: "block", marginBottom: 6 }}>Chuyên ngành</span>
           <Select
             placeholder="Chọn chuyên ngành"
             allowClear
@@ -867,7 +867,7 @@ function UsersManagementModule() {
           />
         </Col>
         <Col xs={24} sm={12} md={8} lg={4}>
-          <Typography.Title level={5}>Khoá</Typography.Title>
+          <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", display: "block", marginBottom: 6 }}>Khoá</span>
           <Select
             placeholder="Chọn khoá"
             allowClear
@@ -906,7 +906,7 @@ function UsersManagementModule() {
           />
         </Col>
         <Col xs={24} sm={12} md={8} lg={5}>
-          <Typography.Title level={5}>Trưởng nhóm/Ban</Typography.Title>
+          <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", display: "block", marginBottom: 6 }}>Trưởng nhóm/Ban</span>
           <Select
             placeholder="Lọc vai trò"
             allowClear

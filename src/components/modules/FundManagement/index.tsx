@@ -452,7 +452,7 @@ export default function FundManagementModule() {
             )}
             <div>
               <Text strong style={{ display: "block", color: "#0F172A", fontSize: 13 }}>{fullName}</Text>
-              <Text type="secondary" style={{ fontSize: 11 }}>{record.userId?.MSSV ? `MSSV: ${record.userId.MSSV}` : record.userId?.email}</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>{record.userId?.MSSV ? `MSSV: ${record.userId.MSSV}` : record.userId?.email}</Text>
             </div>
           </Space>
         );
@@ -464,7 +464,7 @@ export default function FundManagementModule() {
       render: (_: any, record: FundPayment) => (
         <div>
           <Text strong style={{ display: "block", fontSize: 12, color: "#1E293B" }}>{record.campaignId?.title || "Quỹ CLB"}</Text>
-          <Tag color="blue" style={{ fontSize: 10, marginTop: 2 }}>{record.campaignId?.semester || "Fall 2026"}</Tag>
+          <Tag color="blue" style={{ fontSize: 12, marginTop: 2 }}>{record.campaignId?.semester || "Fall 2026"}</Tag>
         </div>
       ),
     },
@@ -488,7 +488,7 @@ export default function FundManagementModule() {
           icon={<EyeOutlined />}
           size="small"
           onClick={() => setBillImageModal(record.proofImageUrl)}
-          style={{ borderRadius: 8, fontSize: 11, fontWeight: 600 }}
+          style={{ borderRadius: 8, fontSize: 12, fontWeight: 600 }}
         >
           Xem Bill
         </Button>
@@ -498,7 +498,7 @@ export default function FundManagementModule() {
       title: t("table.transactionCode", "Mã giao dịch"),
       dataIndex: "transactionCode",
       key: "transactionCode",
-      render: (code: string) => <Text code style={{ fontSize: 11 }}>{code || "N/A"}</Text>,
+      render: (code: string) => <Text code style={{ fontSize: 12 }}>{code || "N/A"}</Text>,
     },
     {
       title: t("table.status", "Trạng thái"),
@@ -519,7 +519,7 @@ export default function FundManagementModule() {
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) => (
-        <Text style={{ fontSize: 11, color: "#64748B" }}>
+        <Text style={{ fontSize: 12, color: "#64748B" }}>
           {dayjs(date).format("HH:mm DD/MM/YYYY")}
         </Text>
       ),
@@ -539,7 +539,7 @@ export default function FundManagementModule() {
               size="small"
               disabled={locked}
               loading={submittingReview && selectedPayment?._id === record._id && reviewAction === "approved"}
-              style={{ backgroundColor: "#0066CC", borderRadius: 8, fontSize: 11, fontWeight: "bold" }}
+              style={{ backgroundColor: "#0066CC", borderRadius: 8, fontSize: 12, fontWeight: "bold" }}
               onClick={() => {
                 if (!isPending || submittingReview) return;
                 setSelectedPayment(record);
@@ -555,7 +555,7 @@ export default function FundManagementModule() {
               size="small"
               disabled={locked}
               loading={submittingReview && selectedPayment?._id === record._id && reviewAction === "rejected"}
-              style={{ borderRadius: 8, fontSize: 11, fontWeight: "bold" }}
+              style={{ borderRadius: 8, fontSize: 12, fontWeight: "bold" }}
               onClick={() => {
                 if (!isPending || submittingReview) return;
                 setSelectedPayment(record);
@@ -738,7 +738,7 @@ export default function FundManagementModule() {
               <Text strong style={{ fontSize: 14, color: "#0F172A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {activeCampaign?.title || "Chưa có kỳ quỹ"}
               </Text>
-              <Text type="secondary" style={{ fontSize: 11 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
                 Hạn chót: {activeCampaign?.deadline ? dayjs(activeCampaign.deadline).format("DD/MM/YYYY") : "N/A"}
               </Text>
             </div>
@@ -920,7 +920,7 @@ export default function FundManagementModule() {
                               </Descriptions>
                             </Col>
                             <Col xs={24} sm={8} style={{ textAlign: "center" }}>
-                              <Text type="secondary" style={{ fontSize: 10, display: "block", marginBottom: 4, fontWeight: 700 }}>MÃ QR ĐANG ÁP DỤNG</Text>
+                              <Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 4, fontWeight: 700 }}>MÃ QR ĐANG ÁP DỤNG</Text>
                               {camp.bankInfo?.customQrUrl || camp.bankInfo?.qrTemplateUrl ? (
                                 <img
                                   src={camp.bankInfo.customQrUrl || camp.bankInfo.qrTemplateUrl}
@@ -1099,7 +1099,7 @@ export default function FundManagementModule() {
             <Text strong style={{ fontSize: 13, color: "#0066CC", display: "block", marginBottom: 6 }}>
               <QrcodeOutlined /> Tải Lên Ảnh Mã QR Ngân Hàng Của Thủ Quỹ (Tùy chọn):
             </Text>
-            <Text type="secondary" style={{ fontSize: 11, display: "block", marginBottom: 10 }}>
+            <Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 10 }}>
               Nếu tải ảnh lên, hệ thống sẽ ưu tiên hiển thị ảnh QR chuẩn của thủ quỹ. Nếu không tải, hệ thống sẽ tự động vẽ mã VietQR động.
             </Text>
             
@@ -1118,7 +1118,7 @@ export default function FundManagementModule() {
                 />
                 <div>
                   <Text strong style={{ color: "#16A34A", fontSize: 12, display: "block" }}>✓ Đã đính kèm ảnh mã QR</Text>
-                  <Button type="link" danger size="small" onClick={() => setCustomQrImage("")} style={{ padding: 0, fontSize: 11 }}>
+                  <Button type="link" danger size="small" onClick={() => setCustomQrImage("")} style={{ padding: 0, fontSize: 12 }}>
                     Xóa ảnh và dùng VietQR tự động
                   </Button>
                 </div>

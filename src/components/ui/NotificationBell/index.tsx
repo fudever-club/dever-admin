@@ -183,7 +183,7 @@ export default function NotificationBell() {
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontWeight: 600, color: "#1e293b", fontSize: 15 }}>Thông báo Ban Quản Trị</span>
           {unreadCount > 0 && (
-            <span style={{ borderRadius: 999, backgroundColor: "#dbeafe", padding: "2px 8px", fontSize: 11, fontWeight: 600, color: "#0066CC" }}>
+            <span style={{ borderRadius: 999, backgroundColor: "#dbeafe", padding: "2px 8px", fontSize: 12, fontWeight: 600, color: "#0066CC" }}>
               {unreadCount} mới
             </span>
           )}
@@ -282,15 +282,15 @@ export default function NotificationBell() {
                       <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#0066CC", flexShrink: 0 }} />
                     )}
                   </div>
-                  <p style={{ fontSize: 11, color: "#64748b", margin: "2px 0 0", lineHeight: 1.4 }}>
+                  <p style={{ fontSize: 12, color: "#64748b", margin: "2px 0 0", lineHeight: 1.5 }}>
                     {item.message}
                   </p>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
-                    <span style={{ fontSize: 10, color: "#94a3b8" }}>
+                    <span style={{ fontSize: 12, color: "#94a3b8" }}>
                       {formatTimeAgo(item.createdAt)}
                     </span>
                     {item.link && (
-                      <span style={{ fontSize: 10, color: "#0066CC", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 2 }}>
+                      <span style={{ fontSize: 12, color: "#0066CC", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 2 }}>
                         Xử lý ngay <LinkOutlined style={{ fontSize: 9 }} />
                       </span>
                     )}
@@ -312,7 +312,7 @@ export default function NotificationBell() {
 
       {/* Footer Actions: Test Telegram Bot */}
       <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ fontSize: 11, color: "#64748b", display: "flex", alignItems: "center", gap: 4 }}>
+        <span style={{ fontSize: 12, color: "#64748b", display: "flex", alignItems: "center", gap: 4 }}>
           <RobotOutlined style={{ color: "#0088cc" }} /> @Fudever_bot
         </span>
         <Popconfirm
@@ -326,9 +326,9 @@ export default function NotificationBell() {
             size="small"
             type="primary"
             ghost
-            icon={<SendOutlined style={{ fontSize: 11 }} />}
+            icon={<SendOutlined style={{ fontSize: 12 }} />}
             loading={isTestingTelegram}
-            style={{ fontSize: 11 }}
+            style={{ fontSize: 12 }}
           >
             Test Gửi Bot Telegram
           </Button>
@@ -351,10 +351,10 @@ export default function NotificationBell() {
           overflowCount={99}
           offset={[-2, 4]}
           size="small"
-          styles={{
+            styles={{
             indicator: {
               backgroundColor: "#0066CC",
-              fontSize: "10px",
+              fontSize: "12px",
               height: "16px",
               minWidth: "16px",
               lineHeight: "16px",

@@ -346,7 +346,7 @@ export default function BlogManagement() {
         <div>
           <div className="flex items-center gap-1.5">
             {record.isFeatured && (
-              <Tag color="gold" className="!mr-1 font-bold text-[10px] inline-flex items-center gap-1">
+              <Tag color="gold" className="!mr-1 font-bold text-[11px] inline-flex items-center gap-1">
                 <StarFilled /> {t("featured.tag", "NỔI BẬT")}
               </Tag>
             )}
@@ -493,7 +493,7 @@ export default function BlogManagement() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <Title level={3} className="!mb-1 text-slate-900 font-black">
+          <Title level={2} className="!mb-1 text-slate-900 font-extrabold">
             {t("title", "Quản Lý & Kiểm Duyệt Tech Blog")}
           </Title>
           <Text type="secondary" className="text-sm">
@@ -530,7 +530,7 @@ export default function BlogManagement() {
         <Col xs={12} sm={6}>
           <Card className="!rounded-2xl !border-slate-200 shadow-2xs hover:border-blue-300 transition-all">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("metrics.total", "Tổng bài viết")}</div>
-            <div className="text-2xl font-black text-slate-900 mt-1">{metricDisplay(totalCount)}</div>
+            <div className="text-2xl font-extrabold text-slate-900 mt-1">{metricDisplay(totalCount)}</div>
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -538,7 +538,7 @@ export default function BlogManagement() {
             <div className="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1">
               <ClockCircleOutlined /> {t("metrics.pending", "Chờ duyệt")}
             </div>
-            <div className="text-2xl font-black text-amber-900 mt-1">{metricDisplay(pendingCount)}</div>
+            <div className="text-2xl font-extrabold text-amber-900 mt-1">{metricDisplay(pendingCount)}</div>
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -546,7 +546,7 @@ export default function BlogManagement() {
             <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
               <CheckCircleOutlined /> {t("metrics.published", "Đã xuất bản")}
             </div>
-            <div className="text-2xl font-black text-emerald-900 mt-1">{metricDisplay(publishedCount)}</div>
+            <div className="text-2xl font-extrabold text-emerald-900 mt-1">{metricDisplay(publishedCount)}</div>
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -554,7 +554,7 @@ export default function BlogManagement() {
             <div className="text-xs font-bold text-[#0066CC] uppercase tracking-wider flex items-center gap-1">
               <StarFilled className="text-amber-500" /> {t("metrics.featured", "Ghim nổi bật")}
             </div>
-            <div className="text-2xl font-black text-[#004C99] mt-1">{metricDisplay(featuredCount)}</div>
+            <div className="text-2xl font-extrabold text-[#004C99] mt-1">{metricDisplay(featuredCount)}</div>
           </Card>
         </Col>
       </Row>
@@ -666,7 +666,7 @@ export default function BlogManagement() {
       {/* Review Modal */}
       <Modal
         title={
-          <div className="flex items-center gap-2 text-lg font-black text-[#0066CC]">
+          <div className="flex items-center gap-2 text-lg font-extrabold text-[#0066CC]">
             <FileTextOutlined /> {t("modal.title", "Đánh Giá Bài Viết & Phản Hồi Tác Giả")}
           </div>
         }
@@ -685,7 +685,7 @@ export default function BlogManagement() {
                 <Tag color="geekblue" className="font-bold">{selectedBlog.category}</Tag>
                 {getStatusTag(selectedBlog.status)}
               </div>
-              <h2 className="text-xl font-black text-slate-900">{selectedBlog.title}</h2>
+              <h3 className="text-xl font-extrabold text-slate-900">{selectedBlog.title}</h3>
               <p className="text-xs text-slate-600 font-medium">{selectedBlog.excerpt}</p>
               <div className="flex items-center gap-4 text-xs text-slate-500 pt-2 border-t border-blue-100">
                 <span><strong>{t("modal.authorLabel", "Tác giả:")}</strong> {selectedBlog.author?.name} ({selectedBlog.author?.role})</span>
