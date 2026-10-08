@@ -1,6 +1,3 @@
-import createNextIntlPlugin from "next-intl/plugin";
-
-const withNextIntl = createNextIntlPlugin("./src/app/i18n/index.ts");
 const apiServer = (process.env.NEXT_PUBLIC_API_SERVER ||
   "https://dever-backend-production.up.railway.app").replace(/\/+$/, "");
 
@@ -43,4 +40,4 @@ const nextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default nextConfig;

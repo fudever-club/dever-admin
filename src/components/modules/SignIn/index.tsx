@@ -4,7 +4,6 @@ import Image from "next/image";
 import { Checkbox, Flex, Form, FormProps, Input, message } from "antd";
 import { useRouter } from "next-nprogress-bar";
 import { useParams } from "next/navigation";
-import { useLocale } from "next-intl";
 
 import Button from "@/components/core/common/Button";
 import SelectLanguage from "@/components/core/layouts/MainLayout/SelectLanguage";
@@ -42,7 +41,7 @@ function SignInModule() {
     };
   }, []);
   const params = useParams();
-  const locale = useLocale();
+  const locale = params?.locale as string;
   const [form] = Form.useForm<FieldType>();
 
   const { t } = useTranslation(params?.locale as string, "signIn");

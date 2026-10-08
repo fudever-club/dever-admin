@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useTransition } from "react";
 import { useRouter } from "next-nprogress-bar";
 import { useParams, usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
 
 import { getLocalizedPath } from "@/utils/getPathname";
 import { useTranslation } from "@/app/i18n/client";
@@ -20,8 +19,8 @@ type MenuItem = Required<MenuProps>["items"][number];
 function SelectLanguage() {
   const router = useRouter();
   const pathname = usePathname();
-  const localActive = useLocale();
   const params = useParams();
+  const localActive = params?.locale as string;
   const [_, startTransition] = useTransition();
 
   const { t } = useTranslation(params?.locale as string, "layout");

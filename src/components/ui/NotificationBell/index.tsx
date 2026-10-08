@@ -27,8 +27,7 @@ import {
   RobotOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
 import {
   useGetMyNotificationsQuery,
   useMarkNotificationAsReadMutation,
@@ -42,7 +41,7 @@ const { Text } = Typography;
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("all");
-  const locale = useLocale();
+  const locale = useParams()?.locale as string;
   const router = useRouter();
 
   const {

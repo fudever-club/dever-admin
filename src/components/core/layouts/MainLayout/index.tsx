@@ -6,7 +6,6 @@ import { MenuFoldOutlined, MenuUnfoldOutlined, CloseOutlined } from "@ant-design
 import { Flex, Layout, Menu, Popover, message } from "antd";
 import { useParams, usePathname } from "next/navigation";
 import { AppProgressBar, useRouter } from "next-nprogress-bar";
-import { useLocale } from "next-intl";
 
 import DropdownMenu from "./DropdownMenu";
 import SelectLanguage from "./SelectLanguage";
@@ -46,7 +45,7 @@ const MainLayout = ({
   const safeHeaderAvatar = !headerAvatarError && userInfo?.avatar
     ? userInfo.avatar
     : "/images/avatar/avatar.jpg";
-  const localActive = useLocale();
+  const localActive = params?.locale as string;
   const pathname = usePathname();
 
   const { t } = useTranslation(params?.locale as string, "layout");

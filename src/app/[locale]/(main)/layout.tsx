@@ -1,4 +1,3 @@
-import { getCookie } from "cookies-next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -14,7 +13,8 @@ export default async function RootMainLayout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
-  const token = getCookie(constants.ACCESS_TOKEN, { cookies });
+  // Awaited for Next 15+ async cookies(); resolves immediately on Next 14.
+  const token = (await cookies()).get(constants.ACCESS_TOKEN)?.value;
 
   if (!token) {
     redirect(`/${locale}/sign-in`);

@@ -3,7 +3,6 @@ import { Avatar, Flex, message } from "antd";
 import { GlobalOutlined, UserOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useLocale } from "next-intl";
 import { useRouter } from "next-nprogress-bar";
 
 import Divider from "@/components/core/common/Divider";
@@ -19,7 +18,7 @@ function DropdownMenu() {
   const params = useParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const locale = useLocale();
+  const locale = params?.locale as string;
   const userInfo = useAppSelector((state) => state.auth.userInfo);
   const [avatarError, setAvatarError] = useState(false);
 

@@ -27,7 +27,7 @@ import {
   SearchOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import { useLocale } from "next-intl";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslation } from "@/app/i18n/client";
 import {
@@ -61,7 +61,7 @@ function getQueueMentorName(item: MentorshipRequestItem): string {
 
 export default function MentorshipManagement() {
   const { message } = App.useApp();
-  const locale = useLocale();
+  const locale = useParams()?.locale as string;
   const { t } = useTranslation(locale, "mentorshipManagement");
   const statusTag: Record<MentorshipRequestStatus, { color: string; label: string }> = {
     pending: { color: "gold", label: t("status.pending", "Chờ duyệt") },
