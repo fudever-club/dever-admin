@@ -11,7 +11,6 @@ import {
   Upload,
   message,
 } from "antd";
-import _ from "lodash";
 import {
   useDeleteProjectMutation,
   useEditProjectMutation,

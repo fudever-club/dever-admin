@@ -30,7 +30,7 @@ import {
   RollbackOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import _ from "lodash";
+import debounce from "lodash/debounce";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/app/i18n/client";
@@ -750,26 +750,26 @@ function UsersManagementModule() {
     router.push(createQueryString("limit", `${pageSize}`, { page: "1" }));
   };
 
-  const handleSearch = _.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     router.push(createQueryString("search", `${e?.target?.value}`));
   }, 300);
 
-  const handleFilterPosition = _.debounce((e: string) => {
+  const handleFilterPosition = debounce((e: string) => {
     router.push(createQueryString("positionId", `${e ?? ""}`));
   }, 300);
 
-  const handleFilterMajor = _.debounce((e: string) => {
+  const handleFilterMajor = debounce((e: string) => {
     router.push(createQueryString("majorId", `${e ?? ""}`));
   }, 300);
-  const handleFilterK = _.debounce((e: string) => {
+  const handleFilterK = debounce((e: string) => {
     router.push(createQueryString("kGeneration", `${e ?? ""}`));
   }, 300);
 
-  const handleFilterDepartment = _.debounce((e) => {
+  const handleFilterDepartment = debounce((e) => {
     router.push(createQueryString("departments", `${e ?? ""}`));
   }, 300);
 
-  const handleFilterLeader = _.debounce((e: string) => {
+  const handleFilterLeader = debounce((e: string) => {
     router.push(createQueryString("isLeader", `${e ?? ""}`));
   }, 300);
 

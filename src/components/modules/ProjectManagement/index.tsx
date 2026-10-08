@@ -18,7 +18,6 @@ import {
   EyeOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
-import _ from "lodash";
 import { useRouter } from "next-nprogress-bar";
 
 import { useTranslation } from "@/app/i18n/client";

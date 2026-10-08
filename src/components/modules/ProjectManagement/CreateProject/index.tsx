@@ -1,7 +1,6 @@
 "use client";
 
 import { Form, Input, Typography, Upload, message } from "antd";
-import _ from "lodash";
 import { UploadOutlined, LinkOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useRouter } from "next-nprogress-bar";

@@ -15,7 +15,6 @@ import {
 } from "antd";
 import { useParams } from "next/navigation";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import _ from "lodash";
 import { useState } from "react";
 
 import { useTranslation } from "@/app/i18n/client";

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Col, Flex, Image, Row, Typography, Upload, message, Space } from "antd";
 import { useParams } from "next/navigation";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import _ from "lodash";
 import axios from "axios";
 
 import {

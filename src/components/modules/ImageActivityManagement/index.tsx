@@ -17,7 +17,6 @@ import {
   PlusOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import _ from "lodash";
 import axios from "axios";
 
 import { useTranslation } from "@/app/i18n/client";
